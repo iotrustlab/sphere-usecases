@@ -1,0 +1,17 @@
+Tag,Address,Type,Units,Range,SafetyNotes
+RawWaterPump,DI_01,Digital Input,Boolean,0-1,High priority - controls raw water intake
+ChemicalPump,DI_02,Digital Input,Boolean,0-1,Chemical dosing control - monitor for overdose
+TreatedWaterPump,DI_03,Digital Input,Boolean,0-1,Distribution pump control
+EmergencyStop,DI_04,Digital Input,Boolean,0-1,CRITICAL - Emergency shutdown input
+HighLevelAlarm,DI_05,Digital Input,Boolean,0-1,Safety alarm - tank overflow protection
+LowLevelAlarm,DI_06,Digital Input,Boolean,0-1,Safety alarm - tank underflow protection
+PressureAlarm,DI_07,Digital Input,Boolean,0-1,Safety alarm - system pressure monitoring
+ManualMode,DI_08,Digital Input,Boolean,0-1,Manual override mode selection
+Pump1Status,DO_01,Digital Output,Boolean,0-1,Pump 1 status indicator
+Pump2Status,DO_02,Digital Output,Boolean,0-1,Pump 2 status indicator
+Valve1Status,DO_03,Digital Output,Boolean,0-1,Valve 1 position indicator
+AlarmLight,DO_04,Digital Output,Boolean,0-1,System alarm indicator
+pH_Value,AI_01,Analog Input,pH,0-14,CRITICAL - pH measurement for chemical dosing
+FlowRate,AI_02,Analog Input,GPM,0-100,Flow rate monitoring for process control
+ChemicalDose1,AO_01,Analog Output,%,0-100,Chemical dosing pump 1 speed control
+ChemicalDose2,AO_02,Analog Output,%,0-100,Chemical dosing pump 2 speed control
