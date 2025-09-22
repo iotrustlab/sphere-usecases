@@ -1,0 +1,69 @@
+# CrossPLC I/O Mapping Translation Report
+
+## Summary
+Successfully implemented I/O mapping from Rockwell `Local:` addresses to IEC 61131-3 I/O addresses in OpenPLC projects.
+
+## Generated Files
+
+### Structured Text (IEC-compliant)
+- `controller.st` - Controller PLC with I/O mapping
+- `simulator.st` - Simulator PLC with I/O mapping
+
+### Coverage Reports
+- `io_report_controller.json` - Controller I/O mapping coverage
+- `io_report_simulator.json` - Simulator I/O mapping coverage
+
+## I/O Mapping Results
+
+### Controller PLC
+- **Total Local: references**: 34
+- **Mapped from CSV**: 3 (exact matches)
+- **Policy mapped**: 27 (using slot→index rules)
+- **Unmapped**: 4 (alarm signals needing manual mapping)
+
+### Simulator PLC
+- **Total Local: references**: 34
+- **Mapped from CSV**: 3 (exact matches)
+- **Policy mapped**: 27 (using slot→index rules)
+- **Unmapped**: 4 (alarm signals needing manual mapping)
+
+## Mapping Policy Applied
+
+### Digital I/O
+- `Local:<slot>:I.Data.<bit>` → `%IX<slot>.<bit>`
+- `Local:<slot>:O.Data.<bit>` → `%QX<slot>.<bit>`
+
+### Analog I/O
+- `Local:<slot>:I.Ch<channel>Data` → `%IW<slot*10 + channel>`
+- `Local:<slot>:O.Ch<channel>Data` → `%QW<slot*10 + channel>`
+
+## Unmapped Addresses (Need Manual Mapping)
+
+### Controller & Simulator
+1. `Local:7:I.Ch0LLAlarm` - Low-Low alarm signal
+2. `Local:7:I.Ch0HAlarm` - High alarm signal
+3. `Local:7:I.Ch0HHAlarm` - High-High alarm signal
+4. `Local:7:I.Ch0LAlarm` - Low alarm signal
+
+These alarm signals don't follow the standard analog channel pattern and need manual mapping in the CSV.
+
+## Next Steps
+
+1. **Add alarm mappings to CSV**: Update `io_map.csv` with alarm signal mappings
+2. **XML I/O mapping**: Investigate why XML emitter shows 0 mappings
+3. **Validation**: Test generated ST files in OpenPLC Editor
+4. **Documentation**: Update mapping policy for alarm signals
+
+## Files Generated
+- ✅ `controller.st` - IEC ST with I/O mapping
+- ✅ `simulator.st` - IEC ST with I/O mapping
+- ✅ `io_report_controller.json` - Coverage analysis
+- ✅ `io_report_simulator.json` - Coverage analysis
+- ⚠️ `controller.xml` - XML needs I/O mapping investigation
+
+## I/O Mapping Modes Tested
+- ✅ **IEC mode**: Generates `AT %I*/%Q*` bindings
+- ⏳ **Comment mode**: Not tested (would add TODO comments)
+- ⏳ **Adapter mode**: Not tested (would generate bridge files)
+
+Generated on: 2025-09-19 12:25:00

@@ -1,0 +1,252 @@
+{
+  "summary": {
+    "total_mapped": 3,
+    "total_policy_mapped": 31,
+    "total_unmapped": 0,
+    "total_references": 34
+  },
+  "mapped": [
+    {
+      "variable_name": "di_2_2",
+      "iec_address": "%IX2.2",
+      "data_type": "BOOL",
+      "rockwell_original": "Local:2:I.Data.2",
+      "notes": "Level sensor low"
+    },
+    {
+      "variable_name": "di_2_1",
+      "iec_address": "%IX2.1",
+      "data_type": "BOOL",
+      "rockwell_original": "Local:2:I.Data.1",
+      "notes": "Level sensor high"
+    },
+    {
+      "variable_name": "ai_7_0",
+      "iec_address": "%IW70",
+      "data_type": "REAL",
+      "rockwell_original": "Local:7:I.Ch0Data",
+      "notes": "pH sensor raw 0..32767"
+    }
+  ],
+  "policy_mapped": [
+    {
+      "variable_name": "do_5_9",
+      "iec_address": "%QX5.9",
+      "data_type": "BOOL",
+      "rockwell_original": "Local:5:O.Data.9",
+      "notes": "Policy-based mapping"
+    },
+    {
+      "variable_name": "do_5_0",
+      "iec_address": "%QX5.0",
+      "data_type": "BOOL",
+      "rockwell_original": "Local:5:O.Data.0",
+      "notes": "Policy-based mapping"
+    },
+    {
+      "variable_name": "do_5_7",
+      "iec_address": "%QX5.7",
+      "data_type": "BOOL",
+      "rockwell_original": "Local:5:O.Data.7",
+      "notes": "Policy-based mapping"
+    },
+    {
+      "variable_name": "ai_7_4",
+      "iec_address": "%IW74",
+      "data_type": "REAL",
+      "rockwell_original": "Local:7:I.Ch4Data",
+      "notes": "Policy-based mapping"
+    },
+    {
+      "variable_name": "di_7_ch0halarm",
+      "iec_address": "%IX7.0",
+      "data_type": "BOOL",
+      "rockwell_original": "Local:7:I.Ch0HAlarm",
+      "notes": "Policy-based mapping"
+    },
+    {
+      "variable_name": "ai_7_2",
+      "iec_address": "%IW72",
+      "data_type": "REAL",
+      "rockwell_original": "Local:7:I.Ch2Data",
+      "notes": "Policy-based mapping"
+    },
+    {
+      "variable_name": "di_2_5",
+      "iec_address": "%IX2.5",
+      "data_type": "BOOL",
+      "rockwell_original": "Local:2:I.Data.5",
+      "notes": "Policy-based mapping"
+    },
+    {
+      "variable_name": "di_2_8",
+      "iec_address": "%IX2.8",
+      "data_type": "BOOL",
+      "rockwell_original": "Local:2:I.Data.8",
+      "notes": "Policy-based mapping"
+    },
+    {
+      "variable_name": "di_2_3",
+      "iec_address": "%IX2.3",
+      "data_type": "BOOL",
+      "rockwell_original": "Local:2:I.Data.3",
+      "notes": "Policy-based mapping"
+    },
+    {
+      "variable_name": "do_5_10",
+      "iec_address": "%QX5.10",
+      "data_type": "BOOL",
+      "rockwell_original": "Local:5:O.Data.10",
+      "notes": "Policy-based mapping"
+    },
+    {
+      "variable_name": "do_5_8",
+      "iec_address": "%QX5.8",
+      "data_type": "BOOL",
+      "rockwell_original": "Local:5:O.Data.8",
+      "notes": "Policy-based mapping"
+    },
+    {
+      "variable_name": "di_7_ch0lalarm",
+      "iec_address": "%IX7.0",
+      "data_type": "BOOL",
+      "rockwell_original": "Local:7:I.Ch0LAlarm",
+      "notes": "Policy-based mapping"
+    },
+    {
+      "variable_name": "ai_7_5",
+      "iec_address": "%IW75",
+      "data_type": "REAL",
+      "rockwell_original": "Local:7:I.Ch5Data",
+      "notes": "Policy-based mapping"
+    },
+    {
+      "variable_name": "di_2_0",
+      "iec_address": "%IX2.0",
+      "data_type": "BOOL",
+      "rockwell_original": "Local:2:I.Data.0",
+      "notes": "Policy-based mapping"
+    },
+    {
+      "variable_name": "do_5_4",
+      "iec_address": "%QX5.4",
+      "data_type": "BOOL",
+      "rockwell_original": "Local:5:O.Data.4",
+      "notes": "Policy-based mapping"
+    },
+    {
+      "variable_name": "di_7_ch0llalarm",
+      "iec_address": "%IX7.0",
+      "data_type": "BOOL",
+      "rockwell_original": "Local:7:I.Ch0LLAlarm",
+      "notes": "Policy-based mapping"
+    },
+    {
+      "variable_name": "di_2_11",
+      "iec_address": "%IX2.11",
+      "data_type": "BOOL",
+      "rockwell_original": "Local:2:I.Data.11",
+      "notes": "Policy-based mapping"
+    },
+    {
+      "variable_name": "di_7_ch0hhalarm",
+      "iec_address": "%IX7.0",
+      "data_type": "BOOL",
+      "rockwell_original": "Local:7:I.Ch0HHAlarm",
+      "notes": "Policy-based mapping"
+    },
+    {
+      "variable_name": "ao_10_0",
+      "iec_address": "%QW100",
+      "data_type": "REAL",
+      "rockwell_original": "Local:10:O.Ch0Data",
+      "notes": "Policy-based mapping"
+    },
+    {
+      "variable_name": "di_2_6",
+      "iec_address": "%IX2.6",
+      "data_type": "BOOL",
+      "rockwell_original": "Local:2:I.Data.6",
+      "notes": "Policy-based mapping"
+    },
+    {
+      "variable_name": "do_5_11",
+      "iec_address": "%QX5.11",
+      "data_type": "BOOL",
+      "rockwell_original": "Local:5:O.Data.11",
+      "notes": "Policy-based mapping"
+    },
+    {
+      "variable_name": "do_5_5",
+      "iec_address": "%QX5.5",
+      "data_type": "BOOL",
+      "rockwell_original": "Local:5:O.Data.5",
+      "notes": "Policy-based mapping"
+    },
+    {
+      "variable_name": "do_5_2",
+      "iec_address": "%QX5.2",
+      "data_type": "BOOL",
+      "rockwell_original": "Local:5:O.Data.2",
+      "notes": "Policy-based mapping"
+    },
+    {
+      "variable_name": "di_2_9",
+      "iec_address": "%IX2.9",
+      "data_type": "BOOL",
+      "rockwell_original": "Local:2:I.Data.9",
+      "notes": "Policy-based mapping"
+    },
+    {
+      "variable_name": "do_5_1",
+      "iec_address": "%QX5.1",
+      "data_type": "BOOL",
+      "rockwell_original": "Local:5:O.Data.1",
+      "notes": "Policy-based mapping"
+    },
+    {
+      "variable_name": "ai_7_1",
+      "iec_address": "%IW71",
+      "data_type": "REAL",
+      "rockwell_original": "Local:7:I.Ch1Data",
+      "notes": "Policy-based mapping"
+    },
+    {
+      "variable_name": "ai_7_3",
+      "iec_address": "%IW73",
+      "data_type": "REAL",
+      "rockwell_original": "Local:7:I.Ch3Data",
+      "notes": "Policy-based mapping"
+    },
+    {
+      "variable_name": "di_2_10",
+      "iec_address": "%IX2.10",
+      "data_type": "BOOL",
+      "rockwell_original": "Local:2:I.Data.10",
+      "notes": "Policy-based mapping"
+    },
+    {
+      "variable_name": "do_5_6",
+      "iec_address": "%QX5.6",
+      "data_type": "BOOL",
+      "rockwell_original": "Local:5:O.Data.6",
+      "notes": "Policy-based mapping"
+    },
+    {
+      "variable_name": "do_5_3",
+      "iec_address": "%QX5.3",
+      "data_type": "BOOL",
+      "rockwell_original": "Local:5:O.Data.3",
+      "notes": "Policy-based mapping"
+    },
+    {
+      "variable_name": "di_2_4",
+      "iec_address": "%IX2.4",
+      "data_type": "BOOL",
+      "rockwell_original": "Local:2:I.Data.4",
+      "notes": "Policy-based mapping"
+    }
+  ],
+  "unmapped": [],
+  "bridge_entries": []
+}

@@ -1,17 +1,15 @@
-Tag,Address,Type,Units,Range,SafetyNotes
-RawWaterPump,DI_01,Digital Input,Boolean,0-1,High priority - controls raw water intake
-ChemicalPump,DI_02,Digital Input,Boolean,0-1,Chemical dosing control - monitor for overdose
-TreatedWaterPump,DI_03,Digital Input,Boolean,0-1,Distribution pump control
-EmergencyStop,DI_04,Digital Input,Boolean,0-1,CRITICAL - Emergency shutdown input
-HighLevelAlarm,DI_05,Digital Input,Boolean,0-1,Safety alarm - tank overflow protection
-LowLevelAlarm,DI_06,Digital Input,Boolean,0-1,Safety alarm - tank underflow protection
-PressureAlarm,DI_07,Digital Input,Boolean,0-1,Safety alarm - system pressure monitoring
-ManualMode,DI_08,Digital Input,Boolean,0-1,Manual override mode selection
-Pump1Status,DO_01,Digital Output,Boolean,0-1,Pump 1 status indicator
-Pump2Status,DO_02,Digital Output,Boolean,0-1,Pump 2 status indicator
-Valve1Status,DO_03,Digital Output,Boolean,0-1,Valve 1 position indicator
-AlarmLight,DO_04,Digital Output,Boolean,0-1,System alarm indicator
-pH_Value,AI_01,Analog Input,pH,0-14,CRITICAL - pH measurement for chemical dosing
-FlowRate,AI_02,Analog Input,GPM,0-100,Flow rate monitoring for process control
-ChemicalDose1,AO_01,Analog Output,%,0-100,Chemical dosing pump 1 speed control
-ChemicalDose2,AO_02,Analog Output,%,0-100,Chemical dosing pump 2 speed control
+rockwell,iec,type,notes
+Local:1:I.Data.0,%IX1.0,BOOL,Emergency stop input
+Local:3:O.Data.5,%QX3.5,BOOL,Pump enable command
+Local:7:I.Ch0Data,%IW70,REAL,pH sensor raw 0..32767
+Local:7:O.Ch1Data,%QW71,REAL,Analog output to dosing valve
+Local:2:I.Data.1,%IX2.1,BOOL,Level sensor high
+Local:2:I.Data.2,%IX2.2,BOOL,Level sensor low
+Local:4:O.Data.0,%QX4.0,BOOL,Valve open command
+Local:4:O.Data.1,%QX4.1,BOOL,Valve close command
+Local:5:I.Ch0Data,%IW50,REAL,Temperature sensor raw
+Local:5:O.Ch0Data,%QW50,REAL,Temperature setpoint output
+Local:6:I.Data.0,%IX6.0,BOOL,Flow sensor status
+Local:6:O.Data.0,%QX6.0,BOOL,Flow control enable
+Local:8:I.Ch0Data,%IW80,REAL,Pressure sensor raw
+Local:8:O.Ch0Data,%QW80,REAL,Pressure setpoint output
