@@ -24,8 +24,9 @@ See [docs/process_overview.md](docs/process_overview.md) for detailed process de
 
 ### OpenPLC Implementation (Virtual)
 ```bash
-# Run local simulation (when available)
-./implementations/openplc/scripts/run_local.sh
+# Open OpenPLC Editor and load projects
+# Controller: implementations/openplc/projects/controller_project/
+# Simulator: implementations/openplc/projects/simulator_project/
 ```
 
 ## 📁 Structure
@@ -45,10 +46,11 @@ water-treatment/
 │   │   └── scripts/                   # Validation and deployment
 │   │       ├── validate.sh            # Validate L5X files
 │   │       └── deploy.sh              # Deploy to testbed
-│   └── openplc/                       # Virtual simulation (planned)
-│       ├── plc_st/                    # Structured Text programs
-│       ├── sim/                       # Python simulation models
-│       └── scripts/                   # Local execution scripts
+│   └── openplc/                       # Virtual simulation
+│       ├── projects/                  # OpenPLC Editor projects
+│       │   ├── controller_project/    # Main control program
+│       │   └── simulator_project/    # Simulation program
+│       └── scripts/                # Local execution scripts
 └── experiments/                       # Security research experiments
     ├── sensor_spoofing/               # Sensor manipulation attacks
     └── pump_override/                 # Direct pump control attacks
@@ -63,11 +65,14 @@ water-treatment/
 - **Validation**: XIR checks, tag schema validation
 - **Deployment**: Delegates to SPHERE enclave infrastructure
 
-### OpenPLC (Optional/Virtual)
+### OpenPLC (Virtual)
 - **Purpose**: Local development and simulation
-- **Files**: Structured Text programs, Python simulation models
-- **Status**: 🔄 Planned - Virtual implementation for local testing
-- **Execution**: Local simulation environment
+- **Files**: OpenPLC Editor projects (PLCopen XML format)
+- **Status**: ✅ Active - Ready for OpenPLC Editor
+- **Projects**: 
+  - `controller_project/` - Main control program
+  - `simulator_project/` - Simulation program
+- **Usage**: Open in OpenPLC Editor for local development and testing
 
 ## 🔬 Security Experiments
 

@@ -14,7 +14,7 @@ This repository contains **self-contained CPS use cases** for security research 
 
 | Use Case | Status | Rockwell | OpenPLC | Description |
 |----------|--------|----------|---------|-------------|
-| [**Water Treatment**](water-treatment/README.md) | ✅ Active | ✅ Testbed | 🔄 Planned | Multi-stage water purification with chemical dosing |
+| [**Water Treatment**](water-treatment/README.md) | ✅ Active | ✅ Testbed | ✅ Virtual | Multi-stage water purification with chemical dosing |
 | [**Oil & Gas Distribution**](oil-and-gas-distribution/README.md) | 🔄 Planned | 🔄 Planned | 🔄 Planned | Pipeline distribution with pressure control |
 
 ## 🚀 Getting Started
