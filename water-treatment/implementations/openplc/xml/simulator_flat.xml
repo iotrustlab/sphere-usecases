@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <project xmlns:ns1="http://www.plcopen.org/xml/tc6_0201" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.plcopen.org/xml/tc6_0201">
-  <fileHeader companyName="Sphere_UseCases" productName="Controller_Project" productVersion="1.0" creationDateTime="2025-09-25T18:30:15" />
-  <contentHeader name="Controller_Project" modificationDateTime="2025-09-25T18:30:15">
+  <fileHeader companyName="CrossPLC" productName="CrossPLC_Project" productVersion="1.0" creationDateTime="2025-09-23T16:55:00" />
+  <contentHeader name="CrossPLC_Project" modificationDateTime="2025-09-23T16:55:00">
     <coordinateInfo>
       <fbd>
         <scaling x="10" y="10" />
@@ -331,32 +331,232 @@
           <inputVars>
             <variable name="Alarms">
               <type>
-                <derived name="RW_tank_AL_UDT" />
-              </type>
-            </variable>
-            <variable name="GSV_Message">
-              <type>
-                <derived name="SYS_MESSAGES" />
-              </type>
-            </variable>
-            <variable name="P1">
-              <type>
-                <derived name="P1_UDT" />
+                <derived name="RW_TANK_AL_UDT" />
               </type>
             </variable>
             <variable name="P1_SYS">
               <type>
-                <derived name="System_State_UDT" />
+                <derived name="SYSTEM_STATE_UDT" />
               </type>
             </variable>
-            <variable name="P2">
+            <variable name="dbg_GSV_Message_ProgramScanTime">
               <type>
-                <derived name="P2_UDT" />
+                <DINT />
               </type>
             </variable>
-            <variable name="P3">
+            <variable name="dbg_GSV_Message_AvailableMemory">
               <type>
-                <derived name="P3_UDT" />
+                <REAL />
+              </type>
+            </variable>
+            <variable name="dbg_GSV_Message_ControllerStatus">
+              <type>
+                <SINT />
+              </type>
+            </variable>
+            <variable name="dbg_GSV_Message_ScanTime">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="dbg_HMI_ZZZZZZZZZZUDT0">
+              <type>
+                <SINT />
+              </type>
+            </variable>
+            <variable name="dbg_HMI_Start_PB">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="dbg_HMI_Stop_PB">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="dbg_HMI_Start_Active">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="dbg_HMI_Stop_Active">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="dbg_P1_RW_Tank_tnk_lvl">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="dbg_P1_RW_Pump_flow">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="dbg_P1_ZZZZZZZZZZP1_UDT2">
+              <type>
+                <SINT />
+              </type>
+            </variable>
+            <variable name="dbg_P1_RW_Tank_PR_Valve_sts">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="dbg_P1_RW_Tank_P6B_Valve_sts">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="dbg_P1_RW_Tank_P_Valve_sts">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="dbg_P1_RW_Pump_sts">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="dbg_P1_RW_Pump_fault">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="dbg_P1_RW_Pump">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="dbg_P1_ZZZZZZZZZZP1_UDT9">
+              <type>
+                <SINT />
+              </type>
+            </variable>
+            <variable name="dbg_P1_RW_Tank_PR_Valve">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="dbg_P1_RW_Tank_P_Valve">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="dbg_P1_RW_Pump_start">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="dbg_P1_RW_Pump_stop">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="dbg_P1_RW_Tank_P6B_Valve">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="dbg_P2_ChemTreat_NaCl_Tank_tnk_lvl">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="dbg_P2_ChemTreat_NaOCl_Tank_tnk_lvl">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="dbg_P2_ChemTreat_HCl_Tank_tnk_lvl">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="dbg_P2_ZZZZZZZZZZP2_UDT3">
+              <type>
+                <SINT />
+              </type>
+            </variable>
+            <variable name="dbg_P2_ChemTreat_NaCl_Tank_Valve_sts">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="dbg_P2_ChemTreat_NaOCl_Tank_Valve_sts">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="dbg_P2_ChemTreat_HCl_Tank_Valve_sts">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="dbg_P2_ChemTreat_NaCl_Tank_Valve">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="dbg_P2_ChemTreat_NaOCl_Tank_Valve">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="dbg_P2_ChemTreat_HCl_Tank_Valve">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="dbg_P3_Ultrafiltration_UFFT_Tank_tnk_lvl">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="dbg_P3_ZZZZZZZZZZP3_UDT1">
+              <type>
+                <SINT />
+              </type>
+            </variable>
+            <variable name="dbg_P3_Ultrafiltration_UFFT_Tank_Valve_sts">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="dbg_P3_Ultrafiltration_UF_Drain_Valve_sts">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="dbg_P3_Ultrafiltration_UF_ROFT_Valve_sts">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="dbg_P3_Ultrafiltration_UF_BWP_Valve_sts">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="dbg_P3_Ultrafiltration_UFFT_Tank_Valve">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="dbg_P3_Ultrafiltration_UF_Drain_Valve">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="dbg_P3_Ultrafiltration_UF_ROFT_Valve">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="dbg_P3_Ultrafiltration_UF_BWP_Valve">
+              <type>
+                <BOOL />
               </type>
             </variable>
             <variable name="di_2_0" address="%IX2.0">
@@ -466,11 +666,6 @@
             </variable>
           </inputVars>
           <outputVars>
-            <variable name="HMI">
-              <type>
-                <derived name="HMI_UDT" />
-              </type>
-            </variable>
             <variable name="ao_10_0" address="%QW100">
               <type>
                 <REAL />
@@ -592,44 +787,34 @@ P3.Ultrafiltration_UF_ROFT_Valve := do_5_10;
 P3.Ultrafiltration_UF_BWP_Valve := do_5_11;
 
 (* Raw_water_control *)
-if P1.RW_Tank_tnk_lvl = 250.0 and P1_SYS.RUNNING then
 P1.RW_Pump_stop := True;
 P1.RW_Pump_start := False; (* send the outputs *)
 Alarms.LL_alarm := True;
 (* if the level is at 500 or lower than 500 open the valve *)
-elsif P1.RW_Tank_tnk_lvl &lt;= 500.0 and P1_SYS.RUNNING then
 (* output to turn the valve open *)
 P1.RW_Tank_PR_Valve := True;
 Alarms.L_alarm := True;
 (* if level is at 800 *)
-elsif  P1.RW_Tank_tnk_lvl = 800.0 and P1_SYS.RUNNING then
 P1.RW_Tank_PR_Valve := False; (* close the valve *)
 Alarms.H_alarm := True;
-elsif P1.RW_Tank_tnk_lvl = 1200.0 and P1_SYS.RUNNING then
 Alarms.HH_alarm := True; (* if the tank is higher than or equal to 1200 set the high high alarm *)
-end_if;
 
 (* Raw_water_pump *)
-if P3.Ultrafiltration_UFFT_Tank_tnk_lvl = 800.0 AND P1_SYS.RUNNING then
 (* start the pump and open the valve from the other tank *)
 P1.RW_Tank_P_Valve := True;
 P1.RW_Pump_start := True;
 P1.RW_Pump_stop := False;
-elsif P3.Ultrafiltration_UFFT_Tank_tnk_lvl = 1000.0 AND P1_SYS.RUNNING then
 (* stop the pump and close the valve *)
 P1.RW_Tank_P_Valve := False;
 P1.RW_Pump_stop := True;
 P1.RW_Pump_start := False;
-end_if;
 
 (* State_change *)
-if not HMI.Start_Active AND not HMI.Stop_Active then
 (* if start and stop is not pressed go to idle *)
 P1_SYS.IDLE := True;
 P1_SYS.START := False;
 P1_SYS.RUNNING := False;
 P1_SYS.SHUTDOWN := False;
-elsif  HMI.Start_Active AND not HMI.Stop_Active then
 (* if the start pb and stop is not pressed then change the state of process one to starting *)
 P1_SYS.IDLE := False;
 P1_SYS.START := True;
@@ -638,13 +823,11 @@ P1_SYS.SHUTDOWN := False;
 (* if the tank level is greater than 250 at the start and UFFT is less than a 1000 we can start *)
 (* then and all permissves cond together into one tag so we know the plant is ready to start *)
 P1_SYS.Permissives_Ready := P1_SYS.Permissives[0] AND P1_SYS.Permissives[1];
-elsif HMI.Start_Active AND P1_SYS.Permissives_Ready then
 (* if the start was pressed and permissives are ready start running Process one *)
 P1_SYS.IDLE := False;
 P1_SYS.START := False;
 P1_SYS.RUNNING := True;
 P1_SYS.SHUTDOWN := False;
-elsif HMI.Stop_Active then
 (* if the stop button is pressed then go to shutdown state *)
 P1_SYS.IDLE := False;
 P1_SYS.START := False;
@@ -652,7 +835,6 @@ P1_SYS.RUNNING := False;
 P1_SYS.SHUTDOWN := True;
 (* set all permissives to false *)
 P1_SYS.Permissives_Ready := False;
-end_if;
 </xhtml:p>
           </ST>
         </body>

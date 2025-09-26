@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <project xmlns:ns1="http://www.plcopen.org/xml/tc6_0201" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.plcopen.org/xml/tc6_0201">
-  <fileHeader companyName="CrossPLC" productName="CrossPLC_Project" productVersion="1.0" creationDateTime="2025-09-22T13:02:06" />
-  <contentHeader name="CrossPLC_Project" modificationDateTime="2025-09-22T13:02:06">
+  <fileHeader companyName="Sphere_UseCases" productName="Simulator_Project" productVersion="1.0" creationDateTime="2025-09-25T18:30:20" />
+  <contentHeader name="Simulator_Project" modificationDateTime="2025-09-25T18:30:20">
     <coordinateInfo>
       <fbd>
         <scaling x="10" y="10" />
@@ -331,7 +331,7 @@
           <inputVars>
             <variable name="Alarms">
               <type>
-                <derived name="RW_TANK_AL_UDT" />
+                <derived name="RW_tank_AL_UDT" />
               </type>
             </variable>
             <variable name="GSV_Message">
@@ -351,7 +351,7 @@
             </variable>
             <variable name="P1_SYS">
               <type>
-                <derived name="SYSTEM_STATE_UDT" />
+                <derived name="System_State_UDT" />
               </type>
             </variable>
             <variable name="P2">
@@ -592,34 +592,44 @@ P3.Ultrafiltration_UF_ROFT_Valve := do_5_10;
 P3.Ultrafiltration_UF_BWP_Valve := do_5_11;
 
 (* Raw_water_control *)
+if P1.RW_Tank_tnk_lvl = 250.0 and P1_SYS.RUNNING then
 P1.RW_Pump_stop := True;
 P1.RW_Pump_start := False; (* send the outputs *)
 Alarms.LL_alarm := True;
 (* if the level is at 500 or lower than 500 open the valve *)
+elsif P1.RW_Tank_tnk_lvl &lt;= 500.0 and P1_SYS.RUNNING then
 (* output to turn the valve open *)
 P1.RW_Tank_PR_Valve := True;
 Alarms.L_alarm := True;
 (* if level is at 800 *)
+elsif  P1.RW_Tank_tnk_lvl = 800.0 and P1_SYS.RUNNING then
 P1.RW_Tank_PR_Valve := False; (* close the valve *)
 Alarms.H_alarm := True;
+elsif P1.RW_Tank_tnk_lvl = 1200.0 and P1_SYS.RUNNING then
 Alarms.HH_alarm := True; (* if the tank is higher than or equal to 1200 set the high high alarm *)
+end_if;
 
 (* Raw_water_pump *)
+if P3.Ultrafiltration_UFFT_Tank_tnk_lvl = 800.0 AND P1_SYS.RUNNING then
 (* start the pump and open the valve from the other tank *)
 P1.RW_Tank_P_Valve := True;
 P1.RW_Pump_start := True;
 P1.RW_Pump_stop := False;
+elsif P3.Ultrafiltration_UFFT_Tank_tnk_lvl = 1000.0 AND P1_SYS.RUNNING then
 (* stop the pump and close the valve *)
 P1.RW_Tank_P_Valve := False;
 P1.RW_Pump_stop := True;
 P1.RW_Pump_start := False;
+end_if;
 
 (* State_change *)
+if not HMI.Start_Active AND not HMI.Stop_Active then
 (* if start and stop is not pressed go to idle *)
 P1_SYS.IDLE := True;
 P1_SYS.START := False;
 P1_SYS.RUNNING := False;
 P1_SYS.SHUTDOWN := False;
+elsif  HMI.Start_Active AND not HMI.Stop_Active then
 (* if the start pb and stop is not pressed then change the state of process one to starting *)
 P1_SYS.IDLE := False;
 P1_SYS.START := True;
@@ -628,11 +638,13 @@ P1_SYS.SHUTDOWN := False;
 (* if the tank level is greater than 250 at the start and UFFT is less than a 1000 we can start *)
 (* then and all permissves cond together into one tag so we know the plant is ready to start *)
 P1_SYS.Permissives_Ready := P1_SYS.Permissives[0] AND P1_SYS.Permissives[1];
+elsif HMI.Start_Active AND P1_SYS.Permissives_Ready then
 (* if the start was pressed and permissives are ready start running Process one *)
 P1_SYS.IDLE := False;
 P1_SYS.START := False;
 P1_SYS.RUNNING := True;
 P1_SYS.SHUTDOWN := False;
+elsif HMI.Stop_Active then
 (* if the stop button is pressed then go to shutdown state *)
 P1_SYS.IDLE := False;
 P1_SYS.START := False;
@@ -640,6 +652,7 @@ P1_SYS.RUNNING := False;
 P1_SYS.SHUTDOWN := True;
 (* set all permissives to false *)
 P1_SYS.Permissives_Ready := False;
+end_if;
 </xhtml:p>
           </ST>
         </body>
@@ -654,7 +667,7 @@ P1_SYS.Permissives_Ready := False;
           <pouInstance name="MainProgram_instance" typeName="MainProgram" />
         </resource>
         <globalVars>
-          <variable name="ao_10_0">
+          <variable name="ao_10_0" address="%QW100">
             <type>
               <REAL />
             </type>
@@ -662,7 +675,7 @@ P1_SYS.Permissives_Ready := False;
               <xhtml:p>Rockwell: Local:10:O.Ch0Data</xhtml:p>
             </documentation>
           </variable>
-          <variable name="di_2_0">
+          <variable name="di_2_0" address="%IX2.0">
             <type>
               <BOOL />
             </type>
@@ -670,7 +683,7 @@ P1_SYS.Permissives_Ready := False;
               <xhtml:p>Rockwell: Local:2:I.Data.0</xhtml:p>
             </documentation>
           </variable>
-          <variable name="di_2_1">
+          <variable name="di_2_1" address="%IX2.1">
             <type>
               <BOOL />
             </type>
@@ -678,7 +691,7 @@ P1_SYS.Permissives_Ready := False;
               <xhtml:p>Rockwell: Local:2:I.Data.1</xhtml:p>
             </documentation>
           </variable>
-          <variable name="di_2_10">
+          <variable name="di_2_10" address="%IX2.10">
             <type>
               <BOOL />
             </type>
@@ -686,7 +699,7 @@ P1_SYS.Permissives_Ready := False;
               <xhtml:p>Rockwell: Local:2:I.Data.10</xhtml:p>
             </documentation>
           </variable>
-          <variable name="di_2_11">
+          <variable name="di_2_11" address="%IX2.11">
             <type>
               <BOOL />
             </type>
@@ -694,7 +707,7 @@ P1_SYS.Permissives_Ready := False;
               <xhtml:p>Rockwell: Local:2:I.Data.11</xhtml:p>
             </documentation>
           </variable>
-          <variable name="di_2_2">
+          <variable name="di_2_2" address="%IX2.2">
             <type>
               <BOOL />
             </type>
@@ -702,7 +715,7 @@ P1_SYS.Permissives_Ready := False;
               <xhtml:p>Rockwell: Local:2:I.Data.2</xhtml:p>
             </documentation>
           </variable>
-          <variable name="di_2_3">
+          <variable name="di_2_3" address="%IX2.3">
             <type>
               <BOOL />
             </type>
@@ -710,7 +723,7 @@ P1_SYS.Permissives_Ready := False;
               <xhtml:p>Rockwell: Local:2:I.Data.3</xhtml:p>
             </documentation>
           </variable>
-          <variable name="di_2_4">
+          <variable name="di_2_4" address="%IX2.4">
             <type>
               <BOOL />
             </type>
@@ -718,7 +731,7 @@ P1_SYS.Permissives_Ready := False;
               <xhtml:p>Rockwell: Local:2:I.Data.4</xhtml:p>
             </documentation>
           </variable>
-          <variable name="di_2_5">
+          <variable name="di_2_5" address="%IX2.5">
             <type>
               <BOOL />
             </type>
@@ -726,7 +739,7 @@ P1_SYS.Permissives_Ready := False;
               <xhtml:p>Rockwell: Local:2:I.Data.5</xhtml:p>
             </documentation>
           </variable>
-          <variable name="di_2_6">
+          <variable name="di_2_6" address="%IX2.6">
             <type>
               <BOOL />
             </type>
@@ -734,7 +747,7 @@ P1_SYS.Permissives_Ready := False;
               <xhtml:p>Rockwell: Local:2:I.Data.6</xhtml:p>
             </documentation>
           </variable>
-          <variable name="di_2_8">
+          <variable name="di_2_8" address="%IX2.8">
             <type>
               <BOOL />
             </type>
@@ -742,7 +755,7 @@ P1_SYS.Permissives_Ready := False;
               <xhtml:p>Rockwell: Local:2:I.Data.8</xhtml:p>
             </documentation>
           </variable>
-          <variable name="di_2_9">
+          <variable name="di_2_9" address="%IX2.9">
             <type>
               <BOOL />
             </type>
@@ -750,7 +763,7 @@ P1_SYS.Permissives_Ready := False;
               <xhtml:p>Rockwell: Local:2:I.Data.9</xhtml:p>
             </documentation>
           </variable>
-          <variable name="do_5_0">
+          <variable name="do_5_0" address="%QX5.0">
             <type>
               <BOOL />
             </type>
@@ -758,7 +771,7 @@ P1_SYS.Permissives_Ready := False;
               <xhtml:p>Rockwell: Local:5:O.Data.0</xhtml:p>
             </documentation>
           </variable>
-          <variable name="do_5_1">
+          <variable name="do_5_1" address="%QX5.1">
             <type>
               <BOOL />
             </type>
@@ -766,7 +779,7 @@ P1_SYS.Permissives_Ready := False;
               <xhtml:p>Rockwell: Local:5:O.Data.1</xhtml:p>
             </documentation>
           </variable>
-          <variable name="do_5_10">
+          <variable name="do_5_10" address="%QX5.10">
             <type>
               <BOOL />
             </type>
@@ -774,7 +787,7 @@ P1_SYS.Permissives_Ready := False;
               <xhtml:p>Rockwell: Local:5:O.Data.10</xhtml:p>
             </documentation>
           </variable>
-          <variable name="do_5_11">
+          <variable name="do_5_11" address="%QX5.11">
             <type>
               <BOOL />
             </type>
@@ -782,7 +795,7 @@ P1_SYS.Permissives_Ready := False;
               <xhtml:p>Rockwell: Local:5:O.Data.11</xhtml:p>
             </documentation>
           </variable>
-          <variable name="do_5_2">
+          <variable name="do_5_2" address="%QX5.2">
             <type>
               <BOOL />
             </type>
@@ -790,7 +803,7 @@ P1_SYS.Permissives_Ready := False;
               <xhtml:p>Rockwell: Local:5:O.Data.2</xhtml:p>
             </documentation>
           </variable>
-          <variable name="do_5_3">
+          <variable name="do_5_3" address="%QX5.3">
             <type>
               <BOOL />
             </type>
@@ -798,7 +811,7 @@ P1_SYS.Permissives_Ready := False;
               <xhtml:p>Rockwell: Local:5:O.Data.3</xhtml:p>
             </documentation>
           </variable>
-          <variable name="do_5_4">
+          <variable name="do_5_4" address="%QX5.4">
             <type>
               <BOOL />
             </type>
@@ -806,7 +819,7 @@ P1_SYS.Permissives_Ready := False;
               <xhtml:p>Rockwell: Local:5:O.Data.4</xhtml:p>
             </documentation>
           </variable>
-          <variable name="do_5_5">
+          <variable name="do_5_5" address="%QX5.5">
             <type>
               <BOOL />
             </type>
@@ -814,7 +827,7 @@ P1_SYS.Permissives_Ready := False;
               <xhtml:p>Rockwell: Local:5:O.Data.5</xhtml:p>
             </documentation>
           </variable>
-          <variable name="do_5_6">
+          <variable name="do_5_6" address="%QX5.6">
             <type>
               <BOOL />
             </type>
@@ -822,7 +835,7 @@ P1_SYS.Permissives_Ready := False;
               <xhtml:p>Rockwell: Local:5:O.Data.6</xhtml:p>
             </documentation>
           </variable>
-          <variable name="do_5_7">
+          <variable name="do_5_7" address="%QX5.7">
             <type>
               <BOOL />
             </type>
@@ -830,7 +843,7 @@ P1_SYS.Permissives_Ready := False;
               <xhtml:p>Rockwell: Local:5:O.Data.7</xhtml:p>
             </documentation>
           </variable>
-          <variable name="do_5_8">
+          <variable name="do_5_8" address="%QX5.8">
             <type>
               <BOOL />
             </type>
@@ -838,7 +851,7 @@ P1_SYS.Permissives_Ready := False;
               <xhtml:p>Rockwell: Local:5:O.Data.8</xhtml:p>
             </documentation>
           </variable>
-          <variable name="do_5_9">
+          <variable name="do_5_9" address="%QX5.9">
             <type>
               <BOOL />
             </type>
@@ -846,7 +859,7 @@ P1_SYS.Permissives_Ready := False;
               <xhtml:p>Rockwell: Local:5:O.Data.9</xhtml:p>
             </documentation>
           </variable>
-          <variable name="ai_7_0">
+          <variable name="ai_7_0" address="%IW70">
             <type>
               <REAL />
             </type>
@@ -854,7 +867,7 @@ P1_SYS.Permissives_Ready := False;
               <xhtml:p>Rockwell: Local:7:I.Ch0Data</xhtml:p>
             </documentation>
           </variable>
-          <variable name="di_7_ch0halarm">
+          <variable name="di_7_ch0halarm" address="%IX7.0">
             <type>
               <BOOL />
             </type>
@@ -862,7 +875,7 @@ P1_SYS.Permissives_Ready := False;
               <xhtml:p>Rockwell: Local:7:I.Ch0HAlarm</xhtml:p>
             </documentation>
           </variable>
-          <variable name="di_7_ch0hhalarm">
+          <variable name="di_7_ch0hhalarm" address="%IX7.0">
             <type>
               <BOOL />
             </type>
@@ -870,7 +883,7 @@ P1_SYS.Permissives_Ready := False;
               <xhtml:p>Rockwell: Local:7:I.Ch0HHAlarm</xhtml:p>
             </documentation>
           </variable>
-          <variable name="di_7_ch0lalarm">
+          <variable name="di_7_ch0lalarm" address="%IX7.0">
             <type>
               <BOOL />
             </type>
@@ -878,7 +891,7 @@ P1_SYS.Permissives_Ready := False;
               <xhtml:p>Rockwell: Local:7:I.Ch0LAlarm</xhtml:p>
             </documentation>
           </variable>
-          <variable name="di_7_ch0llalarm">
+          <variable name="di_7_ch0llalarm" address="%IX7.0">
             <type>
               <BOOL />
             </type>
@@ -886,7 +899,7 @@ P1_SYS.Permissives_Ready := False;
               <xhtml:p>Rockwell: Local:7:I.Ch0LLAlarm</xhtml:p>
             </documentation>
           </variable>
-          <variable name="ai_7_1">
+          <variable name="ai_7_1" address="%IW71">
             <type>
               <REAL />
             </type>
@@ -894,7 +907,7 @@ P1_SYS.Permissives_Ready := False;
               <xhtml:p>Rockwell: Local:7:I.Ch1Data</xhtml:p>
             </documentation>
           </variable>
-          <variable name="ai_7_2">
+          <variable name="ai_7_2" address="%IW72">
             <type>
               <REAL />
             </type>
@@ -902,7 +915,7 @@ P1_SYS.Permissives_Ready := False;
               <xhtml:p>Rockwell: Local:7:I.Ch2Data</xhtml:p>
             </documentation>
           </variable>
-          <variable name="ai_7_3">
+          <variable name="ai_7_3" address="%IW73">
             <type>
               <REAL />
             </type>
@@ -910,7 +923,7 @@ P1_SYS.Permissives_Ready := False;
               <xhtml:p>Rockwell: Local:7:I.Ch3Data</xhtml:p>
             </documentation>
           </variable>
-          <variable name="ai_7_4">
+          <variable name="ai_7_4" address="%IW74">
             <type>
               <REAL />
             </type>
@@ -918,7 +931,7 @@ P1_SYS.Permissives_Ready := False;
               <xhtml:p>Rockwell: Local:7:I.Ch4Data</xhtml:p>
             </documentation>
           </variable>
-          <variable name="ai_7_5">
+          <variable name="ai_7_5" address="%IW75">
             <type>
               <REAL />
             </type>
