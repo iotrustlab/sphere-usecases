@@ -2618,7 +2618,7 @@
 <Routine Name="Raw_water_control" Type="ST">
 <STContent>
 <Line Number="0">
-<![CDATA[if P1.RW_Tank_tnk_lvl = 250 and P1_SYS.RUNNING then]]>
+<![CDATA[if P1.RW_Tank_tnk_lvl = 250.0 and P1_SYS.RUNNING then]]>
 </Line>
 <Line Number="1">
 <![CDATA[	P1.RW_Pump_stop := True;]]>
@@ -2636,7 +2636,7 @@
 <![CDATA[// if the level is at 500 or lower than 500 open the valve ]]>
 </Line>
 <Line Number="6">
-<![CDATA[elsif P1.RW_Tank_tnk_lvl <= 500 and P1_SYS.RUNNING then]]>
+<![CDATA[elsif P1.RW_Tank_tnk_lvl <= 500.0 and P1_SYS.RUNNING then]]>
 </Line>
 <Line Number="7">
 <![CDATA[	//output to turn the valve open]]>
@@ -2654,7 +2654,7 @@
 <![CDATA[//if level is at 800]]>
 </Line>
 <Line Number="12">
-<![CDATA[elsif  P1.RW_Tank_tnk_lvl = 800 and P1_SYS.RUNNING then ]]>
+<![CDATA[elsif  P1.RW_Tank_tnk_lvl = 800.0 and P1_SYS.RUNNING then ]]>
 </Line>
 <Line Number="13">
 <![CDATA[	P1.RW_Tank_PR_Valve := False;//close the valve]]>
@@ -2666,7 +2666,7 @@
 <![CDATA[	]]>
 </Line>
 <Line Number="16">
-<![CDATA[elsif P1.RW_Tank_tnk_lvl = 1200 and P1_SYS.RUNNING then//if the level is at 1200]]>
+<![CDATA[elsif P1.RW_Tank_tnk_lvl = 1200.0 and P1_SYS.RUNNING then//if the level is at 1200]]>
 </Line>
 <Line Number="17">
 <![CDATA[	Alarms.HH_alarm := True;//if the tank is higher than or equal to 1200 set the high high alarm]]>
@@ -2682,7 +2682,7 @@
 <Routine Name="Raw_water_pump" Type="ST">
 <STContent>
 <Line Number="0">
-<![CDATA[if P3.Ultrafiltration_UFFT_Tank_tnk_lvl = 800 AND P1_SYS.RUNNING then]]>
+<![CDATA[if P3.Ultrafiltration_UFFT_Tank_tnk_lvl = 800.0 AND P1_SYS.RUNNING then]]>
 </Line>
 <Line Number="1">
 <![CDATA[		//start the pump and open the valve from the other tank]]>
@@ -2700,7 +2700,7 @@
 <![CDATA[		]]>
 </Line>
 <Line Number="6">
-<![CDATA[elsif P3.Ultrafiltration_UFFT_Tank_tnk_lvl = 1000 AND P1_SYS.RUNNING then]]>
+<![CDATA[elsif P3.Ultrafiltration_UFFT_Tank_tnk_lvl = 1000.0 AND P1_SYS.RUNNING then]]>
 </Line>
 <Line Number="7">
 <![CDATA[	//stop the pump and close the valve]]>
