@@ -1,0 +1,2 @@
+# Python dependencies for water treatment scenario scripts
+pymodbus>=3.0.0
