@@ -13,10 +13,28 @@ The scenario deploys two OpenPLC instances communicating via Modbus TCP:
 ### Prerequisites
 
 - Docker and Docker Compose
-- `cps-enclave` CLI from [cps-enclave-model](https://gitlab.com/mergetb/facilities/sphere/cyber-physical-systems/cps-enclave-model)
-- Python 3.8+ with pymodbus (for operator interface)
+- Ansible 2.10+ with community.docker collection
+- Python 3.8+ with pymodbus (for testing/operator interface)
 
-### Running the Scenario
+### Option 1: Ansible Deployment (Recommended)
+
+```bash
+cd ansible
+
+# Install Ansible dependencies
+ansible-galaxy collection install -r requirements.yml
+
+# Deploy the scenario locally
+ansible-playbook playbooks/deploy-local.yml
+
+# Test Modbus connectivity
+ansible-playbook playbooks/test-modbus.yml
+
+# Teardown when done
+ansible-playbook playbooks/teardown-local.yml
+```
+
+### Option 2: Docker Compose (via cps-enclave CLI)
 
 ```bash
 # Generate Docker Compose from scenario descriptor
@@ -28,16 +46,30 @@ docker-compose up -d
 # View logs
 docker-compose logs -f
 
-# Access OpenPLC web UIs
-# Controller: http://localhost:8080
-# Simulator: http://localhost:8081
-
-# Run operator interface (optional)
-pip install -r scripts/requirements.txt
-python scripts/operator.py
-
 # Stop the scenario
 docker-compose down
+```
+
+### Access Points
+
+After deployment:
+- **Controller WebUI**: http://localhost:8080
+- **Simulator WebUI**: http://localhost:8081
+- **Controller Modbus**: localhost:502
+- **Simulator Modbus**: localhost:503
+
+### Testing
+
+```bash
+# Run E2E tests
+pip install -r scripts/requirements.txt
+pytest tests/test_e2e.py -v
+
+# Or use Ansible Modbus test
+ansible-playbook ansible/playbooks/test-modbus.yml
+
+# Run operator interface
+python scripts/operator.py
 ```
 
 ### Validation
@@ -53,6 +85,17 @@ cps-enclave scenario validate scenario.yaml
 openplc/
 ├── scenario.yaml           # SPHERE scenario descriptor
 ├── README.md               # This file
+├── ansible/                # Ansible deployment
+│   ├── ansible.cfg         # Ansible configuration
+│   ├── requirements.yml    # Galaxy collection dependencies
+│   ├── inventory/
+│   │   └── local.yml       # Local deployment inventory
+│   ├── playbooks/
+│   │   ├── deploy-local.yml    # Deploy containers locally
+│   │   ├── teardown-local.yml  # Remove containers
+│   │   └── test-modbus.yml     # Test Modbus connectivity
+│   └── vars/
+│       └── openplc.yml     # Deployment variables
 ├── configs/
 │   └── modbus_map.yaml     # Modbus address definitions
 ├── docs/
@@ -72,6 +115,8 @@ openplc/
 ├── st/                     # Flat ST files (for reference)
 │   ├── controller_flat.st
 │   └── simulator_flat.st
+├── tests/
+│   └── test_e2e.py         # End-to-end pytest tests
 └── logs/                   # Runtime output (gitignored)
 ```
 

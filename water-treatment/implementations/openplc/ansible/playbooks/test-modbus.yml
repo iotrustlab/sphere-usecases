@@ -1,0 +1,131 @@
+---
+# Test Modbus connectivity between deployed PLCs
+#
+# Usage:
+#   ansible-playbook -i ../inventory/local.yml test-modbus.yml
+#
+# Prerequisites:
+#   - PLCs deployed via deploy-local.yml
+#   - Python pymodbus package installed
+
+- name: Test Modbus Communication
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - ../vars/openplc.yml
+
+  tasks:
+    - name: Check pymodbus is installed
+      ansible.builtin.command: python3 -c "import pymodbus; print(pymodbus.__version__)"
+      register: pymodbus_check
+      changed_when: false
+      failed_when: pymodbus_check.rc != 0
+
+    - name: Test Controller Modbus connection
+      ansible.builtin.shell: |
+        python3 << 'EOF'
+        from pymodbus.client import ModbusTcpClient
+
+        client = ModbusTcpClient('localhost', port={{ controller.modbus_port }}, timeout=5)
+        if not client.connect():
+            print("FAIL: Cannot connect to controller")
+            exit(1)
+
+        # Read first 10 coils
+        result = client.read_coils(0, 10)
+        if result.isError():
+            print(f"FAIL: Cannot read coils: {result}")
+            exit(1)
+
+        print(f"OK: Controller responding, coils[0:10] = {result.bits[:10]}")
+        client.close()
+        EOF
+      register: controller_test
+      changed_when: false
+
+    - name: Controller test result
+      ansible.builtin.debug:
+        msg: "{{ controller_test.stdout }}"
+
+    - name: Test Simulator Modbus connection
+      ansible.builtin.shell: |
+        python3 << 'EOF'
+        from pymodbus.client import ModbusTcpClient
+
+        client = ModbusTcpClient('localhost', port={{ simulator.modbus_port }}, timeout=5)
+        if not client.connect():
+            print("FAIL: Cannot connect to simulator")
+            exit(1)
+
+        # Read input registers (tank levels, etc.)
+        result = client.read_input_registers(70, 6)
+        if result.isError():
+            print(f"FAIL: Cannot read registers: {result}")
+            exit(1)
+
+        print(f"OK: Simulator responding, registers[70:76] = {result.registers}")
+        client.close()
+        EOF
+      register: simulator_test
+      changed_when: false
+
+    - name: Simulator test result
+      ansible.builtin.debug:
+        msg: "{{ simulator_test.stdout }}"
+
+    - name: Test inter-PLC communication
+      ansible.builtin.shell: |
+        python3 << 'EOF'
+        from pymodbus.client import ModbusTcpClient
+        import time
+
+        controller = ModbusTcpClient('localhost', port={{ controller.modbus_port }}, timeout=5)
+        simulator = ModbusTcpClient('localhost', port={{ simulator.modbus_port }}, timeout=5)
+
+        if not controller.connect() or not simulator.connect():
+            print("FAIL: Cannot connect to both PLCs")
+            exit(1)
+
+        # Write a test value to controller (start button)
+        result = controller.write_coil(0, True)
+        if result.isError():
+            print(f"FAIL: Cannot write to controller: {result}")
+            exit(1)
+
+        time.sleep(0.5)  # Wait for scan cycle
+
+        # Verify we can still read from both
+        ctrl_coils = controller.read_coils(0, 5)
+        sim_regs = simulator.read_input_registers(70, 3)
+
+        if ctrl_coils.isError() or sim_regs.isError():
+            print("FAIL: Post-write reads failed")
+            exit(1)
+
+        # Clean up test value
+        controller.write_coil(0, False)
+
+        print("OK: Inter-PLC communication verified")
+        print(f"    Controller coils: {ctrl_coils.bits[:5]}")
+        print(f"    Simulator regs: {sim_regs.registers}")
+
+        controller.close()
+        simulator.close()
+        EOF
+      register: interplc_test
+      changed_when: false
+
+    - name: Inter-PLC test result
+      ansible.builtin.debug:
+        msg: "{{ interplc_test.stdout_lines }}"
+
+    - name: Test summary
+      ansible.builtin.debug:
+        msg: |
+          ============================================
+          Modbus Communication Test Results
+          ============================================
+          Controller: {{ 'PASS' if controller_test.rc == 0 else 'FAIL' }}
+          Simulator:  {{ 'PASS' if simulator_test.rc == 0 else 'FAIL' }}
+          Inter-PLC:  {{ 'PASS' if interplc_test.rc == 0 else 'FAIL' }}
+          ============================================

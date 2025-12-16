@@ -1,0 +1,184 @@
+---
+# Phase 1: Local Docker deployment of OpenPLC scenario
+#
+# This playbook deploys controller and simulator OpenPLC containers
+# on the local machine for testing before SPHERE testbed deployment.
+#
+# Usage:
+#   ansible-playbook -i ../inventory/local.yml deploy-local.yml
+#
+# Prerequisites:
+#   - Docker installed and running
+#   - OpenPLC Dockerfile available in cps-enclave-model repo
+
+- name: Deploy OpenPLC Water Treatment Scenario (Local)
+  hosts: localhost
+  gather_facts: true
+  vars_files:
+    - ../vars/openplc.yml
+
+  tasks:
+    # =========================================================================
+    # Pre-flight checks
+    # =========================================================================
+    - name: Check Docker is available
+      ansible.builtin.command: docker version
+      register: docker_version
+      changed_when: false
+      failed_when: docker_version.rc != 0
+
+    - name: Display Docker version
+      ansible.builtin.debug:
+        msg: "Docker version: {{ docker_version.stdout_lines[0] }}"
+
+    # =========================================================================
+    # Build OpenPLC image
+    # =========================================================================
+    - name: Check if OpenPLC Dockerfile exists
+      ansible.builtin.stat:
+        path: "{{ openplc_dockerfile_path }}/Dockerfile"
+      register: dockerfile_stat
+
+    - name: Build OpenPLC Docker image
+      community.docker.docker_image:
+        name: "{{ openplc_image_name }}"
+        tag: "{{ openplc_image_tag }}"
+        source: build
+        build:
+          path: "{{ openplc_dockerfile_path }}"
+          args:
+            OPENPLC_VERSION: "{{ openplc_version }}"
+        state: present
+        force_source: false
+      when: dockerfile_stat.stat.exists
+      register: image_build
+
+    - name: Image build result
+      ansible.builtin.debug:
+        msg: "OpenPLC image built: {{ openplc_image_name }}:{{ openplc_image_tag }}"
+      when: image_build is changed
+
+    # =========================================================================
+    # Create Docker network
+    # =========================================================================
+    - name: Create Docker network for PLCs
+      community.docker.docker_network:
+        name: "{{ docker_network_name }}"
+        driver: bridge
+        ipam_config:
+          - subnet: "{{ docker_network_subnet }}"
+        state: present
+
+    # =========================================================================
+    # Deploy Controller PLC
+    # =========================================================================
+    - name: Deploy Controller PLC container
+      community.docker.docker_container:
+        name: "{{ controller.container_name }}"
+        image: "{{ openplc_image_name }}:{{ openplc_image_tag }}"
+        state: started
+        restart_policy: unless-stopped
+        networks:
+          - name: "{{ docker_network_name }}"
+            ipv4_address: "{{ controller.ip_address }}"
+        ports:
+          - "{{ controller.modbus_port }}:502"
+          - "{{ controller.webui_port }}:8080"
+        volumes:
+          - "{{ controller.project_path }}:/workdir/project:ro"
+        env:
+          OPENPLC_PROJECT: "/workdir/project/plc.xml"
+          OPENPLC_SCAN_CYCLE: "{{ controller.scan_cycle_ms }}"
+          OPENPLC_MODBUS_PORT: "502"
+        labels:
+          sphere.role: controller
+          sphere.scenario: water-treatment-p1
+      register: controller_container
+
+    - name: Display Controller container info
+      ansible.builtin.debug:
+        msg: |
+          Controller PLC deployed:
+            Container: {{ controller.container_name }}
+            IP: {{ controller.ip_address }}
+            Modbus: localhost:{{ controller.modbus_port }}
+            WebUI: http://localhost:{{ controller.webui_port }}
+
+    # =========================================================================
+    # Deploy Simulator PLC
+    # =========================================================================
+    - name: Deploy Simulator PLC container
+      community.docker.docker_container:
+        name: "{{ simulator.container_name }}"
+        image: "{{ openplc_image_name }}:{{ openplc_image_tag }}"
+        state: started
+        restart_policy: unless-stopped
+        networks:
+          - name: "{{ docker_network_name }}"
+            ipv4_address: "{{ simulator.ip_address }}"
+        ports:
+          - "{{ simulator.modbus_port }}:502"
+          - "{{ simulator.webui_port }}:8080"
+        volumes:
+          - "{{ simulator.project_path }}:/workdir/project:ro"
+        env:
+          OPENPLC_PROJECT: "/workdir/project/plc.xml"
+          OPENPLC_SCAN_CYCLE: "{{ simulator.scan_cycle_ms }}"
+          OPENPLC_MODBUS_PORT: "502"
+        labels:
+          sphere.role: simulator
+          sphere.scenario: water-treatment-p1
+      register: simulator_container
+
+    - name: Display Simulator container info
+      ansible.builtin.debug:
+        msg: |
+          Simulator PLC deployed:
+            Container: {{ simulator.container_name }}
+            IP: {{ simulator.ip_address }}
+            Modbus: localhost:{{ simulator.modbus_port }}
+            WebUI: http://localhost:{{ simulator.webui_port }}
+
+    # =========================================================================
+    # Health checks
+    # =========================================================================
+    - name: Wait for Controller Modbus port
+      ansible.builtin.wait_for:
+        host: localhost
+        port: "{{ controller.modbus_port }}"
+        timeout: 60
+        state: started
+      register: controller_health
+
+    - name: Wait for Simulator Modbus port
+      ansible.builtin.wait_for:
+        host: localhost
+        port: "{{ simulator.modbus_port }}"
+        timeout: 60
+        state: started
+      register: simulator_health
+
+    - name: Deployment summary
+      ansible.builtin.debug:
+        msg: |
+          ============================================
+          OpenPLC Scenario Deployed Successfully
+          ============================================
+
+          Controller PLC:
+            - Modbus TCP: localhost:{{ controller.modbus_port }}
+            - WebUI: http://localhost:{{ controller.webui_port }}
+            - Internal IP: {{ controller.ip_address }}
+
+          Simulator PLC:
+            - Modbus TCP: localhost:{{ simulator.modbus_port }}
+            - WebUI: http://localhost:{{ simulator.webui_port }}
+            - Internal IP: {{ simulator.ip_address }}
+
+          Docker Network: {{ docker_network_name }} ({{ docker_network_subnet }})
+
+          Next steps:
+            1. Open WebUI to verify PLC programs loaded
+            2. Run E2E tests: pytest ../tests/test_e2e.py -v
+            3. Start operator interface: python ../scripts/operator.py
+          ============================================

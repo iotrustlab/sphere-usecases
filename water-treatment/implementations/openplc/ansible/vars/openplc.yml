@@ -1,0 +1,41 @@
+# OpenPLC deployment configuration
+# Phase 1: Basic Docker deployment testing
+
+# Docker network configuration
+docker_network_name: openplc-net
+docker_network_subnet: "10.100.0.0/24"
+
+# OpenPLC image configuration
+openplc_image_name: sphere-openplc
+openplc_image_tag: latest
+
+# Path to cps-enclave-model repo (contains OpenPLC Dockerfile)
+# Override with: -e cps_enclave_model_path=/path/to/cps-enclave-model
+cps_enclave_model_path: "{{ lookup('env', 'CPS_ENCLAVE_MODEL_PATH') | default('~/Development/cps-enclave-model', true) }}"
+openplc_dockerfile_path: "{{ cps_enclave_model_path }}/docker/openplc"
+
+openplc_version: master  # Git commit/branch for reproducibility
+
+# Controller PLC configuration
+controller:
+  name: controller
+  container_name: openplc-controller
+  ip_address: "10.100.0.10"
+  modbus_port: 502
+  webui_port: 8080
+  project_path: "{{ playbook_dir }}/../projects/controller_project"
+  scan_cycle_ms: 100
+
+# Simulator PLC configuration
+simulator:
+  name: simulator
+  container_name: openplc-simulator
+  ip_address: "10.100.0.20"
+  modbus_port: 503
+  webui_port: 8081
+  project_path: "{{ playbook_dir }}/../projects/simulator_project"
+  scan_cycle_ms: 100
+
+# Health check configuration
+health_check_retries: 30
+health_check_delay: 2
