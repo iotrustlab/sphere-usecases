@@ -12,26 +12,35 @@ The scenario deploys two OpenPLC instances communicating via Modbus TCP:
 
 ### Prerequisites
 
-- Docker and Docker Compose
-- Ansible 2.10+ with community.docker collection
-- Python 3.8+ with pymodbus (for testing/operator interface)
+- Docker Desktop with API version 1.44+ (check with `docker version`)
+- Python 3.8+ with virtual environment
+- Ansible 2.10+ with community.docker collection (installed in venv)
+- pymodbus (for testing/operator interface)
+
+**macOS Note:** If using Homebrew's Docker CLI, ensure it's up to date or use Docker Desktop's CLI:
+```bash
+export PATH="/Applications/Docker.app/Contents/Resources/bin:$PATH"
+```
 
 ### Option 1: Ansible Deployment (Recommended)
 
 ```bash
+# Activate the virtual environment (contains Ansible and pymodbus)
+source .venv/bin/activate
+
 cd ansible
 
-# Install Ansible dependencies
+# Install Ansible dependencies (first time only)
 ansible-galaxy collection install -r requirements.yml
 
 # Deploy the scenario locally
-ansible-playbook playbooks/deploy-local.yml
+ansible-playbook -i inventory/local.yml playbooks/deploy-local.yml
 
 # Test Modbus connectivity
-ansible-playbook playbooks/test-modbus.yml
+ansible-playbook -i inventory/local.yml playbooks/test-modbus.yml
 
 # Teardown when done
-ansible-playbook playbooks/teardown-local.yml
+ansible-playbook -i inventory/local.yml playbooks/teardown-local.yml
 ```
 
 ### Option 2: Docker Compose (via cps-enclave CLI)
@@ -156,16 +165,31 @@ This scenario is designed to work with the SPHERE CPS infrastructure:
 
 ## Troubleshooting
 
+### Docker CLI version error
+If you see `client version X.XX is too old. Minimum supported API version is 1.44`:
+```bash
+# Use Docker Desktop CLI instead of Homebrew's
+export PATH="/Applications/Docker.app/Contents/Resources/bin:$PATH"
+```
+
+### Ansible command not found
+```bash
+# Activate the virtual environment first
+source .venv/bin/activate
+```
+
 ### PLCs won't connect
-- Ensure Docker containers are running: `docker-compose ps`
-- Check container logs: `docker-compose logs controller`
+- Ensure Docker containers are running: `docker ps`
+- Check container logs: `docker logs openplc-controller`
 - Verify network: `docker network ls`
 
 ### Modbus communication errors
 - Check Modbus addresses match between controller and simulator
 - Verify ports 502/503 are exposed correctly
-- Use `docker exec` to test connectivity
+- Ensure PLC is in RUN mode (check logs for "Initializing OpenPLC in RUN mode")
+- Test with: `docker exec openplc-controller /workdir/.venv/bin/python3 -c "from pymodbus.client.sync import ModbusTcpClient; c=ModbusTcpClient('10.100.0.20',502); print(c.connect())"`
 
 ### OpenPLC compilation fails
+- Check container logs for compilation errors
 - Open project in OpenPLC Editor to check for ST syntax errors
-- Verify XML project structure is valid PLCopen format
+- Verify the `.st` file path is correct in ansible vars

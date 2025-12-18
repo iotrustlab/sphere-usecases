@@ -23,7 +23,8 @@ controller:
   ip_address: "10.100.0.10"
   modbus_port: 502
   webui_port: 8080
-  project_path: "{{ playbook_dir }}/../projects/controller_project"
+  project_path: "{{ playbook_dir }}/../../projects/controller_project"
+  program_file: "controller_final.st"
   scan_cycle_ms: 100
 
 # Simulator PLC configuration
@@ -33,7 +34,8 @@ simulator:
   ip_address: "10.100.0.20"
   modbus_port: 503
   webui_port: 8081
-  project_path: "{{ playbook_dir }}/../projects/simulator_project"
+  project_path: "{{ playbook_dir }}/../../projects/simulator_project"
+  program_file: "simulator_final.st"
   scan_cycle_ms: 100
 
 # Health check configuration

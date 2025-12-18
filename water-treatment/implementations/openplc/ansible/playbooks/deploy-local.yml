@@ -87,8 +87,8 @@
         volumes:
           - "{{ controller.project_path }}:/workdir/project:ro"
         env:
-          OPENPLC_PROJECT: "/workdir/project/plc.xml"
-          OPENPLC_SCAN_CYCLE: "{{ controller.scan_cycle_ms }}"
+          OPENPLC_PROGRAM: "/workdir/project/{{ controller.program_file }}"
+          OPENPLC_SCAN_CYCLE_MS: "{{ controller.scan_cycle_ms | string }}"
           OPENPLC_MODBUS_PORT: "502"
         labels:
           sphere.role: controller
@@ -122,8 +122,8 @@
         volumes:
           - "{{ simulator.project_path }}:/workdir/project:ro"
         env:
-          OPENPLC_PROJECT: "/workdir/project/plc.xml"
-          OPENPLC_SCAN_CYCLE: "{{ simulator.scan_cycle_ms }}"
+          OPENPLC_PROGRAM: "/workdir/project/{{ simulator.program_file }}"
+          OPENPLC_SCAN_CYCLE_MS: "{{ simulator.scan_cycle_ms | string }}"
           OPENPLC_MODBUS_PORT: "502"
         labels:
           sphere.role: simulator
