@@ -1,0 +1,28 @@
+Host *
+    StrictHostKeyChecking no
+    UserKnownHostsFile=/dev/null
+    User lgarcia
+
+Host jump
+    HostName jump.sphere-testbed.net
+    Port 2022
+    User lgarcia
+    IdentityFile ~/.ssh/merge_key
+
+Host x0-lgarcia
+    HostName x0-lgarcia
+    User lgarcia
+    IdentityFile ~/.ssh/merge_key
+    ProxyJump jump
+
+Host controller
+    HostName controller
+    User lgarcia
+    IdentityFile ~/.ssh/merge_key
+    ProxyJump x0-lgarcia
+
+Host simulator
+    HostName simulator
+    User lgarcia
+    IdentityFile ~/.ssh/merge_key
+    ProxyJump x0-lgarcia

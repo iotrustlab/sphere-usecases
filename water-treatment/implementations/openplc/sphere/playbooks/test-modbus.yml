@@ -1,0 +1,100 @@
+---
+# Test Modbus communication between SPHERE nodes
+
+- name: Test Modbus Communication
+  hosts: controller
+  become: true
+
+  vars:
+    simulator_ip: "10.100.0.20"
+    simulator_port: 502
+
+  tasks:
+    - name: Install pymodbus for testing
+      ansible.builtin.pip:
+        name: pymodbus
+        state: present
+
+    - name: Test Modbus connection to simulator
+      ansible.builtin.shell: |
+        python3 << 'EOF'
+        from pymodbus.client import ModbusTcpClient
+
+        client = ModbusTcpClient('{{ simulator_ip }}', port={{ simulator_port }})
+        connected = client.connect()
+        print(f"Connected to simulator: {connected}")
+
+        if connected:
+            # Read holding registers
+            result = client.read_holding_registers(address=0, count=5)
+            if hasattr(result, 'registers'):
+                print(f"Holding registers 0-4: {result.registers}")
+            else:
+                print(f"Read error: {result}")
+
+            # Write a test value
+            client.write_register(address=0, value=12345)
+            result = client.read_holding_registers(address=0, count=1)
+            print(f"Write/Read test: wrote 12345, read {result.registers[0] if hasattr(result, 'registers') else 'ERROR'}")
+
+            client.close()
+        EOF
+      register: modbus_test
+      changed_when: false
+
+    - name: Display Modbus test results
+      ansible.builtin.debug:
+        msg: "{{ modbus_test.stdout_lines }}"
+
+
+- name: Test reverse communication
+  hosts: simulator
+  become: true
+
+  vars:
+    controller_ip: "10.100.0.10"
+    controller_port: 502
+
+  tasks:
+    - name: Install pymodbus for testing
+      ansible.builtin.pip:
+        name: pymodbus
+        state: present
+
+    - name: Test Modbus connection to controller
+      ansible.builtin.shell: |
+        python3 << 'EOF'
+        from pymodbus.client import ModbusTcpClient
+
+        client = ModbusTcpClient('{{ controller_ip }}', port={{ controller_port }})
+        connected = client.connect()
+        print(f"Connected to controller: {connected}")
+
+        if connected:
+            result = client.read_holding_registers(address=0, count=5)
+            if hasattr(result, 'registers'):
+                print(f"Holding registers 0-4: {result.registers}")
+            else:
+                print(f"Read error: {result}")
+            client.close()
+        EOF
+      register: modbus_test
+      changed_when: false
+
+    - name: Display Modbus test results
+      ansible.builtin.debug:
+        msg: "{{ modbus_test.stdout_lines }}"
+
+
+- name: Summary
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - name: Test summary
+      ansible.builtin.debug:
+        msg: |
+          Modbus communication test complete.
+
+          If both tests show "Connected: True" and register values,
+          the PLCs are communicating correctly.

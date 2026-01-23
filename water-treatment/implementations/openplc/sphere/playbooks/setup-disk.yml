@@ -1,0 +1,69 @@
+---
+# Setup extra disk storage for Docker
+#
+# This playbook formats and mounts the extra disk (/dev/vdb) allocated
+# via disk.capacity in the SPHERE model, then configures Docker to use it.
+
+- name: Setup Extra Disk for Docker
+  hosts: plcs
+  become: true
+
+  vars:
+    extra_disk: /dev/vdb
+    mount_point: /mnt/data
+    docker_data_root: /mnt/data/docker
+
+  tasks:
+    - name: Check if extra disk exists
+      ansible.builtin.stat:
+        path: "{{ extra_disk }}"
+      register: disk_check
+
+    - name: Fail if extra disk not found
+      ansible.builtin.fail:
+        msg: "Extra disk {{ extra_disk }} not found. Ensure disk.capacity is set in the SPHERE model."
+      when: not disk_check.stat.exists
+
+    - name: Check if disk is already formatted
+      ansible.builtin.command:
+        cmd: blkid {{ extra_disk }}
+      register: blkid_result
+      changed_when: false
+      failed_when: false
+
+    - name: Format disk with ext4
+      ansible.builtin.command:
+        cmd: mkfs.ext4 -L data {{ extra_disk }}
+      when: blkid_result.rc != 0
+
+    - name: Create mount point
+      ansible.builtin.file:
+        path: "{{ mount_point }}"
+        state: directory
+        mode: '0755'
+
+    - name: Mount extra disk
+      ansible.posix.mount:
+        path: "{{ mount_point }}"
+        src: LABEL=data
+        fstype: ext4
+        opts: defaults
+        state: mounted
+
+    - name: Create Docker data directory
+      ansible.builtin.file:
+        path: "{{ docker_data_root }}"
+        state: directory
+        mode: '0711'
+
+    - name: Display disk info
+      ansible.builtin.command:
+        cmd: df -h {{ mount_point }}
+      register: disk_info
+      changed_when: false
+
+    - name: Show disk status
+      ansible.builtin.debug:
+        msg: |
+          Extra disk mounted at {{ mount_point }}:
+          {{ disk_info.stdout }}

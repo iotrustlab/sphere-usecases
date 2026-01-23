@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <project xmlns:ns1="http://www.plcopen.org/xml/tc6_0201" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.plcopen.org/xml/tc6_0201">
-  <fileHeader companyName="Sphere_UseCases" productName="Controller_Project" productVersion="1.0" creationDateTime="2025-09-25T18:30:15" />
-  <contentHeader name="Controller_Project" modificationDateTime="2025-09-25T18:30:15">
+  <fileHeader companyName="CrossPLC" productName="Controller_PLC_Test" productVersion="1.0" creationDateTime="2025-12-18T19:48:46" />
+  <contentHeader name="Controller_PLC_Test" modificationDateTime="2025-12-18T19:48:46">
     <coordinateInfo>
       <fbd>
         <scaling x="10" y="10" />
@@ -359,107 +359,87 @@
                 <derived name="P3_UDT" />
               </type>
             </variable>
-            <variable name="di_2_0" address="%IX2.0">
+            <variable name="di_2_0">
               <type>
                 <BOOL />
               </type>
             </variable>
-            <variable name="di_2_1" address="%IX2.1">
+            <variable name="di_2_1">
               <type>
                 <BOOL />
               </type>
             </variable>
-            <variable name="di_2_10" address="%IX2.10">
+            <variable name="di_2_10">
               <type>
                 <BOOL />
               </type>
             </variable>
-            <variable name="di_2_11" address="%IX2.11">
+            <variable name="di_2_11">
               <type>
                 <BOOL />
               </type>
             </variable>
-            <variable name="di_2_2" address="%IX2.2">
+            <variable name="di_2_2">
               <type>
                 <BOOL />
               </type>
             </variable>
-            <variable name="di_2_3" address="%IX2.3">
+            <variable name="di_2_3">
               <type>
                 <BOOL />
               </type>
             </variable>
-            <variable name="di_2_4" address="%IX2.4">
+            <variable name="di_2_4">
               <type>
                 <BOOL />
               </type>
             </variable>
-            <variable name="di_2_5" address="%IX2.5">
+            <variable name="di_2_5">
               <type>
                 <BOOL />
               </type>
             </variable>
-            <variable name="di_2_6" address="%IX2.6">
+            <variable name="di_2_6">
               <type>
                 <BOOL />
               </type>
             </variable>
-            <variable name="di_2_8" address="%IX2.8">
+            <variable name="di_2_8">
               <type>
                 <BOOL />
               </type>
             </variable>
-            <variable name="di_2_9" address="%IX2.9">
+            <variable name="di_2_9">
               <type>
                 <BOOL />
               </type>
             </variable>
-            <variable name="ai_7_0" address="%IW70">
+            <variable name="ai_7_0">
               <type>
                 <REAL />
               </type>
             </variable>
-            <variable name="di_7_ch0halarm" address="%IX7.0">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="di_7_ch0hhalarm" address="%IX7.0">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="di_7_ch0lalarm" address="%IX7.0">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="di_7_ch0llalarm" address="%IX7.0">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="ai_7_1" address="%IW71">
+            <variable name="ai_7_1">
               <type>
                 <REAL />
               </type>
             </variable>
-            <variable name="ai_7_2" address="%IW72">
+            <variable name="ai_7_2">
               <type>
                 <REAL />
               </type>
             </variable>
-            <variable name="ai_7_3" address="%IW73">
+            <variable name="ai_7_3">
               <type>
                 <REAL />
               </type>
             </variable>
-            <variable name="ai_7_4" address="%IW74">
+            <variable name="ai_7_4">
               <type>
                 <REAL />
               </type>
             </variable>
-            <variable name="ai_7_5" address="%IW75">
+            <variable name="ai_7_5">
               <type>
                 <REAL />
               </type>
@@ -471,72 +451,94 @@
                 <derived name="HMI_UDT" />
               </type>
             </variable>
-            <variable name="ao_10_0" address="%QW100">
+            <variable name="ao_10_0">
               <type>
                 <REAL />
               </type>
             </variable>
-            <variable name="do_5_0" address="%QX5.0">
+            <variable name="do_5_0">
               <type>
                 <BOOL />
               </type>
             </variable>
-            <variable name="do_5_1" address="%QX5.1">
+            <variable name="do_5_1">
               <type>
                 <BOOL />
               </type>
             </variable>
-            <variable name="do_5_10" address="%QX5.10">
+            <variable name="do_5_10">
               <type>
                 <BOOL />
               </type>
             </variable>
-            <variable name="do_5_11" address="%QX5.11">
+            <variable name="do_5_11">
               <type>
                 <BOOL />
               </type>
             </variable>
-            <variable name="do_5_2" address="%QX5.2">
+            <variable name="do_5_2">
               <type>
                 <BOOL />
               </type>
             </variable>
-            <variable name="do_5_3" address="%QX5.3">
+            <variable name="do_5_3">
               <type>
                 <BOOL />
               </type>
             </variable>
-            <variable name="do_5_4" address="%QX5.4">
+            <variable name="do_5_4">
               <type>
                 <BOOL />
               </type>
             </variable>
-            <variable name="do_5_5" address="%QX5.5">
+            <variable name="do_5_5">
               <type>
                 <BOOL />
               </type>
             </variable>
-            <variable name="do_5_6" address="%QX5.6">
+            <variable name="do_5_6">
               <type>
                 <BOOL />
               </type>
             </variable>
-            <variable name="do_5_7" address="%QX5.7">
+            <variable name="do_5_7">
               <type>
                 <BOOL />
               </type>
             </variable>
-            <variable name="do_5_8" address="%QX5.8">
+            <variable name="do_5_8">
               <type>
                 <BOOL />
               </type>
             </variable>
-            <variable name="do_5_9" address="%QX5.9">
+            <variable name="do_5_9">
               <type>
                 <BOOL />
               </type>
             </variable>
           </outputVars>
+          <localVars>
+            <variable name="di_7_ch0halarm">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="di_7_ch0hhalarm">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="di_7_ch0lalarm">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="di_7_ch0llalarm">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+          </localVars>
         </interface>
         <body>
           <ST>
@@ -661,8 +663,8 @@ end_if;
   </types>
   <instances>
     <configurations>
-      <configuration name="config">
-        <resource name="res_MainProgram">
+      <configuration name="Config0">
+        <resource name="Res0">
           <task name="task_MainProgram" priority="0" interval="T#100ms" />
           <pouInstance name="MainProgram_instance" typeName="MainProgram" />
         </resource>
@@ -675,7 +677,7 @@ end_if;
               <xhtml:p>Rockwell: Local:10:O.Ch0Data</xhtml:p>
             </documentation>
           </variable>
-          <variable name="di_2_0" address="%IX2.0">
+          <variable name="di_2_0" address="%IX8.0">
             <type>
               <BOOL />
             </type>
@@ -683,7 +685,7 @@ end_if;
               <xhtml:p>Rockwell: Local:2:I.Data.0</xhtml:p>
             </documentation>
           </variable>
-          <variable name="di_2_1" address="%IX2.1">
+          <variable name="di_2_1" address="%IX8.1">
             <type>
               <BOOL />
             </type>
@@ -691,7 +693,7 @@ end_if;
               <xhtml:p>Rockwell: Local:2:I.Data.1</xhtml:p>
             </documentation>
           </variable>
-          <variable name="di_2_10" address="%IX2.10">
+          <variable name="di_2_10" address="%IX9.2">
             <type>
               <BOOL />
             </type>
@@ -699,7 +701,7 @@ end_if;
               <xhtml:p>Rockwell: Local:2:I.Data.10</xhtml:p>
             </documentation>
           </variable>
-          <variable name="di_2_11" address="%IX2.11">
+          <variable name="di_2_11" address="%IX9.3">
             <type>
               <BOOL />
             </type>
@@ -707,7 +709,7 @@ end_if;
               <xhtml:p>Rockwell: Local:2:I.Data.11</xhtml:p>
             </documentation>
           </variable>
-          <variable name="di_2_2" address="%IX2.2">
+          <variable name="di_2_2" address="%IX8.2">
             <type>
               <BOOL />
             </type>
@@ -715,7 +717,7 @@ end_if;
               <xhtml:p>Rockwell: Local:2:I.Data.2</xhtml:p>
             </documentation>
           </variable>
-          <variable name="di_2_3" address="%IX2.3">
+          <variable name="di_2_3" address="%IX8.3">
             <type>
               <BOOL />
             </type>
@@ -723,7 +725,7 @@ end_if;
               <xhtml:p>Rockwell: Local:2:I.Data.3</xhtml:p>
             </documentation>
           </variable>
-          <variable name="di_2_4" address="%IX2.4">
+          <variable name="di_2_4" address="%IX8.4">
             <type>
               <BOOL />
             </type>
@@ -731,7 +733,7 @@ end_if;
               <xhtml:p>Rockwell: Local:2:I.Data.4</xhtml:p>
             </documentation>
           </variable>
-          <variable name="di_2_5" address="%IX2.5">
+          <variable name="di_2_5" address="%IX8.5">
             <type>
               <BOOL />
             </type>
@@ -739,7 +741,7 @@ end_if;
               <xhtml:p>Rockwell: Local:2:I.Data.5</xhtml:p>
             </documentation>
           </variable>
-          <variable name="di_2_6" address="%IX2.6">
+          <variable name="di_2_6" address="%IX8.6">
             <type>
               <BOOL />
             </type>
@@ -747,7 +749,7 @@ end_if;
               <xhtml:p>Rockwell: Local:2:I.Data.6</xhtml:p>
             </documentation>
           </variable>
-          <variable name="di_2_8" address="%IX2.8">
+          <variable name="di_2_8" address="%IX9.0">
             <type>
               <BOOL />
             </type>
@@ -755,7 +757,7 @@ end_if;
               <xhtml:p>Rockwell: Local:2:I.Data.8</xhtml:p>
             </documentation>
           </variable>
-          <variable name="di_2_9" address="%IX2.9">
+          <variable name="di_2_9" address="%IX9.1">
             <type>
               <BOOL />
             </type>
@@ -763,7 +765,7 @@ end_if;
               <xhtml:p>Rockwell: Local:2:I.Data.9</xhtml:p>
             </documentation>
           </variable>
-          <variable name="do_5_0" address="%QX5.0">
+          <variable name="do_5_0" address="%QX20.0">
             <type>
               <BOOL />
             </type>
@@ -771,7 +773,7 @@ end_if;
               <xhtml:p>Rockwell: Local:5:O.Data.0</xhtml:p>
             </documentation>
           </variable>
-          <variable name="do_5_1" address="%QX5.1">
+          <variable name="do_5_1" address="%QX20.1">
             <type>
               <BOOL />
             </type>
@@ -779,7 +781,7 @@ end_if;
               <xhtml:p>Rockwell: Local:5:O.Data.1</xhtml:p>
             </documentation>
           </variable>
-          <variable name="do_5_10" address="%QX5.10">
+          <variable name="do_5_10" address="%QX21.2">
             <type>
               <BOOL />
             </type>
@@ -787,7 +789,7 @@ end_if;
               <xhtml:p>Rockwell: Local:5:O.Data.10</xhtml:p>
             </documentation>
           </variable>
-          <variable name="do_5_11" address="%QX5.11">
+          <variable name="do_5_11" address="%QX21.3">
             <type>
               <BOOL />
             </type>
@@ -795,7 +797,7 @@ end_if;
               <xhtml:p>Rockwell: Local:5:O.Data.11</xhtml:p>
             </documentation>
           </variable>
-          <variable name="do_5_2" address="%QX5.2">
+          <variable name="do_5_2" address="%QX20.2">
             <type>
               <BOOL />
             </type>
@@ -803,7 +805,7 @@ end_if;
               <xhtml:p>Rockwell: Local:5:O.Data.2</xhtml:p>
             </documentation>
           </variable>
-          <variable name="do_5_3" address="%QX5.3">
+          <variable name="do_5_3" address="%QX20.3">
             <type>
               <BOOL />
             </type>
@@ -811,7 +813,7 @@ end_if;
               <xhtml:p>Rockwell: Local:5:O.Data.3</xhtml:p>
             </documentation>
           </variable>
-          <variable name="do_5_4" address="%QX5.4">
+          <variable name="do_5_4" address="%QX20.4">
             <type>
               <BOOL />
             </type>
@@ -819,7 +821,7 @@ end_if;
               <xhtml:p>Rockwell: Local:5:O.Data.4</xhtml:p>
             </documentation>
           </variable>
-          <variable name="do_5_5" address="%QX5.5">
+          <variable name="do_5_5" address="%QX20.5">
             <type>
               <BOOL />
             </type>
@@ -827,7 +829,7 @@ end_if;
               <xhtml:p>Rockwell: Local:5:O.Data.5</xhtml:p>
             </documentation>
           </variable>
-          <variable name="do_5_6" address="%QX5.6">
+          <variable name="do_5_6" address="%QX20.6">
             <type>
               <BOOL />
             </type>
@@ -835,7 +837,7 @@ end_if;
               <xhtml:p>Rockwell: Local:5:O.Data.6</xhtml:p>
             </documentation>
           </variable>
-          <variable name="do_5_7" address="%QX5.7">
+          <variable name="do_5_7" address="%QX20.7">
             <type>
               <BOOL />
             </type>
@@ -843,7 +845,7 @@ end_if;
               <xhtml:p>Rockwell: Local:5:O.Data.7</xhtml:p>
             </documentation>
           </variable>
-          <variable name="do_5_8" address="%QX5.8">
+          <variable name="do_5_8" address="%QX21.0">
             <type>
               <BOOL />
             </type>
@@ -851,7 +853,7 @@ end_if;
               <xhtml:p>Rockwell: Local:5:O.Data.8</xhtml:p>
             </documentation>
           </variable>
-          <variable name="do_5_9" address="%QX5.9">
+          <variable name="do_5_9" address="%QX21.1">
             <type>
               <BOOL />
             </type>
@@ -865,38 +867,6 @@ end_if;
             </type>
             <documentation>
               <xhtml:p>Rockwell: Local:7:I.Ch0Data</xhtml:p>
-            </documentation>
-          </variable>
-          <variable name="di_7_ch0halarm" address="%IX7.0">
-            <type>
-              <BOOL />
-            </type>
-            <documentation>
-              <xhtml:p>Rockwell: Local:7:I.Ch0HAlarm</xhtml:p>
-            </documentation>
-          </variable>
-          <variable name="di_7_ch0hhalarm" address="%IX7.0">
-            <type>
-              <BOOL />
-            </type>
-            <documentation>
-              <xhtml:p>Rockwell: Local:7:I.Ch0HHAlarm</xhtml:p>
-            </documentation>
-          </variable>
-          <variable name="di_7_ch0lalarm" address="%IX7.0">
-            <type>
-              <BOOL />
-            </type>
-            <documentation>
-              <xhtml:p>Rockwell: Local:7:I.Ch0LAlarm</xhtml:p>
-            </documentation>
-          </variable>
-          <variable name="di_7_ch0llalarm" address="%IX7.0">
-            <type>
-              <BOOL />
-            </type>
-            <documentation>
-              <xhtml:p>Rockwell: Local:7:I.Ch0LLAlarm</xhtml:p>
             </documentation>
           </variable>
           <variable name="ai_7_1" address="%IW71">
