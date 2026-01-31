@@ -38,6 +38,8 @@ water-treatment/
 │   ├── process_overview.md            # Detailed process description
 │   ├── io_map.csv                     # I/O mapping and tag definitions
 │   └── pid.pdf                        # Process & Instrumentation Diagram
+├── slices/                            # Viewer slice definitions
+│   └── wt-uc1-slice.yaml             # UC1 slice (overlay + trend tags)
 ├── implementations/                   # Implementation-specific code
 │   ├── rockwell/                      # SPHERE testbed deployment
 │   │   ├── plc/                       # L5X files
@@ -49,8 +51,13 @@ water-treatment/
 │   └── openplc/                       # Virtual simulation
 │       ├── projects/                  # OpenPLC Editor projects
 │       │   ├── controller_project/    # Main control program
-│       │   └── simulator_project/    # Simulation program
-│       └── scripts/                # Local execution scripts
+│       │   └── simulator_project/     # Simulation program
+│       ├── st/                        # Structured Text source files
+│       ├── scenario.yaml              # Scenario descriptor
+│       ├── configs/                   # OpenPLC runtime configs
+│       ├── ansible/                   # Deployment playbooks
+│       ├── sphere/                    # MergeTB model + scripts
+│       └── scripts/                   # Local execution scripts
 └── experiments/                       # Security research experiments
     ├── sensor_spoofing/               # Sensor manipulation attacks
     └── pump_override/                 # Direct pump control attacks
@@ -105,8 +112,41 @@ See [experiments/README.md](experiments/README.md) for detailed experiment descr
 
 See [docs/io_map.csv](docs/io_map.csv) for complete I/O mapping.
 
+## 📊 Visualization (CPS Enclave Viewer)
+
+The water treatment use case integrates with the [CPS Enclave Viewer](https://gitlab.com/mergetb/facilities/sphere/cyber-physical-systems/cps-enclave-model/-/tree/main/cps-enclave-viewer) for replay-based visualization of run bundles.
+
+### Slice definition
+
+`slices/wt-uc1-slice.yaml` defines which tags appear in the viewer overlay panel and trend chart. The canonical copy is here; the viewer's `assets/slice.yaml` is derived from it.
+
+### Data-driven P&ID pipeline
+
+The viewer uses a data-driven SVG pipeline (defined in cps-enclave-model):
+
+1. **Tag inventory** (`tags.normalized.yaml`) — canonical tags grouped by component
+2. **Diagram spec** (`water-treatment.diagram.yaml`) — components, positions, anchors, pipes
+3. **SVG generator** (`cmd/gensvg/`) — produces SVG with stable `anchor:COMP:ANCHOR` IDs
+4. **Overlay config** (`water-treatment.overlay.yaml`) — maps tags to component anchors
+5. **Validator** (`cmd/validate-diagram/`) — checks consistency across all files
+
+### Tag naming conventions
+
+Tags follow a `Component_Parameter` pattern grouped by process stage:
+
+| Prefix | Stage | Examples |
+|--------|-------|---------|
+| `RW_` | P1 — Raw Water | `RW_Tank_Level`, `RW_Pump_Speed`, `RW_Pump_Sts` |
+| `ChemTreat_` | P2 — Chemical | `ChemTreat_NaCl_Level`, `ChemTreat_HCl_Level` |
+| `UF_` | P3 — Ultrafiltration | `UF_UFFT_Tank_Level` |
+| `SYS_` | System State | `SYS_IDLE`, `SYS_RUNNING` |
+| `Alarm_` | Alarms | `Alarm_RW_Tank_HH` |
+
+Suffixes indicate role: `_Level`/`_Flow`/`_Speed` (sensor), `_Sts` (status), `_Fault` (alarm), `_Start`/`_Stop` (command).
+
 ## 🔗 Related
 
+- **[cps-enclave-model](https://gitlab.com/mergetb/facilities/sphere/cyber-physical-systems/cps-enclave-model)**: Viewer, SVG generator, run bundles, use-case runner
 - **Templates**: Based on [templates/single-process/](../templates/single-process/)
 - **Validation**: Uses SPHERE infrastructure validation tools
 - **Deployment**: Integrates with SPHERE enclave infrastructure

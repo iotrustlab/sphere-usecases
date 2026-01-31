@@ -34,12 +34,17 @@ sphere-usecases/
 ├── water-treatment/                   # Water treatment use case
 │   ├── README.md                      # Use case specific documentation
 │   ├── docs/                          # Process docs, P&IDs, I/O maps
+│   ├── slices/                        # Viewer slice definitions
+│   │   └── wt-uc1-slice.yaml         # UC1 slice (overlay + trend tags)
 │   ├── implementations/               # Implementation-specific code
 │   │   ├── rockwell/                  # SPHERE testbed deployment
-│   │   └── openplc/                   # Virtual simulation
+│   │   └── openplc/                   # Virtual simulation (ST + scenarios)
 │   └── experiments/                   # Security research experiments
 ├── oil-and-gas-distribution/          # Oil & gas use case (planned)
-└── [shared references]                # Global tag layouts, controller mappings
+├── diagrams/                          # Global diagram references
+├── tag-layouts/                       # Tag naming conventions
+├── controller-mappings/               # Controller I/O configs
+└── tools/                             # Shared tooling
 ```
 
 ## 🛠️ For Contributors
@@ -60,6 +65,7 @@ See [templates/README.md](templates/README.md) for detailed guidance.
 
 ## 🔗 Related Repositories
 
+- **[cps-enclave-model](https://gitlab.com/mergetb/facilities/sphere/cyber-physical-systems/cps-enclave-model)**: CPS enclave infrastructure — PLC node abstractions, Docker lifecycle, use-case runner, and the **CPS Enclave Viewer** (replay-first web UI with data-driven P&ID diagrams, SVG generator, and overlay system)
 - **sphere-infra**: Validation tools and enclave infrastructure
 - **sphere-control**: PLC programming libraries and examples
 - **sphere-sim**: Simulation model libraries
