@@ -1,0 +1,34 @@
+{
+  "usecase_id": "water-treatment-uc1",
+  "contract_version": "1.0.0",
+  "backend_type": "openplc",
+  "endpoints": [
+    "10.100.0.10:502",
+    "10.100.0.20:502"
+  ],
+  "mapping_file": "openplc_map.yaml",
+  "start_utc": "2025-01-28T10:05:00Z",
+  "end_utc": "2025-01-28T10:05:30Z",
+  "poll_interval_ms": 500,
+  "tag_selection": "headline",
+  "tags": [
+    "RW_Tank_Level",
+    "RW_Pump_Speed",
+    "RW_Pump_Flow",
+    "RW_Pump_Sts",
+    "RW_Pump_Fault",
+    "RW_Pump_Start",
+    "RW_Pump_Stop",
+    "RW_Tank_PR_Valve",
+    "RW_Tank_PR_Valve_Sts",
+    "RW_Tank_P_Valve",
+    "RW_Tank_P_Valve_Sts",
+    "ChemTreat_NaCl_Level",
+    "ChemTreat_NaOCl_Level",
+    "ChemTreat_HCl_Level",
+    "UF_UFFT_Tank_Level",
+    "SYS_IDLE",
+    "SYS_RUNNING",
+    "Alarm_RW_Tank_HH"
+  ]
+}

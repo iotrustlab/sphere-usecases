@@ -1,0 +1,113 @@
+# Overlay tag positions for the generated water-treatment SVG.
+# Uses component-anchor targeting: the viewer resolves target + anchor
+# to the SVG element ID "anchor:COMPONENT:ANCHOR".
+# style: "badge" (colored pill), "text" (plain value), "indicator" (dot)
+
+overlays:
+  # P1 — Raw Water
+  - tag: RW_Tank_Level
+    target: "comp:RW_Tank"
+    anchor: badge_pos
+    offset_px: { dx: 8, dy: -12 }
+    fallback_percent: { x: 15, y: 12 }
+    style: badge
+    group: p1
+
+  - tag: RW_Pump_Speed
+    target: "comp:RW_Pump"
+    anchor: badge_pos
+    offset_px: { dx: 8, dy: -12 }
+    fallback_percent: { x: 33, y: 14 }
+    style: badge
+    group: p1
+
+  - tag: RW_Pump_Flow
+    target: "comp:RW_Pump"
+    anchor: flow_pos
+    offset_px: { dx: 8, dy: 0 }
+    fallback_percent: { x: 33, y: 19 }
+    style: text
+    group: p1
+
+  - tag: RW_Pump_Sts
+    target: "comp:RW_Pump"
+    anchor: status_pos
+    offset_px: { dx: 0, dy: 0 }
+    fallback_percent: { x: 33, y: 10 }
+    style: indicator
+    group: p1
+
+  - tag: RW_Tank_PR_Valve_Sts
+    target: "comp:RW_Tank_PR_Valve"
+    anchor: badge_pos
+    offset_px: { dx: 0, dy: -4 }
+    fallback_percent: { x: 12, y: 2 }
+    style: indicator
+    group: p1
+
+  - tag: RW_Tank_P_Valve_Sts
+    target: "comp:RW_Tank_P_Valve"
+    anchor: badge_pos
+    offset_px: { dx: 0, dy: -4 }
+    fallback_percent: { x: 22, y: 14 }
+    style: indicator
+    group: p1
+
+  # P2 — Chemical Treatment
+  - tag: ChemTreat_NaCl_Level
+    target: "comp:ChemTreat_NaCl"
+    anchor: badge_pos
+    offset_px: { dx: 8, dy: -12 }
+    fallback_percent: { x: 44, y: 2 }
+    style: badge
+    group: p2
+
+  - tag: ChemTreat_NaOCl_Level
+    target: "comp:ChemTreat_NaOCl"
+    anchor: badge_pos
+    offset_px: { dx: 8, dy: -12 }
+    fallback_percent: { x: 58, y: 2 }
+    style: badge
+    group: p2
+
+  - tag: ChemTreat_HCl_Level
+    target: "comp:ChemTreat_HCl"
+    anchor: badge_pos
+    offset_px: { dx: 8, dy: -12 }
+    fallback_percent: { x: 72, y: 2 }
+    style: badge
+    group: p2
+
+  # P3 — Ultrafiltration
+  - tag: UF_UFFT_Tank_Level
+    target: "comp:UF_UFFT_Tank"
+    anchor: badge_pos
+    offset_px: { dx: 8, dy: -12 }
+    fallback_percent: { x: 92, y: 12 }
+    style: badge
+    group: p3
+
+  # System / Alarms
+  - tag: SYS_RUNNING
+    target: "anchor:SYS_RUNNING"
+    anchor: badge_pos
+    offset_px: { dx: 0, dy: 0 }
+    fallback_percent: { x: 42, y: 95 }
+    style: indicator
+    group: sys
+
+  - tag: SYS_IDLE
+    target: "anchor:SYS_IDLE"
+    anchor: badge_pos
+    offset_px: { dx: 0, dy: 0 }
+    fallback_percent: { x: 48, y: 95 }
+    style: indicator
+    group: sys
+
+  - tag: Alarm_RW_Tank_HH
+    target: "anchor:Alarm_RW_Tank_HH"
+    anchor: badge_pos
+    offset_px: { dx: 0, dy: -4 }
+    fallback_percent: { x: 8, y: 6 }
+    style: indicator
+    group: alm
