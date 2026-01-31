@@ -11,23 +11,21 @@ Multi-stage water purification with chemical dosing:
 
 See [docs/process_overview.md](docs/process_overview.md) for detailed process description.
 
-## 🚀 Quick Start
-
-### Rockwell Implementation (SPHERE Testbed)
-```bash
-# Validate the implementation
-./implementations/rockwell/scripts/validate.sh
-
-# Deploy to testbed (requires enclave access)
-./implementations/rockwell/scripts/deploy.sh
-```
+## Quick Start
 
 ### OpenPLC Implementation (Virtual)
 ```bash
 # Open OpenPLC Editor and load projects
 # Controller: implementations/openplc/projects/controller_project/
 # Simulator: implementations/openplc/projects/simulator_project/
+
+# Or use Docker scenario:
+cd implementations/openplc
+# See scenario.yaml and scripts/ for Docker-based deployment
 ```
+
+### Rockwell Implementation (SPHERE Testbed)
+Requires enclave access and Rockwell hardware (currently offline). L5X/L5K programs are in `implementations/rockwell/plc/`. See `scripts/validate.sh` and `scripts/deploy.sh` for deployment helpers.
 
 ## 📁 Structure
 
@@ -67,9 +65,8 @@ water-treatment/
 
 ### Rockwell (Authoritative)
 - **Purpose**: SPHERE testbed deployment
-- **Files**: Studio 5000 L5X programs
-- **Status**: ✅ Active - Ready for testbed deployment
-- **Validation**: XIR checks, tag schema validation
+- **Files**: Studio 5000 L5X/L5K programs (Controller_PLC, Simulator_PLC, ProcessOne variants)
+- **Status**: Programs exist; hardware validation pending (enclave offline)
 - **Deployment**: Delegates to SPHERE enclave infrastructure
 
 ### OpenPLC (Virtual)
@@ -81,19 +78,14 @@ water-treatment/
   - `simulator_project/` - Simulation program
 - **Usage**: Open in OpenPLC Editor for local development and testing
 
-## 🔬 Security Experiments
+## Security Experiments (Planned)
 
-### Sensor Spoofing
-- **pH Sensor Attacks**: Manipulate chemical dosing through false pH readings
-- **Flow Rate Spoofing**: Disrupt process control with false flow data
-- **Level Sensor Attacks**: Cause tank overflow/underflow scenarios
+Experiment stubs exist in `experiments/` for future security research:
 
-### Pump Override
-- **Direct Control**: Bypass safety interlocks for direct pump control
-- **Speed Manipulation**: Alter pump speeds beyond safe ranges
-- **Emergency Bypass**: Disable emergency stop functionality
+- **Sensor Spoofing** — pH, flow, and level sensor manipulation scenarios
+- **Pump Override** — direct control and safety interlock bypass scenarios
 
-See [experiments/README.md](experiments/README.md) for detailed experiment descriptions.
+These are not yet implemented. See [experiments/README.md](experiments/README.md) for descriptions.
 
 ## 🛡️ Safety Considerations
 
