@@ -56,3 +56,31 @@ overlays:
     fallback_percent: { x: 43, y: 69 }
     style: indicator
     group: rws
+
+  # Distribution Grid
+  - tag: Grid_Elev_Tank_Level
+    fallback_percent: { x: 72, y: 18 }
+    style: badge
+    group: grid
+
+  - tag: Grid_Consum_Tank_Level
+    fallback_percent: { x: 85, y: 42 }
+    style: badge
+    group: grid
+
+  # System State
+  - tag: SYS_IDLE
+    fallback_percent: { x: 90, y: 5 }
+    style: indicator
+    group: system
+
+  - tag: SYS_RUNNING
+    fallback_percent: { x: 95, y: 5 }
+    style: indicator
+    group: system
+
+  # Alarms
+  - tag: Alarm_Supply_Tank_HH
+    fallback_percent: { x: 39, y: 12 }
+    style: indicator
+    group: alarms

@@ -1,0 +1,196 @@
+api_version: sphere.mergetb.io/v1
+kind: TagContract
+
+metadata:
+  usecase_id: water-distribution-uc0
+  version: "1.0.0"
+  description: >
+    Water Distribution UC0 tag contract. Covers supply line (intake + chemical dosing),
+    distribution grid (elevated and consumer tanks), and return water system.
+    Derived from RoviSys FunctionalSpec wiring and P&ID diagram components.
+
+tags:
+  # --- Supply Line ---
+  Supply_Tank_Level:
+    type: real
+    direction: sensor
+    role: simulator
+    group: supply
+    description: Supply water tank level
+    units: mm
+    range: [0, 1500]
+
+  Supply_Pump_Flow:
+    type: real
+    direction: sensor
+    role: simulator
+    group: supply
+    description: Supply pump discharge flow rate
+    units: L/min
+    range: [0, 200]
+
+  Supply_Pump_Speed:
+    type: real
+    direction: actuator
+    role: controller
+    group: supply
+    description: Supply pump VFD speed setpoint
+    units: "%"
+    range: [0, 100]
+
+  Supply_Pump_Sts:
+    type: bool
+    direction: sensor
+    role: simulator
+    group: supply
+    description: Supply pump running status
+
+  Supply_Mixer_Sts:
+    type: bool
+    direction: sensor
+    role: simulator
+    group: supply
+    description: Supply tank mixer running status
+
+  Supply_Tank_Valve:
+    type: bool
+    direction: actuator
+    role: controller
+    group: supply
+    description: Supply tank outlet valve command
+
+  Supply_Tank_Valve_Sts:
+    type: bool
+    direction: sensor
+    role: simulator
+    group: supply
+    description: Supply tank outlet valve status
+
+  Supply_NaOCl_Level:
+    type: real
+    direction: sensor
+    role: simulator
+    group: supply
+    description: Sodium hypochlorite dosing tank level
+    units: mm
+    range: [0, 1000]
+
+  Supply_NH4Cl_Level:
+    type: real
+    direction: sensor
+    role: simulator
+    group: supply
+    description: Ammonium chloride dosing tank level
+    units: mm
+    range: [0, 1000]
+
+  # --- Distribution Grid ---
+  Grid_Elev_Tank_Level:
+    type: real
+    direction: sensor
+    role: simulator
+    group: grid
+    description: Elevated storage tank level
+    units: mm
+    range: [0, 2000]
+
+  Grid_Consum_Tank_Level:
+    type: real
+    direction: sensor
+    role: simulator
+    group: grid
+    description: Consumer storage tank level
+    units: mm
+    range: [0, 2000]
+
+  Grid_Elev_Valve:
+    type: bool
+    direction: actuator
+    role: controller
+    group: grid
+    description: Elevated tank inlet valve command
+
+  Grid_Elev_Valve_Sts:
+    type: bool
+    direction: sensor
+    role: simulator
+    group: grid
+    description: Elevated tank inlet valve status
+
+  # --- Return Water System ---
+  RWS_Tank_Level:
+    type: real
+    direction: sensor
+    role: simulator
+    group: rws
+    description: Return water system tank level
+    units: mm
+    range: [0, 1500]
+
+  RWS_Pump_Sts:
+    type: bool
+    direction: sensor
+    role: simulator
+    group: rws
+    description: Return water pump running status
+
+  RWS_Pump_Speed:
+    type: real
+    direction: actuator
+    role: controller
+    group: rws
+    description: Return water pump VFD speed setpoint
+    units: "%"
+    range: [0, 100]
+
+  RWS_Tank_Valve:
+    type: bool
+    direction: actuator
+    role: controller
+    group: rws
+    description: Return water tank outlet valve command
+
+  RWS_Tank_Valve_Sts:
+    type: bool
+    direction: sensor
+    role: simulator
+    group: rws
+    description: Return water tank outlet valve status
+
+  # --- System State ---
+  SYS_IDLE:
+    type: bool
+    direction: sensor
+    role: controller
+    group: system
+    description: System idle state
+
+  SYS_RUNNING:
+    type: bool
+    direction: sensor
+    role: controller
+    group: system
+    description: System running state
+
+  # --- Alarms ---
+  Alarm_Supply_Tank_HH:
+    type: bool
+    direction: sensor
+    role: controller
+    group: alarms
+    description: Supply tank high-high level alarm
+
+alarm_thresholds:
+  Supply_Tank:
+    HH: 1200  # mm
+
+headline_tags:
+  - Supply_Tank_Level
+  - Supply_Pump_Flow
+  - Supply_Pump_Sts
+  - Grid_Elev_Tank_Level
+  - Grid_Consum_Tank_Level
+  - RWS_Tank_Level
+  - SYS_IDLE
+  - SYS_RUNNING
+  - Alarm_Supply_Tank_HH
