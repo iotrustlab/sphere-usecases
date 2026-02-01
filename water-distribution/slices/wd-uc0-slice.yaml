@@ -1,0 +1,41 @@
+api_version: sphere.mergetb.io/v1
+kind: SliceDefinition
+
+metadata:
+  slice_id: wd-uc0-slice-01
+  usecase_id: water-distribution-uc0
+  version: "1.0.0"
+  description: Water Distribution UC0 visualization slice covering supply line, distribution grid, and return water system with system state and alarm overlays.
+
+active_groups:
+  - supply
+  - grid
+  - rws
+
+diagram:
+  asset: "water-distribution.svg"
+
+overlay_tags:
+  - Supply_Tank_Level
+  - Supply_Pump_Flow
+  - Supply_Pump_Sts
+  - Supply_Mixer_Sts
+  - Supply_Tank_Valve_Sts
+  - Supply_NaOCl_Level
+  - Supply_NH4Cl_Level
+  - Grid_Elev_Tank_Level
+  - Grid_Consum_Tank_Level
+  - Grid_Elev_Valve_Sts
+  - RWS_Tank_Level
+  - RWS_Pump_Sts
+  - SYS_IDLE
+  - SYS_RUNNING
+  - Alarm_Supply_Tank_HH
+
+trend_tags:
+  - Supply_Tank_Level
+  - Supply_Pump_Flow
+  - Grid_Elev_Tank_Level
+  - RWS_Tank_Level
+
+notes: Minimal UC0 slice for Water Distribution demo visualization. Overlay tags include headline process values from all three process groups, system state, and the primary alarm.

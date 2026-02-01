@@ -1,0 +1,22 @@
+[
+  {
+    "type": "start",
+    "timestamp": "2025-06-15T10:05:00Z",
+    "message": "Run started (flow transition)"
+  },
+  {
+    "type": "health",
+    "timestamp": "2025-06-15T10:05:03Z",
+    "message": "Health OK"
+  },
+  {
+    "type": "health",
+    "timestamp": "2025-06-15T10:05:15Z",
+    "message": "Health OK - distribution active"
+  },
+  {
+    "type": "stop",
+    "timestamp": "2025-06-15T10:05:30Z",
+    "message": "Run completed"
+  }
+]
