@@ -1,0 +1,62 @@
+# Canonical tag inventory for water-treatment use case.
+# Extracted from meta.json tags + slice.yaml overlay/trend tags.
+# Each component groups its associated tags with role and unit metadata.
+
+components:
+  - id: RW_Tank
+    type: tank
+    stage: p1
+    tags:
+      - { name: RW_Tank_Level, role: sensor, unit: mm }
+      - { name: RW_Tank_PR_Valve, role: command }
+      - { name: RW_Tank_PR_Valve_Sts, role: status }
+      - { name: RW_Tank_P_Valve, role: command }
+      - { name: RW_Tank_P_Valve_Sts, role: status }
+
+  - id: RW_Pump
+    type: pump
+    stage: p1
+    tags:
+      - { name: RW_Pump_Speed, role: sensor, unit: "%" }
+      - { name: RW_Pump_Flow, role: sensor, unit: L/min }
+      - { name: RW_Pump_Sts, role: status }
+      - { name: RW_Pump_Fault, role: alarm }
+      - { name: RW_Pump_Start, role: command }
+      - { name: RW_Pump_Stop, role: command }
+
+  - id: ChemTreat_NaCl
+    type: tank
+    stage: p2
+    tags:
+      - { name: ChemTreat_NaCl_Level, role: sensor, unit: mm }
+
+  - id: ChemTreat_NaOCl
+    type: tank
+    stage: p2
+    tags:
+      - { name: ChemTreat_NaOCl_Level, role: sensor, unit: mm }
+
+  - id: ChemTreat_HCl
+    type: tank
+    stage: p2
+    tags:
+      - { name: ChemTreat_HCl_Level, role: sensor, unit: mm }
+
+  - id: UF_UFFT_Tank
+    type: tank
+    stage: p3
+    tags:
+      - { name: UF_UFFT_Tank_Level, role: sensor, unit: mm }
+
+  - id: SYS
+    type: system
+    stage: sys
+    tags:
+      - { name: SYS_IDLE, role: status }
+      - { name: SYS_RUNNING, role: status }
+
+  - id: Alarm
+    type: alarm
+    stage: alm
+    tags:
+      - { name: Alarm_RW_Tank_HH, role: alarm }

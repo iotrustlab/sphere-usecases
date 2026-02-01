@@ -1,0 +1,387 @@
+# Canonical Tag Contract for Water Treatment Use Case #1
+#
+# This file is the backend-agnostic source of truth for all tags in the
+# water treatment scenario. Tag names here must be used identically across
+# OpenPLC, Rockwell, and any future backend implementations.
+#
+# Backend-specific protocol bindings (Modbus addresses, CIP paths) are in
+# separate mapping files under implementations/<backend>/.
+
+api_version: sphere.mergetb.io/v1
+kind: TagContract
+
+metadata:
+  name: water-treatment-uc1
+  use_case: water-treatment
+  version: "1.0.0"
+  description: |
+    Water treatment Process One - a subset of the full RoviSys functional
+    specification (USC24A-FDS-001, Rev B, Dec 2024). Covers P1 (Raw Water),
+    P2 (Chemical Treatment), and P3 (Ultrafiltration) only.
+
+    The full spec defines additional stages (Dechlorination, Reverse Osmosis,
+    Backwash, Permeate, Supply) plus a separate Water Distribution subsystem.
+    These will be added as future use cases.
+
+    Derived from Rockwell UDTs (P1_UDT, P2_UDT, P3_UDT, System_State_UDT,
+    HMI_UDT, RW_tank_AL_UDT) and validated against OpenPLC Modbus map.
+  references:
+    - "USC24A-FDS-001 Rev B (RoviSys Functional Specification)"
+    - "USC24A-IOL-001 (USC Finalized IO List)"
+
+# Tags grouped by process and role
+tags:
+  # ─── HMI (Human-Machine Interface) ───────────────────────────────────
+  - name: HMI_Start_PB
+    type: bool
+    direction: actuator      # external -> controller
+    role: controller
+    group: hmi
+    description: "HMI start pushbutton"
+
+  - name: HMI_Stop_PB
+    type: bool
+    direction: actuator
+    role: controller
+    group: hmi
+    description: "HMI stop pushbutton"
+
+  - name: HMI_Start_Active
+    type: bool
+    direction: sensor        # controller -> external
+    role: controller
+    group: hmi
+    description: "Start command active indicator"
+
+  - name: HMI_Stop_Active
+    type: bool
+    direction: sensor
+    role: controller
+    group: hmi
+    description: "Stop command active indicator"
+
+  # ─── Process 1: Raw Water System ─────────────────────────────────────
+  # Analog sensors (simulator -> controller)
+  - name: RW_Tank_Level
+    type: real
+    direction: sensor
+    role: simulator
+    group: p1
+    units: mm
+    range: [0, 1200]
+    description: "Raw water tank level"
+
+  - name: RW_Pump_Flow
+    type: real
+    direction: sensor
+    role: simulator
+    group: p1
+    units: "L/min"
+    description: "Raw water pump flow rate"
+
+  # Analog actuators (controller -> simulator)
+  - name: RW_Pump_Speed
+    type: real
+    direction: actuator
+    role: controller
+    group: p1
+    units: "%"
+    range: [0, 100]
+    description: "Raw water pump speed setpoint"
+
+  # Digital status (simulator -> controller)
+  - name: RW_Tank_PR_Valve_Sts
+    type: bool
+    direction: sensor
+    role: simulator
+    group: p1
+    description: "Raw water tank pressure relief valve status"
+
+  - name: RW_Tank_P6B_Valve_Sts
+    type: bool
+    direction: sensor
+    role: simulator
+    group: p1
+    description: "Raw water tank P6B valve status"
+
+  - name: RW_Tank_P_Valve_Sts
+    type: bool
+    direction: sensor
+    role: simulator
+    group: p1
+    description: "Raw water tank process valve status"
+
+  - name: RW_Pump_Sts
+    type: bool
+    direction: sensor
+    role: simulator
+    group: p1
+    description: "Raw water pump running status"
+
+  - name: RW_Pump_Fault
+    type: bool
+    direction: sensor
+    role: simulator
+    group: p1
+    description: "Raw water pump fault indicator"
+
+  # Digital commands (controller -> simulator)
+  - name: RW_Tank_PR_Valve
+    type: bool
+    direction: actuator
+    role: controller
+    group: p1
+    description: "Raw water tank pressure relief valve command"
+
+  - name: RW_Tank_P6B_Valve
+    type: bool
+    direction: actuator
+    role: controller
+    group: p1
+    description: "Raw water tank P6B valve command"
+
+  - name: RW_Tank_P_Valve
+    type: bool
+    direction: actuator
+    role: controller
+    group: p1
+    description: "Raw water tank process valve command"
+
+  - name: RW_Pump_Start
+    type: bool
+    direction: actuator
+    role: controller
+    group: p1
+    description: "Raw water pump start command"
+
+  - name: RW_Pump_Stop
+    type: bool
+    direction: actuator
+    role: controller
+    group: p1
+    description: "Raw water pump stop command"
+
+  # ─── Process 2: Chemical Treatment ───────────────────────────────────
+  # Analog sensors (simulator -> controller)
+  - name: ChemTreat_NaCl_Level
+    type: real
+    direction: sensor
+    role: simulator
+    group: p2
+    units: mm
+    description: "NaCl tank level"
+
+  - name: ChemTreat_NaOCl_Level
+    type: real
+    direction: sensor
+    role: simulator
+    group: p2
+    units: mm
+    description: "NaOCl tank level"
+
+  - name: ChemTreat_HCl_Level
+    type: real
+    direction: sensor
+    role: simulator
+    group: p2
+    units: mm
+    description: "HCl tank level"
+
+  # Digital status (simulator -> controller)
+  - name: ChemTreat_NaCl_Valve_Sts
+    type: bool
+    direction: sensor
+    role: simulator
+    group: p2
+    description: "NaCl valve status"
+
+  - name: ChemTreat_NaOCl_Valve_Sts
+    type: bool
+    direction: sensor
+    role: simulator
+    group: p2
+    description: "NaOCl valve status"
+
+  - name: ChemTreat_HCl_Valve_Sts
+    type: bool
+    direction: sensor
+    role: simulator
+    group: p2
+    description: "HCl valve status"
+
+  # Digital commands (controller -> simulator)
+  - name: ChemTreat_NaCl_Valve
+    type: bool
+    direction: actuator
+    role: controller
+    group: p2
+    description: "NaCl tank valve command"
+
+  - name: ChemTreat_NaOCl_Valve
+    type: bool
+    direction: actuator
+    role: controller
+    group: p2
+    description: "NaOCl tank valve command"
+
+  - name: ChemTreat_HCl_Valve
+    type: bool
+    direction: actuator
+    role: controller
+    group: p2
+    description: "HCl tank valve command"
+
+  # ─── Process 3: Ultrafiltration ──────────────────────────────────────
+  # Analog sensors (simulator -> controller)
+  - name: UF_UFFT_Tank_Level
+    type: real
+    direction: sensor
+    role: simulator
+    group: p3
+    units: mm
+    range: [0, 1200]
+    description: "Ultrafiltration feed tank level"
+
+  # Digital status (simulator -> controller)
+  - name: UF_UFFT_Tank_Valve_Sts
+    type: bool
+    direction: sensor
+    role: simulator
+    group: p3
+    description: "UF feed tank valve status"
+
+  - name: UF_Drain_Valve_Sts
+    type: bool
+    direction: sensor
+    role: simulator
+    group: p3
+    description: "UF drain valve status"
+
+  - name: UF_ROFT_Valve_Sts
+    type: bool
+    direction: sensor
+    role: simulator
+    group: p3
+    description: "Reverse osmosis feed tank valve status"
+
+  - name: UF_BWP_Valve_Sts
+    type: bool
+    direction: sensor
+    role: simulator
+    group: p3
+    description: "Backwash permeate valve status"
+
+  # Digital commands (controller -> simulator)
+  - name: UF_UFFT_Tank_Valve
+    type: bool
+    direction: actuator
+    role: controller
+    group: p3
+    description: "UF feed tank valve command"
+
+  - name: UF_Drain_Valve
+    type: bool
+    direction: actuator
+    role: controller
+    group: p3
+    description: "UF drain valve command"
+
+  - name: UF_ROFT_Valve
+    type: bool
+    direction: actuator
+    role: controller
+    group: p3
+    description: "Reverse osmosis feed tank valve command"
+
+  - name: UF_BWP_Valve
+    type: bool
+    direction: actuator
+    role: controller
+    group: p3
+    description: "Backwash permeate valve command"
+
+  # ─── System State ────────────────────────────────────────────────────
+  - name: SYS_IDLE
+    type: bool
+    direction: sensor
+    role: controller
+    group: system
+    description: "System in IDLE state"
+
+  - name: SYS_START
+    type: bool
+    direction: sensor
+    role: controller
+    group: system
+    description: "System in START state"
+
+  - name: SYS_RUNNING
+    type: bool
+    direction: sensor
+    role: controller
+    group: system
+    description: "System in RUNNING state"
+
+  - name: SYS_SHUTDOWN
+    type: bool
+    direction: sensor
+    role: controller
+    group: system
+    description: "System in SHUTDOWN state"
+
+  - name: SYS_Permissives_Ready
+    type: bool
+    direction: sensor
+    role: controller
+    group: system
+    description: "All permissives met for START->RUNNING transition"
+
+  # ─── Alarms ──────────────────────────────────────────────────────────
+  - name: Alarm_RW_Tank_LL
+    type: bool
+    direction: sensor
+    role: controller
+    group: alarms
+    description: "Raw water tank Low-Low level alarm"
+
+  - name: Alarm_RW_Tank_L
+    type: bool
+    direction: sensor
+    role: controller
+    group: alarms
+    description: "Raw water tank Low level alarm"
+
+  - name: Alarm_RW_Tank_H
+    type: bool
+    direction: sensor
+    role: controller
+    group: alarms
+    description: "Raw water tank High level alarm"
+
+  - name: Alarm_RW_Tank_HH
+    type: bool
+    direction: sensor
+    role: controller
+    group: alarms
+    description: "Raw water tank High-High level alarm"
+
+# Alarm thresholds (reference - actual logic is in PLC program)
+alarm_thresholds:
+  RW_Tank:
+    LL: 250     # mm - Low-Low: Stop pump
+    L: 500      # mm - Low: Open inlet valve
+    H: 800      # mm - High: Close inlet valve
+    HH: 1200    # mm - High-High: Alarm
+  UF_UFFT_Tank:
+    start_pump: 800   # mm
+    stop_pump: 1000   # mm
+
+# Headline tags for UI overlays and trend displays
+headline_tags:
+  - RW_Tank_Level
+  - RW_Pump_Speed
+  - RW_Pump_Flow
+  - UF_UFFT_Tank_Level
+  - SYS_IDLE
+  - SYS_RUNNING
+  - Alarm_RW_Tank_HH

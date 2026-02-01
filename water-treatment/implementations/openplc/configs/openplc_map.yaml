@@ -1,0 +1,279 @@
+# OpenPLC Backend Mapping: Canonical Tag -> Modbus Address
+#
+# Maps each canonical tag name from tag_contract.yaml to its Modbus
+# register type and address for the OpenPLC backend.
+#
+# Modbus register types:
+#   coil              - Digital output (function codes 1/5/15)
+#   discrete_input    - Digital input (function code 2)
+#   holding_register  - Analog output (function codes 3/6/16)
+#   input_register    - Analog input (function code 4)
+#
+# OpenPLC IEC address convention:
+#   %QX<byte>.<bit> -> coil address = byte*8 + bit
+#   %IX<byte>.<bit> -> discrete_input address = byte*8 + bit
+#   %QW<n>          -> holding_register address = n
+#   %IW<n>          -> input_register address = n
+
+api_version: sphere.mergetb.io/v1
+kind: BackendMapping
+metadata:
+  backend: openplc
+  protocol: modbus_tcp
+
+mappings:
+  # ─── Process 1: Raw Water System ─────────────────────────────────────
+  # Digital commands (coils) - controller -> simulator
+  RW_Tank_PR_Valve:
+    register_type: coil
+    address: 40             # %QX5.0
+    iec_address: "%QX5.0"
+
+  RW_Tank_P6B_Valve:
+    register_type: coil
+    address: 41             # %QX5.1
+    iec_address: "%QX5.1"
+
+  RW_Tank_P_Valve:
+    register_type: coil
+    address: 42             # %QX5.2
+    iec_address: "%QX5.2"
+
+  RW_Pump_Start:
+    register_type: coil
+    address: 43             # %QX5.3
+    iec_address: "%QX5.3"
+
+  RW_Pump_Stop:
+    register_type: coil
+    address: 44             # %QX5.4
+    iec_address: "%QX5.4"
+
+  # Digital status (discrete inputs) - simulator -> controller
+  RW_Tank_PR_Valve_Sts:
+    register_type: discrete_input
+    address: 16             # %IX2.0
+    iec_address: "%IX2.0"
+
+  RW_Tank_P6B_Valve_Sts:
+    register_type: discrete_input
+    address: 17             # %IX2.1
+    iec_address: "%IX2.1"
+
+  RW_Tank_P_Valve_Sts:
+    register_type: discrete_input
+    address: 18             # %IX2.2
+    iec_address: "%IX2.2"
+
+  RW_Pump_Sts:
+    register_type: discrete_input
+    address: 19             # %IX2.3
+    iec_address: "%IX2.3"
+
+  RW_Pump_Fault:
+    register_type: discrete_input
+    address: 20             # %IX2.4
+    iec_address: "%IX2.4"
+
+  # Analog output (holding register) - controller -> simulator
+  RW_Pump_Speed:
+    register_type: holding_register
+    address: 100            # %QW100
+    iec_address: "%QW100"
+    scale: 1.0
+
+  # Analog inputs (input registers) - simulator -> controller
+  RW_Tank_Level:
+    register_type: input_register
+    address: 70             # %IW70
+    iec_address: "%IW70"
+    scale: 1.0
+
+  RW_Pump_Flow:
+    register_type: input_register
+    address: 71             # %IW71
+    iec_address: "%IW71"
+    scale: 1.0
+
+  # ─── Process 2: Chemical Treatment ───────────────────────────────────
+  # Digital commands (coils)
+  ChemTreat_NaCl_Valve:
+    register_type: coil
+    address: 45             # %QX5.5
+    iec_address: "%QX5.5"
+
+  ChemTreat_NaOCl_Valve:
+    register_type: coil
+    address: 46             # %QX5.6
+    iec_address: "%QX5.6"
+
+  ChemTreat_HCl_Valve:
+    register_type: coil
+    address: 47             # %QX5.7
+    iec_address: "%QX5.7"
+
+  # Digital status (discrete inputs)
+  ChemTreat_NaCl_Valve_Sts:
+    register_type: discrete_input
+    address: 21             # %IX2.5
+    iec_address: "%IX2.5"
+
+  ChemTreat_NaOCl_Valve_Sts:
+    register_type: discrete_input
+    address: 22             # %IX2.6
+    iec_address: "%IX2.6"
+
+  ChemTreat_HCl_Valve_Sts:
+    register_type: discrete_input
+    address: 23             # %IX2.7
+    iec_address: "%IX2.7"
+
+  # Analog inputs (input registers)
+  ChemTreat_NaCl_Level:
+    register_type: input_register
+    address: 72             # %IW72
+    iec_address: "%IW72"
+    scale: 1.0
+
+  ChemTreat_NaOCl_Level:
+    register_type: input_register
+    address: 73             # %IW73
+    iec_address: "%IW73"
+    scale: 1.0
+
+  ChemTreat_HCl_Level:
+    register_type: input_register
+    address: 74             # %IW74
+    iec_address: "%IW74"
+    scale: 1.0
+
+  # ─── Process 3: Ultrafiltration ──────────────────────────────────────
+  # Digital commands (coils)
+  UF_UFFT_Tank_Valve:
+    register_type: coil
+    address: 48             # %QX5.8
+    iec_address: "%QX5.8"
+
+  UF_Drain_Valve:
+    register_type: coil
+    address: 49             # %QX5.9
+    iec_address: "%QX5.9"
+
+  UF_ROFT_Valve:
+    register_type: coil
+    address: 50             # %QX5.10
+    iec_address: "%QX5.10"
+
+  UF_BWP_Valve:
+    register_type: coil
+    address: 51             # %QX5.11
+    iec_address: "%QX5.11"
+
+  # Digital status (discrete inputs)
+  UF_UFFT_Tank_Valve_Sts:
+    register_type: discrete_input
+    address: 24             # %IX2.8
+    iec_address: "%IX2.8"
+
+  UF_Drain_Valve_Sts:
+    register_type: discrete_input
+    address: 25             # %IX2.9
+    iec_address: "%IX2.9"
+
+  UF_ROFT_Valve_Sts:
+    register_type: discrete_input
+    address: 26             # %IX2.10
+    iec_address: "%IX2.10"
+
+  UF_BWP_Valve_Sts:
+    register_type: discrete_input
+    address: 27             # %IX2.11
+    iec_address: "%IX2.11"
+
+  # Analog input (input register)
+  UF_UFFT_Tank_Level:
+    register_type: input_register
+    address: 75             # %IW75
+    iec_address: "%IW75"
+    scale: 1.0
+
+  # ─── Reserved Address Ranges ─────────────────────────────────────────
+  # Coils:
+  #   %QX0.0-0.3  (0-3)    HMI pushbuttons / indicators
+  #   %QX5.0-5.11 (40-51)  Process actuator commands
+  #   %QX7.0-7.4  (56-60)  System state
+  #   %QX8.0-8.3  (64-67)  Alarms
+  # Discrete inputs:
+  #   %IX2.0-2.11 (16-27)  Process status feedback
+  # Holding registers:
+  #   %QW100              Pump speed command
+  # Input registers:
+  #   %IW70-75            Analog sensor values
+
+  # ─── HMI ────────────────────────────────────────────────────────────
+  HMI_Start_PB:
+    register_type: coil
+    address: 0              # %QX0.0
+    iec_address: "%QX0.0"
+
+  HMI_Stop_PB:
+    register_type: coil
+    address: 1              # %QX0.1
+    iec_address: "%QX0.1"
+
+  HMI_Start_Active:
+    register_type: coil
+    address: 2              # %QX0.2
+    iec_address: "%QX0.2"
+
+  HMI_Stop_Active:
+    register_type: coil
+    address: 3              # %QX0.3
+    iec_address: "%QX0.3"
+
+  # ─── System State ──────────────────────────────────────────────────
+  SYS_IDLE:
+    register_type: coil
+    address: 56             # %QX7.0
+    iec_address: "%QX7.0"
+
+  SYS_START:
+    register_type: coil
+    address: 57             # %QX7.1
+    iec_address: "%QX7.1"
+
+  SYS_RUNNING:
+    register_type: coil
+    address: 58             # %QX7.2
+    iec_address: "%QX7.2"
+
+  SYS_SHUTDOWN:
+    register_type: coil
+    address: 59             # %QX7.3
+    iec_address: "%QX7.3"
+
+  SYS_Permissives_Ready:
+    register_type: coil
+    address: 60             # %QX7.4
+    iec_address: "%QX7.4"
+
+  # ─── Alarms ────────────────────────────────────────────────────────
+  Alarm_RW_Tank_LL:
+    register_type: coil
+    address: 64             # %QX8.0
+    iec_address: "%QX8.0"
+
+  Alarm_RW_Tank_L:
+    register_type: coil
+    address: 65             # %QX8.1
+    iec_address: "%QX8.1"
+
+  Alarm_RW_Tank_H:
+    register_type: coil
+    address: 66             # %QX8.2
+    iec_address: "%QX8.2"
+
+  Alarm_RW_Tank_HH:
+    register_type: coil
+    address: 67             # %QX8.3
+    iec_address: "%QX8.3"

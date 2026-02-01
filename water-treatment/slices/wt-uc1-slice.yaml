@@ -1,0 +1,48 @@
+api_version: sphere.mergetb.io/v1
+kind: SliceDefinition
+metadata:
+  slice_id: wt-uc1-slice-01
+  usecase_id: water-treatment-uc1
+  version: "1.0.0"
+  description: >
+    Water Treatment UC1 visualization slice covering raw water intake (P1),
+    chemical treatment (P2), and ultrafiltration (P3) with key system state
+    and alarm overlays.
+
+active_groups:
+  - p1
+  - p2
+  - p3
+
+diagram:
+  asset: "water-treatment-p1.svg"
+
+overlay_tags:
+  # P1 key indicators
+  - RW_Tank_Level
+  - RW_Pump_Speed
+  - RW_Pump_Flow
+  - RW_Pump_Sts
+  - RW_Tank_PR_Valve
+  - RW_Tank_P_Valve
+  # P2 chemical levels
+  - ChemTreat_NaCl_Level
+  - ChemTreat_NaOCl_Level
+  - ChemTreat_HCl_Level
+  # P3 UF tank
+  - UF_UFFT_Tank_Level
+  # System state + alarms
+  - SYS_IDLE
+  - SYS_RUNNING
+  - Alarm_RW_Tank_HH
+
+trend_tags:
+  - RW_Tank_Level
+  - RW_Pump_Speed
+  - RW_Pump_Flow
+  - UF_UFFT_Tank_Level
+
+notes: >
+  Minimal UC1 slice for demo visualization. Overlay tags include headline
+  process values, key actuators, system state, and the highest-priority
+  alarm. Trend tags cover the four primary analog signals.

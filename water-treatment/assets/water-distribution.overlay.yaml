@@ -1,0 +1,58 @@
+# Overlay tag positions for water-distribution.svg
+# Uses component-anchor targeting: the viewer resolves target + anchor
+# to the SVG element ID "anchor:COMPONENT:ANCHOR".
+# style: "badge" (colored pill), "text" (plain value), "indicator" (dot)
+#
+# NOTE: water-distribution.svg still uses legacy anchor IDs (anchor_TAGNAME).
+# These entries use the legacy svg_id mode until the WD diagram is regenerated.
+
+overlays:
+  # Supply
+  - tag: Supply_Tank_Level
+    mode: svg_id
+    svg_id: "anchor_Supply_Tank_Level"
+    offset_px: { dx: 8, dy: -12 }
+    fallback_percent: { x: 39, y: 18 }
+    style: badge
+    group: supply
+
+  - tag: Supply_Pump_Flow
+    mode: svg_id
+    svg_id: "anchor_Supply_Pump_Flow"
+    offset_px: { dx: 8, dy: 0 }
+    fallback_percent: { x: 51, y: 27 }
+    style: text
+    group: supply
+
+  - tag: Supply_Pump_Sts
+    mode: svg_id
+    svg_id: "anchor_Supply_Pump_Sts"
+    offset_px: { dx: 0, dy: 0 }
+    fallback_percent: { x: 52, y: 18 }
+    style: indicator
+    group: supply
+
+  - tag: Supply_Mixer_Sts
+    mode: svg_id
+    svg_id: "anchor_Supply_Mixer_Sts"
+    offset_px: { dx: 0, dy: 0 }
+    fallback_percent: { x: 32, y: 18 }
+    style: indicator
+    group: supply
+
+  # Return Water System
+  - tag: RWS_Tank_Level
+    mode: svg_id
+    svg_id: "anchor_RWS_Tank_Level"
+    offset_px: { dx: 8, dy: -12 }
+    fallback_percent: { x: 30, y: 69 }
+    style: badge
+    group: rws
+
+  - tag: RWS_Pump_Sts
+    mode: svg_id
+    svg_id: "anchor_RWS_Pump_Sts"
+    offset_px: { dx: 0, dy: 0 }
+    fallback_percent: { x: 43, y: 69 }
+    style: indicator
+    group: rws

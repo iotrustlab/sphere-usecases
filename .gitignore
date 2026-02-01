@@ -76,6 +76,9 @@ simulation_results/
 docs/_build/
 site/
 
+# Generated reports (from OpenPLC flatten/IO analysis)
+*_report.json
+
 # Backup files
 *.bak
 *.backup

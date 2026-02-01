@@ -1,0 +1,158 @@
+# Modbus I/O Mapping for Water Treatment Process One
+#
+# This file defines the Modbus address space for communication between
+# the Controller and Simulator PLCs.
+#
+# OpenPLC Modbus Mapping Convention:
+#   - Coils (0x): %QX addresses (digital outputs)
+#   - Discrete Inputs (1x): %IX addresses (digital inputs)
+#   - Holding Registers (4x): %QW addresses (analog outputs)
+#   - Input Registers (3x): %IW addresses (analog inputs)
+#
+# Address Calculation:
+#   %QX5.0 -> Coil address = 5*8 + 0 = 40
+#   %IW70  -> Input Register address = 70
+
+# Digital Outputs (Coils) - Controller -> Simulator
+coils:
+  # Process 1: Raw Water System
+  - name: RW_Tank_PR_Valve
+    address: 40          # %QX5.0
+    description: "Raw water tank pressure relief valve command"
+  - name: RW_Tank_P6B_Valve
+    address: 41          # %QX5.1
+    description: "Raw water tank P6B valve command"
+  - name: RW_Tank_P_Valve
+    address: 42          # %QX5.2
+    description: "Raw water tank process valve command"
+  - name: RW_Pump_Start
+    address: 43          # %QX5.3
+    description: "Raw water pump start command"
+  - name: RW_Pump_Stop
+    address: 44          # %QX5.4
+    description: "Raw water pump stop command"
+
+  # Process 2: Chemical Treatment
+  - name: ChemTreat_NaCl_Valve
+    address: 45          # %QX5.5
+    description: "NaCl tank valve command"
+  - name: ChemTreat_NaOCl_Valve
+    address: 46          # %QX5.6
+    description: "NaOCl tank valve command"
+  - name: ChemTreat_HCl_Valve
+    address: 47          # %QX5.7
+    description: "HCl tank valve command"
+
+  # Process 3: Ultrafiltration
+  - name: UF_UFFT_Tank_Valve
+    address: 48          # %QX5.8
+    description: "UF feed tank valve command"
+  - name: UF_Drain_Valve
+    address: 49          # %QX5.9
+    description: "UF drain valve command"
+  - name: UF_ROFT_Valve
+    address: 50          # %QX5.10
+    description: "UF to RO feed tank valve command"
+  - name: UF_BWP_Valve
+    address: 51          # %QX5.11
+    description: "UF backwash pump valve command"
+
+# Digital Inputs (Discrete Inputs) - Simulator -> Controller
+discrete_inputs:
+  # Process 1: Valve Status Feedback
+  - name: RW_Tank_PR_Valve_Sts
+    address: 16          # %IX2.0
+    description: "Raw water tank PR valve status"
+  - name: RW_Tank_P6B_Valve_Sts
+    address: 17          # %IX2.1
+    description: "Raw water tank P6B valve status"
+  - name: RW_Tank_P_Valve_Sts
+    address: 18          # %IX2.2
+    description: "Raw water tank process valve status"
+  - name: RW_Pump_Sts
+    address: 19          # %IX2.3
+    description: "Raw water pump running status"
+  - name: RW_Pump_Fault
+    address: 20          # %IX2.4
+    description: "Raw water pump fault status"
+
+  # Process 2: Chemical Treatment Status
+  - name: ChemTreat_NaCl_Valve_Sts
+    address: 21          # %IX2.5
+    description: "NaCl valve status"
+  - name: ChemTreat_NaOCl_Valve_Sts
+    address: 22          # %IX2.6
+    description: "NaOCl valve status"
+
+  # Process 3: UF Status
+  - name: UF_UFFT_Tank_Valve_Sts
+    address: 24          # %IX2.8
+    description: "UF feed tank valve status"
+  - name: UF_Drain_Valve_Sts
+    address: 25          # %IX2.9
+    description: "UF drain valve status"
+  - name: UF_ROFT_Valve_Sts
+    address: 26          # %IX2.10
+    description: "UF to RO valve status"
+  - name: UF_BWP_Valve_Sts
+    address: 27          # %IX2.11
+    description: "UF backwash pump valve status"
+
+# Analog Outputs (Holding Registers) - Controller -> Simulator
+holding_registers:
+  - name: RW_Pump_Speed
+    address: 100         # %QW100
+    description: "Raw water pump speed setpoint"
+    units: "%"
+    scale: 1.0
+
+# Analog Inputs (Input Registers) - Simulator -> Controller
+input_registers:
+  # Process 1: Tank Levels and Flow
+  - name: RW_Tank_Level
+    address: 70          # %IW70
+    description: "Raw water tank level"
+    units: "mm"
+    scale: 1.0
+    range: [0, 1200]
+  - name: RW_Pump_Flow
+    address: 71          # %IW71
+    description: "Raw water pump flow rate"
+    units: "L/min"
+    scale: 1.0
+
+  # Process 2: Chemical Tank Levels
+  - name: ChemTreat_NaCl_Level
+    address: 72          # %IW72
+    description: "NaCl tank level"
+    units: "mm"
+    scale: 1.0
+  - name: ChemTreat_NaOCl_Level
+    address: 73          # %IW73
+    description: "NaOCl tank level"
+    units: "mm"
+    scale: 1.0
+  - name: ChemTreat_HCl_Level
+    address: 74          # %IW74
+    description: "HCl tank level"
+    units: "mm"
+    scale: 1.0
+
+  # Process 3: UF Tank Level
+  - name: UF_UFFT_Tank_Level
+    address: 75          # %IW75
+    description: "UF feed tank level"
+    units: "mm"
+    scale: 1.0
+    range: [0, 1200]
+
+# Alarm thresholds (for reference - actual logic is in PLC program)
+alarm_levels:
+  RW_Tank:
+    LL: 250   # Low-Low: Stop pump
+    L: 500    # Low: Open inlet valve
+    H: 800    # High: Close inlet valve
+    HH: 1200  # High-High: Alarm
+  UF_UFFT_Tank:
+    start_pump: 800   # Start raw water pump
+    stop_pump: 1000   # Stop raw water pump

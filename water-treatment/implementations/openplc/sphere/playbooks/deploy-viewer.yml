@@ -1,0 +1,189 @@
+---
+# Deploy CPS Enclave Viewer on SPHERE testbed
+#
+# This playbook:
+# 1. Sets up Docker on the viewer node
+# 2. Builds the viewer container image
+# 3. Copies golden run bundles and assets from sphere-usecases to the node
+# 4. Deploys the viewer container with host networking (required for ingress)
+#
+# Prerequisites:
+# - setup-disk.yml and install-docker.yml have been run on the viewer node
+# - The cps-enclave-viewer source is available locally for copying
+
+- name: Build and deploy CPS Enclave Viewer
+  hosts: viewer
+  become: true
+
+  vars:
+    viewer_image_name: cps-enclave-viewer
+    viewer_image_tag: latest
+    container_name: cps-viewer
+    viewer_port: 8080
+    node_ip: "10.100.0.30"
+    # Paths on the viewer node
+    data_dir: /mnt/data/runs
+    assets_dir: /mnt/data/assets
+    slice_path: /mnt/data/slices/wt-uc1-slice.yaml
+    build_dir: /tmp/viewer-build
+    # Local source paths (relative to playbook)
+    viewer_src: "{{ playbook_dir }}/../../../../cps-enclave-model/cps-enclave-viewer"
+    usecase_src: "{{ playbook_dir }}/../../../.."
+
+  tasks:
+    - name: Create data directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0755'
+      loop:
+        - "{{ data_dir }}"
+        - "{{ assets_dir }}"
+        - /mnt/data/slices
+        - "{{ build_dir }}"
+
+    # --- Copy assets and run bundles from sphere-usecases ---
+    - name: Copy golden run bundles
+      ansible.builtin.copy:
+        src: "{{ usecase_src }}/runs/"
+        dest: "{{ data_dir }}/"
+        mode: '0644'
+        directory_mode: '0755'
+
+    - name: Copy diagram assets
+      ansible.builtin.copy:
+        src: "{{ usecase_src }}/assets/"
+        dest: "{{ assets_dir }}/"
+        mode: '0644'
+        directory_mode: '0755'
+
+    - name: Copy slice definition
+      ansible.builtin.copy:
+        src: "{{ usecase_src }}/slices/wt-uc1-slice.yaml"
+        dest: "{{ slice_path }}"
+        mode: '0644'
+
+    # --- Build viewer container image ---
+    - name: Create build context directory
+      ansible.builtin.file:
+        path: "{{ build_dir }}/cps-enclave-viewer"
+        state: directory
+        mode: '0755'
+
+    - name: Copy viewer source for build
+      ansible.builtin.copy:
+        src: "{{ item.src }}"
+        dest: "{{ build_dir }}/{{ item.dest }}"
+        mode: '0644'
+        directory_mode: '0755'
+      loop:
+        - { src: "{{ viewer_src }}/Dockerfile",    dest: "cps-enclave-viewer/Dockerfile" }
+        - { src: "{{ viewer_src }}/cmd/",           dest: "cps-enclave-viewer/cmd/" }
+        - { src: "{{ viewer_src }}/web/",           dest: "cps-enclave-viewer/web/" }
+        # The Dockerfile needs the Go module files at the repo root
+        - { src: "{{ playbook_dir }}/../../../../cps-enclave-model/go.mod", dest: "go.mod" }
+        - { src: "{{ playbook_dir }}/../../../../cps-enclave-model/go.sum", dest: "go.sum" }
+
+    - name: Check if viewer image already exists
+      community.docker.docker_image_info:
+        name: "{{ viewer_image_name }}:{{ viewer_image_tag }}"
+      register: existing_image
+
+    - name: Build viewer container image
+      community.docker.docker_image:
+        name: "{{ viewer_image_name }}"
+        tag: "{{ viewer_image_tag }}"
+        source: build
+        build:
+          path: "{{ build_dir }}"
+          dockerfile: "cps-enclave-viewer/Dockerfile"
+        state: present
+        force_source: "{{ existing_image.images | length == 0 }}"
+      register: build_result
+
+    - name: Display build result
+      ansible.builtin.debug:
+        msg: "Viewer image built: {{ viewer_image_name }}:{{ viewer_image_tag }}"
+      when: build_result.changed
+
+    # --- Deploy viewer container ---
+    - name: Deploy Viewer container
+      community.docker.docker_container:
+        name: "{{ container_name }}"
+        image: "{{ viewer_image_name }}:{{ viewer_image_tag }}"
+        state: started
+        restart_policy: unless-stopped
+        network_mode: host  # Required for MergeTB ingress (binds to infranet)
+        volumes:
+          - "{{ data_dir }}:/data:ro"
+          - "{{ assets_dir }}:/assets:ro"
+          - /mnt/data/slices:/slices:ro
+        command:
+          - "-data"
+          - "/data"
+          - "-assets-dir"
+          - "/assets"
+          - "-slice"
+          - "/slices/wt-uc1-slice.yaml"
+          - "-addr"
+          - ":{{ viewer_port }}"
+        labels:
+          sphere.role: viewer
+          sphere.scenario: water-treatment-uc1
+      register: viewer_container
+
+    - name: Wait for viewer HTTP port
+      ansible.builtin.wait_for:
+        host: localhost
+        port: "{{ viewer_port }}"
+        timeout: 60
+        state: started
+
+    - name: Display Viewer info
+      ansible.builtin.debug:
+        msg: |
+          Viewer deployed on {{ inventory_hostname }}:
+            Container: {{ container_name }}
+            Local URL: http://{{ node_ip }}:{{ viewer_port }}
+            Ingress URL: Check portal or run:
+              mrg show materialization <rid.eid.pid> -j | jq '.ingresses'
+
+    # --- Cleanup build context ---
+    - name: Remove build directory
+      ansible.builtin.file:
+        path: "{{ build_dir }}"
+        state: absent
+
+
+- name: Viewer Deployment Summary
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - name: Display summary
+      ansible.builtin.debug:
+        msg: |
+          ============================================
+          CPS Enclave Viewer Deployment Complete
+          ============================================
+
+          Viewer (10.100.0.30):
+            - HTTP: http://10.100.0.30:8080
+            - Run bundles: /mnt/data/runs/
+            - Assets: /mnt/data/assets/
+            - Slice: /mnt/data/slices/wt-uc1-slice.yaml
+
+          MergeTB Ingress URL:
+            mrg show materialization <rid.eid.pid> -j | jq -r '.ingresses'
+
+          Expected format:
+            http://<gateway>/<rid.eid.pid>/viewer/8080
+
+          Full deployment order:
+            1. ansible-playbook playbooks/setup-disk.yml
+            2. ansible-playbook playbooks/install-docker.yml
+            3. ansible-playbook playbooks/build-openplc.yml
+            4. ansible-playbook playbooks/deploy-sphere.yml
+            5. ansible-playbook playbooks/deploy-viewer.yml  <-- this playbook
+            6. ansible-playbook playbooks/test-modbus.yml
+          ============================================

@@ -1,0 +1,122 @@
+---
+# Install Docker on SPHERE VMs and configure to use extra disk
+#
+# This playbook installs Docker CE and configures it to store images/containers
+# on the extra disk mounted at /mnt/data (from setup-disk.yml)
+
+- name: Install Docker on SPHERE VMs
+  hosts: plcs
+  become: true
+
+  vars:
+    docker_data_root: /mnt/data/docker
+
+  tasks:
+    - name: Verify extra disk is mounted
+      ansible.builtin.command:
+        cmd: mountpoint -q /mnt/data
+      changed_when: false
+
+    - name: Create apt directories on extra disk
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0755'
+      loop:
+        - /mnt/data/apt/cache
+        - /mnt/data/apt/lib
+
+    - name: Configure apt to use extra disk for cache
+      ansible.builtin.copy:
+        content: |
+          Dir::Cache "/mnt/data/apt/cache";
+          Dir::State::lists "/mnt/data/apt/lib/lists";
+        dest: /etc/apt/apt.conf.d/99-extra-disk
+        mode: '0644'
+
+    - name: Create lists directory
+      ansible.builtin.file:
+        path: /mnt/data/apt/lib/lists/partial
+        state: directory
+        mode: '0755'
+
+    - name: Install prerequisites
+      ansible.builtin.apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - gnupg
+          - lsb-release
+        state: present
+        update_cache: true
+
+    - name: Add Docker GPG key
+      ansible.builtin.apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Add Docker repository
+      ansible.builtin.apt_repository:
+        repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+        state: present
+
+    - name: Install Docker CE
+      ansible.builtin.apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-buildx-plugin
+        state: present
+        update_cache: true
+
+    - name: Create Docker config directory
+      ansible.builtin.file:
+        path: /etc/docker
+        state: directory
+        mode: '0755'
+
+    - name: Configure Docker to use extra disk
+      ansible.builtin.copy:
+        content: |
+          {
+            "data-root": "{{ docker_data_root }}",
+            "storage-driver": "overlay2",
+            "log-driver": "json-file",
+            "log-opts": {
+              "max-size": "10m",
+              "max-file": "3"
+            }
+          }
+        dest: /etc/docker/daemon.json
+        mode: '0644'
+      notify: Restart Docker
+
+    - name: Add user to docker group
+      ansible.builtin.user:
+        name: "{{ ansible_user }}"
+        groups: docker
+        append: true
+
+    - name: Ensure Docker service is started
+      ansible.builtin.systemd:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Verify Docker is working
+      ansible.builtin.command:
+        cmd: docker info --format '{{ "{{" }}.DockerRootDir{{ "}}" }}'
+      register: docker_root
+      changed_when: false
+
+    - name: Display Docker data root
+      ansible.builtin.debug:
+        msg: "Docker data root: {{ docker_root.stdout }}"
+
+  handlers:
+    - name: Restart Docker
+      ansible.builtin.systemd:
+        name: docker
+        state: restarted
