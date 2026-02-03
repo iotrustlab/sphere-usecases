@@ -32,6 +32,9 @@ from datetime import datetime, timezone
 from enum import Enum
 from typing import Dict, List, Any, Optional, Tuple
 
+# Bridge mode uses holding registers 300-331 on the simulator
+# instead of input registers and discrete inputs.
+
 try:
     from pymodbus.client import ModbusTcpClient
     from pymodbus.exceptions import ModbusException, ConnectionException
@@ -365,8 +368,14 @@ class HistorianCollector:
         return status
 
 
-def create_default_collector() -> HistorianCollector:
-    """Create collector with default water treatment configuration"""
+def create_default_collector(bridge_mode: bool = False) -> HistorianCollector:
+    """Create collector with default water treatment configuration.
+
+    Args:
+        bridge_mode: If True, read sensor data from bridge holding registers
+                     (HR 300-331) instead of legacy input registers and
+                     discrete inputs.
+    """
     collector = HistorianCollector()
 
     # Register PLCs
@@ -378,38 +387,77 @@ def create_default_collector() -> HistorianCollector:
     collector.add_plc("controller", controller_host, controller_port)
     collector.add_plc("simulator", simulator_host, simulator_port)
 
-    # Register tags - Analog Inputs (from Simulator)
-    analog_inputs = [
-        ("RW_Tank_Level", 70, "mm", "Raw water tank level"),
-        ("RW_Pump_Flow", 71, "L/min", "Raw water pump flow rate"),
-        ("ChemTreat_NaCl_Level", 72, "mm", "NaCl tank level"),
-        ("ChemTreat_NaOCl_Level", 73, "mm", "NaOCl tank level"),
-        ("ChemTreat_HCl_Level", 74, "mm", "HCl tank level"),
-        ("UF_UFFT_Tank_Level", 75, "mm", "UF feed tank level"),
-    ]
-    for name, addr, units, desc in analog_inputs:
-        collector.add_tag(TagDefinition(
-            name=name, source="simulator", register_type="input_register",
-            address=addr, units=units, description=desc
-        ))
+    if bridge_mode:
+        # ── Bridge mode: read sensors from holding registers ──
+        # Levels (HR 300-305 on simulator)
+        bridge_levels = [
+            ("RW_Tank_Level", 300, "mm", "Raw water tank level"),
+            ("RW_Pump_Flow", 301, "L/min", "Raw water pump flow rate"),
+            ("ChemTreat_NaCl_Level", 302, "mm", "NaCl tank level"),
+            ("ChemTreat_NaOCl_Level", 303, "mm", "NaOCl tank level"),
+            ("ChemTreat_HCl_Level", 304, "mm", "HCl tank level"),
+            ("UF_UFFT_Tank_Level", 305, "mm", "UF feed tank level"),
+        ]
+        for name, addr, units, desc in bridge_levels:
+            collector.add_tag(TagDefinition(
+                name=name, source="simulator", register_type="holding_register",
+                address=addr, units=units, description=desc
+            ))
 
-    # Digital Inputs (from Simulator)
-    digital_inputs = [
-        ("RW_Tank_PR_Valve_Sts", 16, "PR valve status"),
-        ("RW_Tank_P6B_Valve_Sts", 17, "P6B valve status"),
-        ("RW_Tank_P_Valve_Sts", 18, "Process valve status"),
-        ("RW_Pump_Sts", 19, "Pump running status"),
-        ("RW_Pump_Fault", 20, "Pump fault status"),
-        ("ChemTreat_NaCl_Valve_Sts", 21, "NaCl valve status"),
-        ("ChemTreat_NaOCl_Valve_Sts", 22, "NaOCl valve status"),
-    ]
-    for name, addr, desc in digital_inputs:
-        collector.add_tag(TagDefinition(
-            name=name, source="simulator", register_type="discrete_input",
-            address=addr, description=desc
-        ))
+        # Valve/pump status (HR 320-331 on simulator)
+        bridge_status = [
+            ("RW_Tank_PR_Valve_Sts", 320, "PR valve status"),
+            ("RW_Tank_P6B_Valve_Sts", 321, "P6B valve status"),
+            ("RW_Tank_P_Valve_Sts", 322, "Process valve status"),
+            ("RW_Pump_Sts", 323, "Pump running status"),
+            ("RW_Pump_Fault", 324, "Pump fault status"),
+            ("ChemTreat_NaCl_Valve_Sts", 325, "NaCl valve status"),
+            ("ChemTreat_NaOCl_Valve_Sts", 326, "NaOCl valve status"),
+            ("ChemTreat_HCl_Valve_Sts", 327, "HCl valve status"),
+            ("UF_UFFT_Tank_Valve_Sts", 328, "UF tank valve status"),
+            ("UF_Drain_Valve_Sts", 329, "UF drain valve status"),
+            ("UF_ROFT_Valve_Sts", 330, "UF ROFT valve status"),
+            ("UF_BWP_Valve_Sts", 331, "UF BWP valve status"),
+        ]
+        for name, addr, desc in bridge_status:
+            collector.add_tag(TagDefinition(
+                name=name, source="simulator", register_type="holding_register",
+                address=addr, description=desc
+            ))
+    else:
+        # ── Legacy mode: input registers and discrete inputs ──
+        # Register tags - Analog Inputs (from Simulator)
+        analog_inputs = [
+            ("RW_Tank_Level", 70, "mm", "Raw water tank level"),
+            ("RW_Pump_Flow", 71, "L/min", "Raw water pump flow rate"),
+            ("ChemTreat_NaCl_Level", 72, "mm", "NaCl tank level"),
+            ("ChemTreat_NaOCl_Level", 73, "mm", "NaOCl tank level"),
+            ("ChemTreat_HCl_Level", 74, "mm", "HCl tank level"),
+            ("UF_UFFT_Tank_Level", 75, "mm", "UF feed tank level"),
+        ]
+        for name, addr, units, desc in analog_inputs:
+            collector.add_tag(TagDefinition(
+                name=name, source="simulator", register_type="input_register",
+                address=addr, units=units, description=desc
+            ))
 
-    # Digital Outputs / Commands (from Controller)
+        # Digital Inputs (from Simulator)
+        digital_inputs = [
+            ("RW_Tank_PR_Valve_Sts", 16, "PR valve status"),
+            ("RW_Tank_P6B_Valve_Sts", 17, "P6B valve status"),
+            ("RW_Tank_P_Valve_Sts", 18, "Process valve status"),
+            ("RW_Pump_Sts", 19, "Pump running status"),
+            ("RW_Pump_Fault", 20, "Pump fault status"),
+            ("ChemTreat_NaCl_Valve_Sts", 21, "NaCl valve status"),
+            ("ChemTreat_NaOCl_Valve_Sts", 22, "NaOCl valve status"),
+        ]
+        for name, addr, desc in digital_inputs:
+            collector.add_tag(TagDefinition(
+                name=name, source="simulator", register_type="discrete_input",
+                address=addr, description=desc
+            ))
+
+    # Digital Outputs / Commands (from Controller) — same in both modes
     digital_outputs = [
         ("RW_Tank_PR_Valve_Cmd", 40, "PR valve command"),
         ("RW_Tank_P6B_Valve_Cmd", 41, "P6B valve command"),
@@ -418,6 +466,11 @@ def create_default_collector() -> HistorianCollector:
         ("RW_Pump_Stop_Cmd", 44, "Pump stop command"),
         ("ChemTreat_NaCl_Valve_Cmd", 45, "NaCl valve command"),
         ("ChemTreat_NaOCl_Valve_Cmd", 46, "NaOCl valve command"),
+        ("ChemTreat_HCl_Valve_Cmd", 47, "HCl valve command"),
+        ("UF_UFFT_Tank_Valve_Cmd", 48, "UF tank valve command"),
+        ("UF_Drain_Valve_Cmd", 49, "UF drain valve command"),
+        ("UF_ROFT_Valve_Cmd", 50, "UF ROFT valve command"),
+        ("UF_BWP_Valve_Cmd", 51, "UF BWP valve command"),
     ]
     for name, addr, desc in digital_outputs:
         collector.add_tag(TagDefinition(
@@ -442,6 +495,33 @@ def create_default_collector() -> HistorianCollector:
         register_type="coil", address=1, description="HMI Stop button"
     ))
 
+    # System state coils (from Controller) — only in bridge mode for now
+    if bridge_mode:
+        state_coils = [
+            ("SYS_IDLE", 56, "System IDLE state"),
+            ("SYS_START", 57, "System START state"),
+            ("SYS_RUNNING", 58, "System RUNNING state"),
+            ("SYS_SHUTDOWN", 59, "System SHUTDOWN state"),
+            ("SYS_Permissives_Ready", 60, "Permissives ready"),
+        ]
+        for name, addr, desc in state_coils:
+            collector.add_tag(TagDefinition(
+                name=name, source="controller", register_type="coil",
+                address=addr, description=desc
+            ))
+        # Alarm coils
+        alarm_coils = [
+            ("Alarm_RW_Tank_LL", 64, "RW tank Low-Low alarm"),
+            ("Alarm_RW_Tank_L", 65, "RW tank Low alarm"),
+            ("Alarm_RW_Tank_H", 66, "RW tank High alarm"),
+            ("Alarm_RW_Tank_HH", 67, "RW tank High-High alarm"),
+        ]
+        for name, addr, desc in alarm_coils:
+            collector.add_tag(TagDefinition(
+                name=name, source="controller", register_type="coil",
+                address=addr, description=desc
+            ))
+
     return collector
 
 
@@ -455,14 +535,19 @@ def main():
                         help="Poll rate in milliseconds")
     parser.add_argument("--retry-delay", type=int, default=5,
                         help="Delay between connection retries (seconds)")
+    parser.add_argument("--bridge-mode", action="store_true",
+                        default=os.environ.get("BRIDGE_MODE", "").lower() in ("1", "true", "yes"),
+                        help="Use bridge holding registers instead of legacy I/O")
     args = parser.parse_args()
 
     print("=" * 60)
     print("SPHERE Historian Collector")
     print("=" * 60)
 
-    collector = create_default_collector()
+    collector = create_default_collector(bridge_mode=args.bridge_mode)
     collector.build_batches()
+    if args.bridge_mode:
+        print("Mode: Bridge (HR 300-331)")
 
     print(f"\nConfiguration:")
     print(f"  Output: {args.output}")

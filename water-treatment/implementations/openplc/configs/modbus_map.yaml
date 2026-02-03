@@ -15,6 +15,20 @@
 
 # Digital Outputs (Coils) - Controller -> Simulator
 coils:
+  # HMI controls %QX0.0-0.3
+  - name: HMI_Start_PB
+    address: 0           # %QX0.0
+    description: "HMI Start pushbutton (written by external client)"
+  - name: HMI_Stop_PB
+    address: 1           # %QX0.1
+    description: "HMI Stop pushbutton (written by external client)"
+  - name: HMI_Start_Active
+    address: 2           # %QX0.2
+    description: "HMI Start Active (written by controller)"
+  - name: HMI_Stop_Active
+    address: 3           # %QX0.3
+    description: "HMI Stop Active (written by controller)"
+
   # Process 1: Raw Water System
   - name: RW_Tank_PR_Valve
     address: 40          # %QX5.0
@@ -57,12 +71,43 @@ coils:
     address: 51          # %QX5.11
     description: "UF backwash pump valve command"
 
-# Digital Inputs (Discrete Inputs) - Simulator -> Controller
+  # System state %QX7.0-7.4
+  - name: SYS_IDLE
+    address: 56          # %QX7.0
+    description: "System IDLE state"
+  - name: SYS_START
+    address: 57          # %QX7.1
+    description: "System START state"
+  - name: SYS_RUNNING
+    address: 58          # %QX7.2
+    description: "System RUNNING state"
+  - name: SYS_SHUTDOWN
+    address: 59          # %QX7.3
+    description: "System SHUTDOWN state"
+  - name: SYS_Permissives_Ready
+    address: 60          # %QX7.4
+    description: "All permissives satisfied"
+
+  # Alarms %QX8.0-8.3
+  - name: Alarm_RW_Tank_LL
+    address: 64          # %QX8.0
+    description: "RW tank Low-Low alarm"
+  - name: Alarm_RW_Tank_L
+    address: 65          # %QX8.1
+    description: "RW tank Low alarm"
+  - name: Alarm_RW_Tank_H
+    address: 66          # %QX8.2
+    description: "RW tank High alarm"
+  - name: Alarm_RW_Tank_HH
+    address: 67          # %QX8.3
+    description: "RW tank High-High alarm"
+
+# Discrete Inputs (Discrete Inputs) - Simulator -> Controller (legacy mode)
 discrete_inputs:
   # Process 1: Valve Status Feedback
   - name: RW_Tank_PR_Valve_Sts
     address: 16          # %IX2.0
-    description: "Raw water tank PR valve status"
+    description: "Raw water tank PR valve status (legacy — use bridge HR 320 instead)"
   - name: RW_Tank_P6B_Valve_Sts
     address: 17          # %IX2.1
     description: "Raw water tank P6B valve status"
@@ -106,12 +151,118 @@ holding_registers:
     units: "%"
     scale: 1.0
 
-# Analog Inputs (Input Registers) - Simulator -> Controller
+  # ── Bridge registers ──
+  # Simulator command inputs (written by bridge, read by simulator)
+  - name: Bridge_Cmd_PR_Valve
+    address: 200         # %QW200  on simulator
+    description: "Bridge: PR valve command → simulator"
+  - name: Bridge_Cmd_P6B_Valve
+    address: 201
+    description: "Bridge: P6B valve command → simulator"
+  - name: Bridge_Cmd_P_Valve
+    address: 202
+    description: "Bridge: P valve command → simulator"
+  - name: Bridge_Cmd_Pump_Start
+    address: 203
+    description: "Bridge: pump start → simulator"
+  - name: Bridge_Cmd_Pump_Stop
+    address: 204
+    description: "Bridge: pump stop → simulator"
+  - name: Bridge_Cmd_NaCl_Valve
+    address: 205
+    description: "Bridge: NaCl valve command → simulator"
+  - name: Bridge_Cmd_NaOCl_Valve
+    address: 206
+    description: "Bridge: NaOCl valve command → simulator"
+  - name: Bridge_Cmd_HCl_Valve
+    address: 207
+    description: "Bridge: HCl valve command → simulator"
+  - name: Bridge_Cmd_UF_Valve
+    address: 208
+    description: "Bridge: UF tank valve command → simulator"
+  - name: Bridge_Cmd_UF_Drain
+    address: 209
+    description: "Bridge: UF drain valve command → simulator"
+  - name: Bridge_Cmd_UF_ROFT
+    address: 210
+    description: "Bridge: UF ROFT valve command → simulator"
+  - name: Bridge_Cmd_UF_BWP
+    address: 211
+    description: "Bridge: UF BWP valve command → simulator"
+  - name: Bridge_Cmd_Pump_Speed
+    address: 220
+    description: "Bridge: pump speed → simulator"
+
+  # Sensor outputs (written by simulator, read by bridge, written to controller)
+  - name: Bridge_RW_Tank_Level
+    address: 300         # %QW300  on both PLCs
+    description: "Bridge: RW tank level (sim → ctrl)"
+    units: "mm"
+  - name: Bridge_RW_Pump_Flow
+    address: 301
+    description: "Bridge: RW pump flow (sim → ctrl)"
+    units: "L/min"
+  - name: Bridge_ChemTreat_NaCl_Level
+    address: 302
+    description: "Bridge: NaCl tank level (sim → ctrl)"
+    units: "mm"
+  - name: Bridge_ChemTreat_NaOCl_Level
+    address: 303
+    description: "Bridge: NaOCl tank level (sim → ctrl)"
+    units: "mm"
+  - name: Bridge_ChemTreat_HCl_Level
+    address: 304
+    description: "Bridge: HCl tank level (sim → ctrl)"
+    units: "mm"
+  - name: Bridge_UF_UFFT_Tank_Level
+    address: 305
+    description: "Bridge: UF tank level (sim → ctrl)"
+    units: "mm"
+
+  # Valve/pump status (written by simulator, forwarded by bridge to controller)
+  - name: Bridge_PR_Valve_Sts
+    address: 320
+    description: "Bridge: PR valve status (sim → ctrl)"
+  - name: Bridge_P6B_Valve_Sts
+    address: 321
+    description: "Bridge: P6B valve status (sim → ctrl)"
+  - name: Bridge_P_Valve_Sts
+    address: 322
+    description: "Bridge: P valve status (sim → ctrl)"
+  - name: Bridge_Pump_Sts
+    address: 323
+    description: "Bridge: pump running status (sim → ctrl)"
+  - name: Bridge_Pump_Fault
+    address: 324
+    description: "Bridge: pump fault (sim → ctrl)"
+  - name: Bridge_NaCl_Valve_Sts
+    address: 325
+    description: "Bridge: NaCl valve status (sim → ctrl)"
+  - name: Bridge_NaOCl_Valve_Sts
+    address: 326
+    description: "Bridge: NaOCl valve status (sim → ctrl)"
+  - name: Bridge_HCl_Valve_Sts
+    address: 327
+    description: "Bridge: HCl valve status (sim → ctrl)"
+  - name: Bridge_UF_Valve_Sts
+    address: 328
+    description: "Bridge: UF tank valve status (sim → ctrl)"
+  - name: Bridge_UF_Drain_Sts
+    address: 329
+    description: "Bridge: UF drain valve status (sim → ctrl)"
+  - name: Bridge_UF_ROFT_Sts
+    address: 330
+    description: "Bridge: UF ROFT valve status (sim → ctrl)"
+  - name: Bridge_UF_BWP_Sts
+    address: 331
+    description: "Bridge: UF BWP valve status (sim → ctrl)"
+
+# Analog Inputs (Input Registers) - Simulator -> Controller (legacy mode)
 input_registers:
   # Process 1: Tank Levels and Flow
   - name: RW_Tank_Level
     address: 70          # %IW70
-    description: "Raw water tank level"
+    description: "Raw water tank level (legacy — use bridge HR 300 instead)"
     units: "mm"
     scale: 1.0
     range: [0, 1200]
