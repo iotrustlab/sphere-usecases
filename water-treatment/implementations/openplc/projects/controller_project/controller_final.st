@@ -78,6 +78,7 @@ PROGRAM MainProgram
     P3 : P3_UDT;
   END_VAR
   VAR_INPUT
+    (* Original I/O — kept for standalone/legacy mode *)
     di_2_0 : BOOL;
     di_2_1 : BOOL;
     di_2_10 : BOOL;
@@ -133,22 +134,59 @@ PROGRAM MainProgram
     alm_8_1 : BOOL;  (* Alarm_RW_Tank_L *)
     alm_8_2 : BOOL;  (* Alarm_RW_Tank_H *)
     alm_8_3 : BOOL;  (* Alarm_RW_Tank_HH *)
+    (* Bridge sensor inputs — holding registers written by bridge *)
+    bridge_rw_level : INT;       (* %QW300 — RW tank level from simulator *)
+    bridge_rw_flow : INT;        (* %QW301 — RW pump flow from simulator *)
+    bridge_nacl_level : INT;     (* %QW302 — NaCl tank level *)
+    bridge_naocl_level : INT;    (* %QW303 — NaOCl tank level *)
+    bridge_hcl_level : INT;      (* %QW304 — HCl tank level *)
+    bridge_uf_level : INT;       (* %QW305 — UF tank level *)
+    bridge_pr_valve_sts : INT;   (* %QW320 — PR valve status *)
+    bridge_p6b_valve_sts : INT;  (* %QW321 — P6B valve status *)
+    bridge_p_valve_sts : INT;    (* %QW322 — P valve status *)
+    bridge_pump_sts : INT;       (* %QW323 — pump running status *)
+    bridge_pump_fault : INT;     (* %QW324 — pump fault *)
+    bridge_nacl_valve_sts : INT; (* %QW325 — NaCl valve status *)
+    bridge_naocl_valve_sts : INT;(* %QW326 — NaOCl valve status *)
+    bridge_hcl_valve_sts : INT;  (* %QW327 — HCl valve status *)
+    bridge_uf_valve_sts : INT;   (* %QW328 — UF tank valve status *)
+    bridge_uf_drain_sts : INT;   (* %QW329 — UF drain valve status *)
+    bridge_uf_roft_sts : INT;    (* %QW330 — UF ROFT valve status *)
+    bridge_uf_bwp_sts : INT;    (* %QW331 — UF BWP valve status *)
   END_VAR
 
-  (* IO_setup *)
-  (* HMI inputs from external Modbus client *)
+  (* ===== HMI button latch ===== *)
   HMI.Start_PB := hmi_0_0;
   HMI.Stop_PB := hmi_0_1;
+  IF HMI.Start_PB THEN
+    HMI.Start_Active := TRUE;
+    HMI.Stop_Active := FALSE;
+  ELSIF HMI.Stop_PB THEN
+    HMI.Stop_Active := TRUE;
+    HMI.Start_Active := FALSE;
+  END_IF;
 
-  (* P1 Analog Input *)
-  P1.RW_Tank_tnk_lvl := ai_7_0;
-  P1.RW_Pump_flow := ai_7_1;
-  (* P1 Digital Input *)
-  P1.RW_Tank_PR_Valve_sts := di_2_0;
-  P1.RW_Tank_P6B_Valve_sts := di_2_1;
-  P1.RW_Tank_P_Valve_sts := di_2_2;
-  P1.RW_Pump_sts := di_2_3;
-  P1.RW_Pump_fault := di_2_4;
+  (* ===== Read sensors from bridge holding registers ===== *)
+  (* Levels: INT -> REAL conversion *)
+  P1.RW_Tank_tnk_lvl := INT_TO_REAL(bridge_rw_level);
+  P1.RW_Pump_flow := INT_TO_REAL(bridge_rw_flow);
+  P2.ChemTreat_NaCl_Tank_tnk_lvl := INT_TO_REAL(bridge_nacl_level);
+  P2.ChemTreat_NaOCl_Tank_tnk_lvl := INT_TO_REAL(bridge_naocl_level);
+  P2.ChemTreat_HCl_Tank_tnk_lvl := INT_TO_REAL(bridge_hcl_level);
+  P3.Ultrafiltration_UFFT_Tank_tnk_lvl := INT_TO_REAL(bridge_uf_level);
+  (* Valve/pump status: INT -> BOOL (nonzero = TRUE) *)
+  P1.RW_Tank_PR_Valve_sts := bridge_pr_valve_sts <> 0;
+  P1.RW_Tank_P6B_Valve_sts := bridge_p6b_valve_sts <> 0;
+  P1.RW_Tank_P_Valve_sts := bridge_p_valve_sts <> 0;
+  P1.RW_Pump_sts := bridge_pump_sts <> 0;
+  P1.RW_Pump_fault := bridge_pump_fault <> 0;
+  P2.ChemTreat_NaCl_Tank_Valve_sts := bridge_nacl_valve_sts <> 0;
+  P2.ChemTreat_NaOCl_Tank_Valve_sts := bridge_naocl_valve_sts <> 0;
+  P3.Ultrafiltration_UFFT_Tank_Valve_sts := bridge_uf_valve_sts <> 0;
+  P3.Ultrafiltration_UF_Drain_Valve_sts := bridge_uf_drain_sts <> 0;
+  P3.Ultrafiltration_UF_ROFT_Valve_sts := bridge_uf_roft_sts <> 0;
+  P3.Ultrafiltration_UF_BWP_Valve_sts := bridge_uf_bwp_sts <> 0;
+
   (* P1 Analog Output *)
   P1.RW_Pump := ao_10_0;
   (* Digital Output *)
@@ -157,103 +195,86 @@ PROGRAM MainProgram
   P1.RW_Tank_P_Valve := do_5_2;
   P1.RW_Pump_start := do_5_3;
   P1.RW_Pump_stop := do_5_4;
-  (* P1 raw water tank alarms *)
-  Alarms.LL_alarm := di_7_ch0llalarm;
-  Alarms.L_alarm := di_7_ch0lalarm;
-  Alarms.H_alarm := di_7_ch0halarm;
-  Alarms.HH_alarm := di_7_ch0hhalarm;
-  (* P2 Analog Input *)
-  P2.ChemTreat_NaCl_Tank_tnk_lvl := ai_7_2;
-  P2.ChemTreat_NaOCl_Tank_tnk_lvl := ai_7_3;
-  P2.ChemTreat_HCl_Tank_tnk_lvl := ai_7_4;
-  (* P2 Digital Input *)
-  P2.ChemTreat_NaCl_Tank_Valve_sts := di_2_5;
-  P2.ChemTreat_NaOCl_Tank_Valve_sts := di_2_6;
-  (* P2 Analog Output *)
-  (* NONE *)
   (* P2 Digital Output *)
   P2.ChemTreat_NaCl_Tank_Valve := do_5_5;
   P2.ChemTreat_NaOCl_Tank_Valve := do_5_6;
   P2.ChemTreat_HCl_Tank_Valve := do_5_7;
-  (* P3 Analog Input *)
-  P3.Ultrafiltration_UFFT_Tank_tnk_lvl := ai_7_5;
-  (* P3 Digital Input *)
-  P3.Ultrafiltration_UFFT_Tank_Valve_sts := di_2_8;
-  P3.Ultrafiltration_UF_Drain_Valve_sts := di_2_9;
-  P3.Ultrafiltration_UF_ROFT_Valve_sts := di_2_10;
-  P3.Ultrafiltration_UF_BWP_Valve_sts := di_2_11;
-  (* P3 Analog Output *)
-  (* none *)
   (* P3 Digital Output *)
   P3.Ultrafiltration_UFFT_Tank_Valve := do_5_8;
   P3.Ultrafiltration_UF_Drain_Valve := do_5_9;
   P3.Ultrafiltration_UF_ROFT_Valve := do_5_10;
   P3.Ultrafiltration_UF_BWP_Valve := do_5_11;
 
-  (* Raw_water_control *)
-  if P1.RW_Tank_tnk_lvl = 250.0 and P1_SYS.RUNNING then
-  P1.RW_Pump_stop := True;
-  P1.RW_Pump_start := False; (* send the outputs *)
-  Alarms.LL_alarm := True;
-  (* if the level is at 500 or lower than 500 open the valve *)
-  elsif P1.RW_Tank_tnk_lvl <= 500.0 and P1_SYS.RUNNING then
-  (* output to turn the valve open *)
-  P1.RW_Tank_PR_Valve := True;
-  Alarms.L_alarm := True;
-  (* if level is at 800 *)
-  elsif  P1.RW_Tank_tnk_lvl = 800.0 and P1_SYS.RUNNING then
-  P1.RW_Tank_PR_Valve := False; (* close the valve *)
-  Alarms.H_alarm := True;
-  elsif P1.RW_Tank_tnk_lvl = 1200.0 and P1_SYS.RUNNING then
-  Alarms.HH_alarm := True; (* if the tank is higher than or equal to 1200 set the high high alarm *)
-  end_if;
+  (* ===== Compute alarms from levels ===== *)
+  Alarms.LL_alarm := P1.RW_Tank_tnk_lvl <= 250.0;
+  Alarms.L_alarm := P1.RW_Tank_tnk_lvl <= 500.0;
+  Alarms.H_alarm := P1.RW_Tank_tnk_lvl >= 800.0;
+  Alarms.HH_alarm := P1.RW_Tank_tnk_lvl >= 1200.0;
 
-  (* Raw_water_pump *)
-  if P3.Ultrafiltration_UFFT_Tank_tnk_lvl = 800.0 AND P1_SYS.RUNNING then
-  (* start the pump and open the valve from the other tank *)
-  P1.RW_Tank_P_Valve := True;
-  P1.RW_Pump_start := True;
-  P1.RW_Pump_stop := False;
-  elsif P3.Ultrafiltration_UFFT_Tank_tnk_lvl = 1000.0 AND P1_SYS.RUNNING then
-  (* stop the pump and close the valve *)
-  P1.RW_Tank_P_Valve := False;
-  P1.RW_Pump_stop := True;
-  P1.RW_Pump_start := False;
-  end_if;
+  (* ===== Raw_water_control ===== *)
+  IF P1.RW_Tank_tnk_lvl <= 250.0 AND P1_SYS.RUNNING THEN
+    P1.RW_Pump_stop := TRUE;
+    P1.RW_Pump_start := FALSE;
+  ELSIF P1.RW_Tank_tnk_lvl <= 500.0 AND P1_SYS.RUNNING THEN
+    P1.RW_Tank_PR_Valve := TRUE;
+  ELSIF P1.RW_Tank_tnk_lvl >= 800.0 AND P1_SYS.RUNNING THEN
+    P1.RW_Tank_PR_Valve := FALSE;
+  END_IF;
 
-  (* State_change *)
-  if not HMI.Start_Active AND not HMI.Stop_Active then
-  (* if start and stop is not pressed go to idle *)
-  P1_SYS.IDLE := True;
-  P1_SYS.START := False;
-  P1_SYS.RUNNING := False;
-  P1_SYS.SHUTDOWN := False;
-  elsif  HMI.Start_Active AND not HMI.Stop_Active then
-  (* if the start pb and stop is not pressed then change the state of process one to starting *)
-  P1_SYS.IDLE := False;
-  P1_SYS.START := True;
-  P1_SYS.RUNNING := False;
-  P1_SYS.SHUTDOWN := False;
-  (* if the tank level is greater than 250 at the start and UFFT is less than a 1000 we can start *)
-  (* then and all permissves cond together into one tag so we know the plant is ready to start *)
-  P1_SYS.Permissives_Ready := P1_SYS.Permissives[0] AND P1_SYS.Permissives[1];
-  elsif HMI.Start_Active AND P1_SYS.Permissives_Ready then
-  (* if the start was pressed and permissives are ready start running Process one *)
-  P1_SYS.IDLE := False;
-  P1_SYS.START := False;
-  P1_SYS.RUNNING := True;
-  P1_SYS.SHUTDOWN := False;
-  elsif HMI.Stop_Active then
-  (* if the stop button is pressed then go to shutdown state *)
-  P1_SYS.IDLE := False;
-  P1_SYS.START := False;
-  P1_SYS.RUNNING := False;
-  P1_SYS.SHUTDOWN := True;
-  (* set all permissives to false *)
-  P1_SYS.Permissives_Ready := False;
-  end_if;
+  (* ===== Raw_water_pump ===== *)
+  IF P3.Ultrafiltration_UFFT_Tank_tnk_lvl <= 800.0 AND P1_SYS.RUNNING THEN
+    P1.RW_Tank_P_Valve := TRUE;
+    P1.RW_Pump_start := TRUE;
+    P1.RW_Pump_stop := FALSE;
+  ELSIF P3.Ultrafiltration_UFFT_Tank_tnk_lvl >= 1000.0 AND P1_SYS.RUNNING THEN
+    P1.RW_Tank_P_Valve := FALSE;
+    P1.RW_Pump_stop := TRUE;
+    P1.RW_Pump_start := FALSE;
+  END_IF;
 
-  (* Wire internal state to Modbus-visible outputs *)
+  (* ===== Permissives ===== *)
+  P1_SYS.Permissives[0] := P1.RW_Tank_tnk_lvl > 250.0;
+  P1_SYS.Permissives[1] := P3.Ultrafiltration_UFFT_Tank_tnk_lvl < 1000.0;
+
+  (* ===== State_change ===== *)
+  IF NOT HMI.Start_Active AND NOT HMI.Stop_Active THEN
+    P1_SYS.IDLE := TRUE;
+    P1_SYS.START := FALSE;
+    P1_SYS.RUNNING := FALSE;
+    P1_SYS.SHUTDOWN := FALSE;
+  ELSIF HMI.Start_Active AND NOT HMI.Stop_Active AND NOT P1_SYS.Permissives_Ready THEN
+    P1_SYS.IDLE := FALSE;
+    P1_SYS.START := TRUE;
+    P1_SYS.RUNNING := FALSE;
+    P1_SYS.SHUTDOWN := FALSE;
+    P1_SYS.Permissives_Ready := P1_SYS.Permissives[0] AND P1_SYS.Permissives[1];
+  ELSIF HMI.Start_Active AND P1_SYS.Permissives_Ready THEN
+    P1_SYS.IDLE := FALSE;
+    P1_SYS.START := FALSE;
+    P1_SYS.RUNNING := TRUE;
+    P1_SYS.SHUTDOWN := FALSE;
+  ELSIF HMI.Stop_Active THEN
+    P1_SYS.IDLE := FALSE;
+    P1_SYS.START := FALSE;
+    P1_SYS.RUNNING := FALSE;
+    P1_SYS.SHUTDOWN := TRUE;
+    P1_SYS.Permissives_Ready := FALSE;
+  END_IF;
+
+  (* ===== Wire outputs to coils/registers ===== *)
+  do_5_0 := P1.RW_Tank_PR_Valve;
+  do_5_1 := P1.RW_Tank_P6B_Valve;
+  do_5_2 := P1.RW_Tank_P_Valve;
+  do_5_3 := P1.RW_Pump_start;
+  do_5_4 := P1.RW_Pump_stop;
+  do_5_5 := P2.ChemTreat_NaCl_Tank_Valve;
+  do_5_6 := P2.ChemTreat_NaOCl_Tank_Valve;
+  do_5_7 := P2.ChemTreat_HCl_Tank_Valve;
+  do_5_8 := P3.Ultrafiltration_UFFT_Tank_Valve;
+  do_5_9 := P3.Ultrafiltration_UF_Drain_Valve;
+  do_5_10 := P3.Ultrafiltration_UF_ROFT_Valve;
+  do_5_11 := P3.Ultrafiltration_UF_BWP_Valve;
+  ao_10_0 := P1.RW_Pump;
   (* HMI status *)
   hmi_0_2 := HMI.Start_Active;
   hmi_0_3 := HMI.Stop_Active;
@@ -323,6 +344,25 @@ CONFIGURATION Config0
     alm_8_1 AT %QX8.1 : BOOL;
     alm_8_2 AT %QX8.2 : BOOL;
     alm_8_3 AT %QX8.3 : BOOL;
+    (* Bridge sensor inputs — holding registers writable by bridge *)
+    bridge_rw_level AT %QW300 : INT;
+    bridge_rw_flow AT %QW301 : INT;
+    bridge_nacl_level AT %QW302 : INT;
+    bridge_naocl_level AT %QW303 : INT;
+    bridge_hcl_level AT %QW304 : INT;
+    bridge_uf_level AT %QW305 : INT;
+    bridge_pr_valve_sts AT %QW320 : INT;
+    bridge_p6b_valve_sts AT %QW321 : INT;
+    bridge_p_valve_sts AT %QW322 : INT;
+    bridge_pump_sts AT %QW323 : INT;
+    bridge_pump_fault AT %QW324 : INT;
+    bridge_nacl_valve_sts AT %QW325 : INT;
+    bridge_naocl_valve_sts AT %QW326 : INT;
+    bridge_hcl_valve_sts AT %QW327 : INT;
+    bridge_uf_valve_sts AT %QW328 : INT;
+    bridge_uf_drain_sts AT %QW329 : INT;
+    bridge_uf_roft_sts AT %QW330 : INT;
+    bridge_uf_bwp_sts AT %QW331 : INT;
   END_VAR
 
   RESOURCE Res0 ON PLC
@@ -330,4 +370,3 @@ CONFIGURATION Config0
     PROGRAM MainProgram_instance : MainProgram;
   END_RESOURCE
 END_CONFIGURATION
-

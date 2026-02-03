@@ -1,0 +1,20 @@
+scenario_id: "wt-uc1-alarm-hh"
+description: "Fill RW tank past 1200mm to trigger HH alarm"
+duration_sec: 90
+poll_interval_ms: 500
+
+initial_conditions:
+  RW_Tank_Level: 1100
+  UF_UFFT_Tank_Level: 400
+  ChemTreat_NaCl_Level: 800
+  ChemTreat_NaOCl_Level: 800
+  ChemTreat_HCl_Level: 800
+
+timeline:
+  - { time_sec: 5, action: hmi_start }
+  # With PR valve opening at L_alarm (<=500) and level starting at 1100,
+  # PR valve stays closed.  But the inlet keeps filling if we force it:
+  - { time_sec: 10, action: "set_sim_level:300:1250" }
+  - { time_sec: 70, action: hmi_stop }
+
+reference_bundle: null
