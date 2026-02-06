@@ -10,6 +10,7 @@ Usage:
     python validation_harness.py \\
         --scenario scenarios/nominal_startup.yaml \\
         --output runs/validate-nominal \\
+        [--profile profiles/realistic.yaml] \\
         [--controller HOST:PORT] [--simulator HOST:PORT] \\
         [--invariant-rules PATH]
 """
@@ -47,13 +48,20 @@ from modbus_bridge import ModbusBridge, parse_host_port
 
 log = logging.getLogger("validation_harness")
 
-# Default invariant rules path (in cps-enclave-model repo)
-DEFAULT_RULES = str(SCRIPT_DIR.parent.parent.parent.parent.parent
-                    / "cps-enclave-model" / "tools" / "defense" / "rules"
-                    / "water-treatment.yaml")
-DEFAULT_CHECKER = str(SCRIPT_DIR.parent.parent.parent.parent.parent
-                      / "cps-enclave-model" / "tools" / "defense"
-                      / "invariant_check.py")
+# Default paths (in cps-enclave-model repo)
+_ENCLAVE_MODEL_ROOT = SCRIPT_DIR.parent.parent.parent.parent.parent / "cps-enclave-model"
+DEFAULT_RULES = str(_ENCLAVE_MODEL_ROOT / "tools" / "defense" / "rules" / "water-treatment.yaml")
+DEFAULT_CHECKER = str(_ENCLAVE_MODEL_ROOT / "tools" / "defense" / "invariant_check.py")
+DEFAULT_PROFILE = str(SCRIPT_DIR.parent.parent.parent / "profiles" / "realistic.yaml")
+
+# Try to import sim primitives for profile loading
+try:
+    sys.path.insert(0, str(_ENCLAVE_MODEL_ROOT))
+    from sim.primitives import load_profile, SimProfile
+    HAS_PRIMITIVES = True
+except ImportError:
+    HAS_PRIMITIVES = False
+    SimProfile = None
 
 
 # ── Tag polling ──────────────────────────────────────────────────────
@@ -253,7 +261,8 @@ def apply_initial_conditions(sim_client, conditions):
 
 # ── Bundle writer ────────────────────────────────────────────────────
 
-def write_bundle(output_dir, scenario, events, tags_file, invariant_report=None):
+def write_bundle(output_dir, scenario, events, tags_file, invariant_report=None,
+                 profile=None):
     """Write a run bundle to output_dir."""
     out = Path(output_dir)
     out.mkdir(parents=True, exist_ok=True)
@@ -268,7 +277,14 @@ def write_bundle(output_dir, scenario, events, tags_file, invariant_report=None)
         "poll_interval_ms": scenario.get("poll_interval_ms", 500),
         "tags_file": "tags.csv",
         "events_file": "events.json",
+        "bundle_schema_version": "1.1.0",
     }
+
+    # Add profile metadata if available
+    if profile is not None:
+        meta["profile_name"] = profile.metadata.name
+        meta["params_snapshot"] = profile.to_snapshot()
+
     (out / "meta.json").write_text(json.dumps(meta, indent=2) + "\n")
 
     # events.json
@@ -328,6 +344,8 @@ def main():
     parser = argparse.ArgumentParser(description="SPHERE Validation Harness")
     parser.add_argument("--scenario", required=True, help="Scenario YAML file")
     parser.add_argument("--output", required=True, help="Output run bundle directory")
+    parser.add_argument("--profile", default=os.environ.get("SIM_PROFILE", DEFAULT_PROFILE),
+                        help="Simulation profile YAML (default: realistic)")
     parser.add_argument("--controller", default=os.environ.get("CONTROLLER_ADDR", "controller:502"))
     parser.add_argument("--simulator", default=os.environ.get("SIMULATOR_ADDR", "simulator:503"))
     parser.add_argument("--cycle-ms", type=int, default=100, help="Bridge cycle time")
@@ -341,6 +359,33 @@ def main():
         level=logging.DEBUG if args.verbose else logging.INFO,
         format="%(asctime)s %(name)s %(levelname)s %(message)s",
     )
+
+    # Load simulation profile
+    profile = None
+    if HAS_PRIMITIVES and args.profile and os.path.exists(args.profile):
+        try:
+            profile = load_profile(args.profile)
+            log.info("Loaded profile: %s (v%s)", profile.metadata.name, profile.metadata.version)
+        except Exception as e:
+            log.warning("Failed to load profile %s: %s", args.profile, e)
+    elif args.profile and os.path.exists(args.profile):
+        log.warning("sim.primitives not available, profile metadata will be limited")
+        # Still record profile path even without full parsing
+        with open(args.profile) as f:
+            profile_data = yaml.safe_load(f)
+        # Create minimal profile-like object for metadata
+        class MinimalProfile:
+            class Metadata:
+                def __init__(self, data):
+                    self.name = data.get("metadata", {}).get("name", "unknown")
+                    self.version = data.get("metadata", {}).get("version", "1.0.0")
+            def __init__(self, data):
+                self.metadata = self.Metadata(data)
+                self._data = data
+            def to_snapshot(self):
+                return self._data
+        profile = MinimalProfile(profile_data)
+        log.info("Loaded profile (limited): %s", profile.metadata.name)
 
     # Load scenario
     with open(args.scenario) as f:
@@ -454,7 +499,7 @@ def main():
         tags_tmp, args.invariant_rules, args.invariant_checker, args.output)
 
     # Write bundle
-    write_bundle(args.output, scenario, events, tags_tmp, report_dir)
+    write_bundle(args.output, scenario, events, tags_tmp, report_dir, profile)
 
     # Clean up temp CSV
     if os.path.exists(tags_tmp):

@@ -36,6 +36,9 @@ water-treatment/
 │   ├── process_overview.md            # Detailed process description
 │   ├── io_map.csv                     # I/O mapping and tag definitions
 │   └── pid.pdf                        # Process & Instrumentation Diagram
+├── profiles/                          # Simulation parameter profiles
+│   ├── realistic.yaml                 # Research-grounded defaults
+│   └── demo.yaml                      # Fast timing for demos
 ├── slices/                            # Viewer slice definitions
 │   └── wt-uc1-slice.yaml             # UC1 slice (overlay + trend tags)
 ├── implementations/                   # Implementation-specific code
@@ -77,6 +80,37 @@ water-treatment/
   - `controller_project/` - Main control program
   - `simulator_project/` - Simulation program
 - **Usage**: Open in OpenPLC Editor for local development and testing
+
+## Simulation Profiles
+
+The `profiles/` directory contains simulation parameter profiles that define physical timing characteristics for run generation and validation.
+
+### Available profiles
+
+| Profile | Valve tau | Dosing | Alarm HH | Use case |
+|---------|-----------|--------|----------|----------|
+| `realistic.yaml` | 30s | 0.063 L/min | 95% span | Research validation |
+| `demo.yaml` | 0.5s | 5.0 L/min | 80% span | Quick demos |
+
+### Key parameters
+- **Actuator timing**: Motorized valves (30s realistic vs 0.5s demo), solenoids (0.05s), pumps (2s+10s VFD)
+- **Per-tag overrides**: Chemical treatment valves classified as solenoids
+- **Alarm setpoints**: Industry standard (95% HH) vs demo-friendly (80% HH)
+- **Dosing rates**: Realistic metering pump (1 GPH) vs visible demo rate
+
+### Usage
+```bash
+# Generate synthetic runs with realistic profile
+./bin/genruns -profile profiles/realistic.yaml /tmp/runs
+
+# Run validation harness (defaults to realistic)
+python scripts/validation_harness.py \
+    --scenario scenarios/nominal_startup.yaml \
+    --profile profiles/realistic.yaml \
+    --output runs/validate-nominal
+```
+
+Run bundles include `profile_name` and `params_snapshot` in `meta.json` for traceability.
 
 ## Security Experiments (Planned)
 

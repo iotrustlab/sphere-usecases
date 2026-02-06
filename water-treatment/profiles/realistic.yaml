@@ -1,0 +1,98 @@
+# Realistic simulation profile for SPHERE Water Treatment UC1
+# Research-grounded defaults for accurate physical modeling
+#
+# Sources:
+#   - USACE EM 1110-2-503 (valve sizing and response times)
+#   - AUMA SA 07.1/SA 16.1 datasheets (motorized valve actuators)
+#   - EPA Water Treatment Plant Operation guidance
+#   - LMI metering pump catalogs (chemical dosing rates)
+
+api_version: sphere.mergetb.io/v1
+kind: SimProfile
+metadata:
+  name: realistic
+  version: "1.0.0"
+  description: Research-grounded realistic timing for validation
+  basis: "USACE EM 1110-2-503, AUMA datasheets, EPA guidance, LMI pump catalogs"
+
+timing:
+  dt_sec: 0.1           # Simulation timestep
+  poll_interval_ms: 500  # Tag polling interval
+
+actuators:
+  # Motorized valve: large ball/butterfly valves with electric actuators
+  # AUMA SA series: 15-60 seconds for 90-degree travel
+  motorized_valve:
+    tau_sec: 30.0
+
+  # Solenoid valve: fast-acting on/off valves for chemical dosing
+  # Typical response: 20-100ms
+  solenoid_valve:
+    tau_sec: 0.05
+
+  # Pump dynamics
+  pump:
+    spinup_sec: 2.0      # Motor start to rotation
+    vfd_accel_sec: 10.0  # VFD ramp to target speed
+
+  # Per-tag type overrides (tag_name -> actuator class)
+  overrides:
+    ChemTreat_NaCl_Valve:
+      type: solenoid_valve
+    ChemTreat_NaOCl_Valve:
+      type: solenoid_valve
+    ChemTreat_HCl_Valve:
+      type: solenoid_valve
+    # All other valves default to motorized_valve
+
+sensors:
+  # Level sensors (ultrasonic/radar): slow response, moderate noise
+  level:
+    tau_sec: 5.0
+    noise_sigma: 2.0     # mm
+
+  # Flow sensors (mag flow): faster response, lower noise
+  flow:
+    tau_sec: 2.0
+    noise_sigma: 0.5     # L/min
+
+dosing:
+  # LMI metering pump: 1-2 GPH typical for small treatment
+  # 1 GPH = 3.785 L/h = 0.063 L/min
+  rate_lpm: 0.063
+
+alarms:
+  # Alarm setpoints as percentage of span
+  # Industry standard: LL=10%, L=20%, H=80%, HH=95%
+  RW_Tank:
+    span_mm: 1500
+    ll_pct: 10
+    l_pct: 20
+    h_pct: 80
+    hh_pct: 95
+
+  UF_UFFT_Tank:
+    span_mm: 1200
+    ll_pct: 10
+    l_pct: 20
+    h_pct: 80
+    hh_pct: 95
+
+physics:
+  # Raw Water Tank
+  RW_Tank:
+    max_mm: 1500
+    area_m2: 12.0        # ~3.9m diameter circular tank
+    pump_max_lpm: 567    # 150 GPM max pump capacity
+    inflow_lpm: 189      # 50 GPM typical raw water inflow
+
+  # UF Feed Tank
+  UF_Tank:
+    max_mm: 1200
+    area_m2: 8.0
+    drain_lpm: 114       # 30 GPM drain rate
+
+  # Chemical tanks (smaller scale)
+  ChemTreat_Tank:
+    max_mm: 1000
+    area_m2: 0.5         # ~80cm diameter

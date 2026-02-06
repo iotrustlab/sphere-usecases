@@ -1,0 +1,94 @@
+# Demo/fast simulation profile for SPHERE Water Treatment UC1
+# Sped-up timing for quicker validation cycles and demonstrations
+#
+# Use this profile when:
+#   - Running quick demos or presentations
+#   - Iterating on control logic without waiting for realistic timing
+#   - Testing alarm/shutdown logic in accelerated mode
+#
+# For research validation, use realistic.yaml instead.
+
+api_version: sphere.mergetb.io/v1
+kind: SimProfile
+metadata:
+  name: demo
+  version: "1.0.0"
+  description: Fast timing for demos and quick iteration
+  basis: "SPHERE legacy timing (pre-profile standardization)"
+
+timing:
+  dt_sec: 0.1           # Simulation timestep
+  poll_interval_ms: 500  # Tag polling interval
+
+actuators:
+  # Motorized valve: dramatically sped up for demo
+  # Real: 30s, Demo: 0.5s (60x faster)
+  motorized_valve:
+    tau_sec: 0.5
+
+  # Solenoid valve: already fast, slight speedup
+  solenoid_valve:
+    tau_sec: 0.05
+
+  # Pump dynamics: sped up for demo
+  pump:
+    spinup_sec: 0.3
+    vfd_accel_sec: 1.0
+
+  # Per-tag type overrides (same as realistic)
+  overrides:
+    ChemTreat_NaCl_Valve:
+      type: solenoid_valve
+    ChemTreat_NaOCl_Valve:
+      type: solenoid_valve
+    ChemTreat_HCl_Valve:
+      type: solenoid_valve
+
+sensors:
+  # Sensors instantaneous in demo mode
+  level:
+    tau_sec: 0.1
+    noise_sigma: 2.0
+
+  flow:
+    tau_sec: 0.1
+    noise_sigma: 0.5
+
+dosing:
+  # High dosing rate for visible chemical level changes in demos
+  # ~80x realistic rate
+  rate_lpm: 5.0
+
+alarms:
+  # Lower HH threshold for demo (triggers faster)
+  # This matches the legacy ST code: HH at 80% span
+  RW_Tank:
+    span_mm: 1500
+    ll_pct: 10
+    l_pct: 20
+    h_pct: 70
+    hh_pct: 80
+
+  UF_UFFT_Tank:
+    span_mm: 1200
+    ll_pct: 10
+    l_pct: 20
+    h_pct: 70
+    hh_pct: 80
+
+physics:
+  # Same physical dimensions as realistic
+  RW_Tank:
+    max_mm: 1500
+    area_m2: 12.0
+    pump_max_lpm: 567
+    inflow_lpm: 189
+
+  UF_Tank:
+    max_mm: 1200
+    area_m2: 8.0
+    drain_lpm: 114
+
+  ChemTreat_Tank:
+    max_mm: 1000
+    area_m2: 0.5
