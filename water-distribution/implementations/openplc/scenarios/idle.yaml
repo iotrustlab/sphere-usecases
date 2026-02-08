@@ -1,0 +1,16 @@
+scenario_id: "wd-uc0-idle"
+description: "System remains idle for 60s, verify no drift or spurious outputs"
+duration_sec: 60
+poll_interval_ms: 500
+
+initial_conditions:
+  Supply_Tank_Level: 1000
+  Supply_NaOCl_Level: 800
+  Supply_NH4Cl_Level: 800
+  Grid_Elev_Tank_Level: 4000
+  Grid_Consum_Tank_Level: 3000
+  RWS_Tank_Level: 500
+
+timeline: []
+
+reference_bundle: null

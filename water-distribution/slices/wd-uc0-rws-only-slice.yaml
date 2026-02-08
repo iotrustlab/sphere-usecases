@@ -1,0 +1,28 @@
+api_version: sphere.mergetb.io/v1
+kind: SliceDefinition
+
+metadata:
+  slice_id: wd-uc0-rws-only-slice
+  usecase_id: water-distribution-uc0
+  version: "1.0.0"
+  description: Water Distribution UC0 Return Water System only slice. Isolates RWS tank, pump, and valve for focused validation.
+
+active_groups:
+  - rws
+
+diagram:
+  asset: "water-distribution.svg"
+
+overlay_tags:
+  - RWS_Tank_Level
+  - RWS_Pump_Speed
+  - RWS_Pump_Sts
+  - RWS_Tank_Valve
+  - RWS_Tank_Valve_Sts
+  - SYS_IDLE
+  - SYS_RUNNING
+
+trend_tags:
+  - RWS_Tank_Level
+
+notes: RWS-only slice for isolated validation of the return water system process (return tank, recirculation pump, return-to-supply loop).
