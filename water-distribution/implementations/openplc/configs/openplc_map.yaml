@@ -3,9 +3,12 @@
 # Maps each canonical tag name from tag_contract.yaml to its Modbus
 # register type and address for the OpenPLC backend.
 #
-# NOTE: These are placeholder addresses — no PLC program exists yet.
-# Address assignments are structurally valid but will need updating
-# when an actual OpenPLC program is developed.
+# Architecture:
+#   Controller PLC (10.100.0.10:502) <-> Modbus Bridge <-> Simulator PLC (10.100.0.20:502)
+#
+# The Modbus bridge shuttles data between controller and simulator:
+#   - Controller outputs (coils, holding regs) → Simulator inputs
+#   - Simulator outputs (sensor values, status) → Controller inputs
 #
 # Modbus register types:
 #   coil              - Digital output (function codes 1/5/15)
@@ -24,7 +27,24 @@ kind: BackendMapping
 metadata:
   backend: openplc
   protocol: modbus_tcp
-  status: placeholder  # no PLC program exists yet
+  status: active
+  controller_address: "10.100.0.10:502"
+  simulator_address: "10.100.0.20:502"
+
+# Bridge register allocation:
+#
+# Controller -> Simulator (via bridge):
+#   Coils 40-42      (%QX5.0-5.2)     Valve commands
+#   HR 100-101       (%QW100-101)     Pump speed setpoints
+#
+# Simulator -> Controller (via bridge):
+#   IR 70-76         (%IW70-76)       Analog sensor values
+#   DI 16-21         (%IX2.0-2.5)     Status bits
+#
+# Internal to Controller:
+#   Coils 56-57      (%QX7.0-7.1)     System state (IDLE, RUNNING)
+#   Coil 64          (%QX8.0)         Alarm outputs
+#   DI 0-1           (%IX0.0-0.1)     HMI inputs (Start, Stop)
 
 mappings:
   # ─── Supply Line ────────────────────────────────────────────────────────
@@ -34,24 +54,28 @@ mappings:
     address: 70             # %IW70
     iec_address: "%IW70"
     scale: 1.0
+    description: "Supply tank level [mm], range [0, 1500]"
 
   Supply_Pump_Flow:
     register_type: input_register
     address: 71             # %IW71
     iec_address: "%IW71"
     scale: 1.0
+    description: "Supply pump discharge flow [L/min], range [0, 200]"
 
   Supply_NaOCl_Level:
     register_type: input_register
     address: 72             # %IW72
     iec_address: "%IW72"
     scale: 1.0
+    description: "NaOCl dosing tank level [mm], range [0, 1000]"
 
   Supply_NH4Cl_Level:
     register_type: input_register
     address: 73             # %IW73
     iec_address: "%IW73"
     scale: 1.0
+    description: "NH4Cl dosing tank level [mm], range [0, 1000]"
 
   # Analog actuator (holding register) - controller -> simulator
   Supply_Pump_Speed:
@@ -59,28 +83,33 @@ mappings:
     address: 100            # %QW100
     iec_address: "%QW100"
     scale: 1.0
+    description: "Supply pump VFD speed setpoint [%], range [0, 100]"
 
   # Digital commands (coils) - controller -> simulator
   Supply_Tank_Valve:
     register_type: coil
     address: 40             # %QX5.0
     iec_address: "%QX5.0"
+    description: "Supply tank outlet valve command (open/close)"
 
   # Digital status (discrete inputs) - simulator -> controller
   Supply_Pump_Sts:
     register_type: discrete_input
     address: 16             # %IX2.0
     iec_address: "%IX2.0"
+    description: "Supply pump running status"
 
   Supply_Mixer_Sts:
     register_type: discrete_input
     address: 17             # %IX2.1
     iec_address: "%IX2.1"
+    description: "Supply tank mixer running status"
 
   Supply_Tank_Valve_Sts:
     register_type: discrete_input
     address: 18             # %IX2.2
     iec_address: "%IX2.2"
+    description: "Supply tank outlet valve status (open/closed)"
 
   # ─── Distribution Grid ─────────────────────────────────────────────────
   # Analog sensors (input registers) - simulator -> controller
@@ -89,24 +118,28 @@ mappings:
     address: 74             # %IW74
     iec_address: "%IW74"
     scale: 1.0
+    description: "Elevated storage tank level [mm], range [0, 2000]"
 
   Grid_Consum_Tank_Level:
     register_type: input_register
     address: 75             # %IW75
     iec_address: "%IW75"
     scale: 1.0
+    description: "Consumer storage tank level [mm], range [0, 2000]"
 
   # Digital command (coil) - controller -> simulator
   Grid_Elev_Valve:
     register_type: coil
     address: 41             # %QX5.1
     iec_address: "%QX5.1"
+    description: "Elevated tank inlet valve command (open/close)"
 
   # Digital status (discrete input) - simulator -> controller
   Grid_Elev_Valve_Sts:
     register_type: discrete_input
     address: 19             # %IX2.3
     iec_address: "%IX2.3"
+    description: "Elevated tank inlet valve status (open/closed)"
 
   # ─── Return Water System ───────────────────────────────────────────────
   # Analog sensors (input registers) - simulator -> controller
@@ -115,6 +148,7 @@ mappings:
     address: 76             # %IW76
     iec_address: "%IW76"
     scale: 1.0
+    description: "Return water system tank level [mm], range [0, 1500]"
 
   # Analog actuator (holding register) - controller -> simulator
   RWS_Pump_Speed:
@@ -122,49 +156,70 @@ mappings:
     address: 101            # %QW101
     iec_address: "%QW101"
     scale: 1.0
+    description: "Return water pump VFD speed setpoint [%], range [0, 100]"
 
   # Digital command (coil) - controller -> simulator
   RWS_Tank_Valve:
     register_type: coil
     address: 42             # %QX5.2
     iec_address: "%QX5.2"
+    description: "Return water tank outlet valve command (open/close)"
 
   # Digital status (discrete inputs) - simulator -> controller
   RWS_Pump_Sts:
     register_type: discrete_input
     address: 20             # %IX2.4
     iec_address: "%IX2.4"
+    description: "Return water pump running status"
 
   RWS_Tank_Valve_Sts:
     register_type: discrete_input
     address: 21             # %IX2.5
     iec_address: "%IX2.5"
+    description: "Return water tank outlet valve status (open/closed)"
 
   # ─── System State ──────────────────────────────────────────────────────
   SYS_IDLE:
     register_type: coil
     address: 56             # %QX7.0
     iec_address: "%QX7.0"
+    description: "System idle state indicator"
 
   SYS_RUNNING:
     register_type: coil
     address: 57             # %QX7.1
     iec_address: "%QX7.1"
+    description: "System running state indicator"
 
   # ─── Alarms ────────────────────────────────────────────────────────────
   Alarm_Supply_Tank_HH:
     register_type: coil
     address: 64             # %QX8.0
     iec_address: "%QX8.0"
+    description: "Supply tank high-high level alarm (>=1200mm)"
 
-  # ─── Reserved Address Ranges ───────────────────────────────────────────
-  # Coils:
-  #   %QX5.0-5.2  (40-42)  Process actuator commands
-  #   %QX7.0-7.1  (56-57)  System state
-  #   %QX8.0      (64)     Alarms
-  # Discrete inputs:
-  #   %IX2.0-2.5  (16-21)  Process status feedback
-  # Holding registers:
-  #   %QW100-101           Speed setpoints
-  # Input registers:
-  #   %IW70-76             Analog sensor values
+# ─── Bridge Configuration Reference ────────────────────────────────────────
+#
+# The modbus_bridge.py script should be configured to shuttle:
+#
+# Controller → Simulator:
+#   Coil 40     (%QX5.0) → Discrete Input 24 (%IX3.0)  Supply_Tank_Valve
+#   Coil 41     (%QX5.1) → Discrete Input 25 (%IX3.1)  Grid_Elev_Valve
+#   Coil 42     (%QX5.2) → Discrete Input 26 (%IX3.2)  RWS_Tank_Valve
+#   HR 100      (%QW100) → IR 200 (%IW200)             Supply_Pump_Speed
+#   HR 101      (%QW101) → IR 201 (%IW201)             RWS_Pump_Speed
+#
+# Simulator → Controller:
+#   HR 300      (%QW300) → IR 70 (%IW70)               Supply_Tank_Level
+#   HR 301      (%QW301) → IR 71 (%IW71)               Supply_Pump_Flow
+#   HR 302      (%QW302) → IR 72 (%IW72)               Supply_NaOCl_Level
+#   HR 303      (%QW303) → IR 73 (%IW73)               Supply_NH4Cl_Level
+#   HR 304      (%QW304) → IR 74 (%IW74)               Grid_Elev_Tank_Level
+#   HR 305      (%QW305) → IR 75 (%IW75)               Grid_Consum_Tank_Level
+#   HR 306      (%QW306) → IR 76 (%IW76)               RWS_Tank_Level
+#   Coil 320    (%QX40.0) → DI 16 (%IX2.0)             Supply_Pump_Sts
+#   Coil 321    (%QX40.1) → DI 17 (%IX2.1)             Supply_Mixer_Sts
+#   Coil 322    (%QX40.2) → DI 18 (%IX2.2)             Supply_Tank_Valve_Sts
+#   Coil 323    (%QX40.3) → DI 19 (%IX2.3)             Grid_Elev_Valve_Sts
+#   Coil 324    (%QX40.4) → DI 20 (%IX2.4)             RWS_Pump_Sts
+#   Coil 325    (%QX40.5) → DI 21 (%IX2.5)             RWS_Tank_Valve_Sts

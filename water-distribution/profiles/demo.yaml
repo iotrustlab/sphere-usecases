@@ -1,0 +1,154 @@
+# Demo/fast simulation profile for SPHERE Water Distribution UC0
+# Sped-up timing for quicker validation cycles and demonstrations
+#
+# Use this profile when:
+#   - Running quick demos or presentations
+#   - Iterating on control logic without waiting for realistic timing
+#   - Testing alarm/shutdown logic in accelerated mode
+#
+# For research validation, use realistic.yaml instead.
+
+api_version: sphere.mergetb.io/v1
+kind: SimProfile
+metadata:
+  name: demo
+  version: "1.0.0"
+  description: Fast timing for demos and quick iteration
+  basis: "SPHERE legacy timing (accelerated from realistic.yaml)"
+
+timing:
+  dt_sec: 0.1            # Simulation timestep
+  poll_interval_ms: 500  # Tag polling interval
+
+actuators:
+  # Motorized valve: dramatically sped up for demo
+  # Real: 60s, Demo: 5s (12x faster)
+  motorized_valve:
+    tau_sec: 5.0
+
+  # Solenoid valve: already fast, unchanged
+  solenoid_valve:
+    tau_sec: 0.05
+
+  # Pump dynamics: sped up for demo
+  pump:
+    spinup_sec: 0.3
+    vfd_accel_sec: 1.0
+
+  # Per-tag type overrides (same as realistic)
+  overrides: {}
+
+sensors:
+  # Sensors near-instantaneous in demo mode
+  level:
+    tau_sec: 0.1
+    noise_sigma: 2.0
+
+  flow:
+    tau_sec: 0.1
+    noise_sigma: 0.5
+
+alarms:
+  # Lower HH thresholds for demo (triggers faster)
+  Supply_Tank:
+    span_mm: 1500
+    ll_pct: 10
+    l_pct: 20
+    h_pct: 70
+    hh_pct: 80
+
+  Grid_Elev_Tank:
+    span_mm: 2000
+    ll_pct: 10
+    l_pct: 20
+    h_pct: 70
+    hh_pct: 80
+
+  Grid_Consum_Tank:
+    span_mm: 2000
+    ll_pct: 10
+    l_pct: 20
+    h_pct: 70
+    hh_pct: 80
+
+  RWS_Tank:
+    span_mm: 1500
+    ll_pct: 10
+    l_pct: 20
+    h_pct: 70
+    hh_pct: 80
+
+physics:
+  # Smaller tanks for faster level changes in demos
+  Supply_Tank:
+    max_mm: 1500
+    area_m2: 10.0          # 4x smaller than realistic
+    inflow_lpm: 150
+    pump_max_lpm: 380
+
+  NaOCl_Tank:
+    max_mm: 1000
+    area_m2: 0.05          # 2x smaller
+    dose_rate_lpm: 0.38    # 10x faster dosing
+
+  NH4Cl_Tank:
+    max_mm: 1000
+    area_m2: 0.05
+    dose_rate_lpm: 0.19
+
+  Grid_Elev_Tank:
+    max_mm: 3000           # Halved depth
+    area_m2: 20.0          # 3x smaller
+    drain_lpm: 300
+
+  Grid_Consum_Tank:
+    max_mm: 2000           # Halved depth
+    area_m2: 5.0           # 2x smaller
+
+  RWS_Tank:
+    max_mm: 1500
+    area_m2: 0.15          # 2x smaller
+
+pumps:
+  Supply_Pump:
+    max_flow_lpm: 380
+    max_flow_m3s: 0.0063
+
+  RWS_Pump:
+    max_flow_lpm: 38
+    max_flow_m3s: 0.00063
+
+demand:
+  # Same demand model as realistic (patterns still useful)
+  base_demand_gpd_per_conn: 400
+  connections: 50          # Fewer connections for demo
+  mdd_factor: 2.0
+  phd_factor: 4.5
+  ufw_fraction: 0.13
+  return_fraction: 0.90
+
+  diurnal_pattern:
+    - { hour: 0, mult: 0.5 }
+    - { hour: 1, mult: 0.4 }
+    - { hour: 2, mult: 0.3 }
+    - { hour: 3, mult: 0.3 }
+    - { hour: 4, mult: 0.4 }
+    - { hour: 5, mult: 0.6 }
+    - { hour: 6, mult: 1.0 }
+    - { hour: 7, mult: 1.4 }
+    - { hour: 8, mult: 1.3 }
+    - { hour: 9, mult: 1.1 }
+    - { hour: 10, mult: 1.0 }
+    - { hour: 11, mult: 1.0 }
+    - { hour: 12, mult: 1.1 }
+    - { hour: 13, mult: 1.0 }
+    - { hour: 14, mult: 0.9 }
+    - { hour: 15, mult: 0.9 }
+    - { hour: 16, mult: 1.0 }
+    - { hour: 17, mult: 1.2 }
+    - { hour: 18, mult: 1.4 }
+    - { hour: 19, mult: 1.3 }
+    - { hour: 20, mult: 1.1 }
+    - { hour: 21, mult: 1.0 }
+    - { hour: 22, mult: 0.8 }
+    - { hour: 23, mult: 0.6 }
