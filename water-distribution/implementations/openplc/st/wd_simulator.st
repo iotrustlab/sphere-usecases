@@ -89,7 +89,7 @@ VAR CONSTANT
     SUPPLY_TANK_AREA_M2 : REAL := 40.0;         (* Tank cross-section [m²] *)
     SUPPLY_TANK_MAX_MM : REAL := 1500.0;        (* Max level [mm] *)
     SUPPLY_INFLOW_LPM : REAL := 150.0;          (* Inflow from treatment [L/min] *)
-    SUPPLY_PUMP_MAX_LPM : REAL := 380.0;        (* Max pump flow [L/min] *)
+    SUPPLY_PUMP_MAX_LPM : REAL := 200.0;        (* Max pump flow [L/min] *)
 
     (* Physical parameters - Chemical tanks *)
     NAOCL_TANK_AREA_M2 : REAL := 0.1;           (* Tank cross-section [m²] *)
@@ -99,9 +99,9 @@ VAR CONSTANT
 
     (* Physical parameters - Grid *)
     ELEV_TANK_AREA_M2 : REAL := 60.0;           (* Tank cross-section [m²] *)
-    ELEV_TANK_MAX_MM : REAL := 6000.0;          (* Max level [mm] *)
+    ELEV_TANK_MAX_MM : REAL := 2000.0;          (* Max level [mm] *)
     CONSUM_TANK_AREA_M2 : REAL := 10.0;         (* Tank cross-section [m²] *)
-    CONSUM_TANK_MAX_MM : REAL := 4000.0;        (* Max level [mm] *)
+    CONSUM_TANK_MAX_MM : REAL := 2000.0;        (* Max level [mm] *)
     GRID_DEMAND_LPM : REAL := 100.0;            (* Base grid demand [L/min] *)
     ELEV_DRAIN_LPM : REAL := 300.0;             (* Gravity drain rate [L/min] *)
 
@@ -121,8 +121,8 @@ VAR
     supply_tank_level : REAL := 1000.0;
     naocl_tank_level : REAL := 800.0;
     nh4cl_tank_level : REAL := 800.0;
-    grid_elev_level : REAL := 4000.0;
-    grid_consum_level : REAL := 3000.0;
+    grid_elev_level : REAL := 1200.0;
+    grid_consum_level : REAL := 1000.0;
     rws_tank_level : REAL := 500.0;
 
     (* Valve states with delay modeling *)
