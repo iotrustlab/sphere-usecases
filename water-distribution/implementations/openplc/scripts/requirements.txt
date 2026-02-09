@@ -1,0 +1,2 @@
+# Python dependencies for water distribution OpenPLC scripts
+pymodbus>=3.0.0

@@ -203,11 +203,11 @@ mappings:
 # The modbus_bridge.py script should be configured to shuttle:
 #
 # Controller → Simulator:
-#   Coil 40     (%QX5.0) → Discrete Input 24 (%IX3.0)  Supply_Tank_Valve
-#   Coil 41     (%QX5.1) → Discrete Input 25 (%IX3.1)  Grid_Elev_Valve
-#   Coil 42     (%QX5.2) → Discrete Input 26 (%IX3.2)  RWS_Tank_Valve
-#   HR 100      (%QW100) → IR 200 (%IW200)             Supply_Pump_Speed
-#   HR 101      (%QW101) → IR 201 (%IW201)             RWS_Pump_Speed
+#   Coil 40     (%QX5.0) → Coil 24 (%QX3.0)            Supply_Tank_Valve
+#   Coil 41     (%QX5.1) → Coil 25 (%QX3.1)            Grid_Elev_Valve
+#   Coil 42     (%QX5.2) → Coil 26 (%QX3.2)            RWS_Tank_Valve
+#   HR 100      (%QW100) → HR 200 (%QW200)             Supply_Pump_Speed
+#   HR 101      (%QW101) → HR 201 (%QW201)             RWS_Pump_Speed
 #
 # Simulator → Controller:
 #   HR 300      (%QW300) → IR 70 (%IW70)               Supply_Tank_Level
