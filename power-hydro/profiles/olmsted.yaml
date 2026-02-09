@@ -1,0 +1,149 @@
+# Olmsted Hydroelectric Profile Overlay for SPHERE Power Systems
+#
+# Site-specific parameters derived from public Olmsted Hydroelectric poster:
+#   - Unit 1: 8032 kW, 300 cfs (8.5 m3/s), 328 ft (100m) head, 72" pipe
+#   - Unit 2: 3304 kW, 120 cfs (3.4 m3/s), 338 ft (103m) head, 48" pipe
+#   - Unit 3 (micro): 272 kW, 11.9 cfs, 340 ft head
+#   - Unit 4 (micro): 160 kW, 7.5 cfs, 340 ft head
+#
+# This profile extends realistic.yaml with Olmsted-specific values.
+# Select unit via 'unit_selector' parameter.
+
+api_version: sphere.mergetb.io/v1
+kind: SimProfile
+metadata:
+  name: olmsted
+  version: "1.0.0"
+  description: Olmsted Hydroelectric site-specific parameters (public data)
+  extends: realistic
+  site: "Olmsted Hydroelectric"
+  basis: "Olmsted Hydroelectric Poster (Public Data)"
+
+timing:
+  dt_sec: 0.1
+  poll_interval_ms: 500
+
+# Select which unit to simulate (1-4)
+unit_selector: 1
+
+# ─── Unit-Specific Parameters ───────────────────────────────────────────────
+# These override the base 'realistic' profile values based on unit_selector
+units:
+  1:
+    # Main Francis unit - 8032 kW
+    turbine:
+      q_max_m3s: 8.5         # 300 cfs
+      eta_t: 0.88            # Slightly lower for older unit
+      k_q: 0.85              # Calibrated for site
+    generator:
+      p_rated_mw: 8.032      # 8032 kW
+      eta_g: 0.96
+    reservoir:
+      initial_level_m: 100.0 # 328 ft head
+    penstock:
+      diameter_m: 1.83       # 72" = 1.83m
+      length_m: 400          # Estimated
+      tau_sec: 4.0
+
+  2:
+    # Secondary Francis unit - 3304 kW
+    turbine:
+      q_max_m3s: 3.4         # 120 cfs
+      eta_t: 0.87
+      k_q: 0.34
+    generator:
+      p_rated_mw: 3.304      # 3304 kW
+      eta_g: 0.95
+    reservoir:
+      initial_level_m: 103.0 # 338 ft head
+    penstock:
+      diameter_m: 1.22       # 48" = 1.22m
+      length_m: 350
+      tau_sec: 3.5
+
+  3:
+    # Micro-hydro unit 3 - 272 kW
+    turbine:
+      q_max_m3s: 0.34        # 11.9 cfs
+      eta_t: 0.82            # Lower efficiency for micro
+      k_q: 0.034
+    generator:
+      p_rated_mw: 0.272      # 272 kW
+      eta_g: 0.92
+    reservoir:
+      initial_level_m: 104.0 # 340 ft head
+    penstock:
+      diameter_m: 0.3        # ~12" estimated
+      length_m: 200
+      tau_sec: 2.0
+
+  4:
+    # Micro-hydro unit 4 - 160 kW
+    turbine:
+      q_max_m3s: 0.21        # 7.5 cfs
+      eta_t: 0.80
+      k_q: 0.021
+    generator:
+      p_rated_mw: 0.160      # 160 kW
+      eta_g: 0.90
+    reservoir:
+      initial_level_m: 104.0 # 340 ft head
+    penstock:
+      diameter_m: 0.25       # ~10" estimated
+      length_m: 180
+      tau_sec: 1.5
+
+# ─── Common Olmsted Parameters ──────────────────────────────────────────────
+# These apply to all units unless overridden
+
+reservoir:
+  # Olmsted reservoir is run-of-river with relatively stable head
+  area_m2: 50000           # Moderate forebay
+  max_level_m: 110.0       # Maximum operating level
+  min_level_m: 95.0        # Minimum operating level
+  inflow_m3s: 15.0         # Typical river flow allocation
+
+gate:
+  # Wicket gates at Olmsted (typical Francis unit)
+  travel_time_sec: 15.0    # Conservative for older equipment
+  slew_rate_pct_s: 7.0     # Slower slew
+  tau_servo_sec: 1.5
+  emergency_close_sec: 4.0
+
+breaker:
+  # Standard HV breakers
+  open_time_sec: 0.08
+  close_time_sec: 0.06
+  arc_time_sec: 0.03
+
+sensors:
+  speed:
+    tau_sec: 0.01
+    noise_sigma: 0.15      # Slightly noisier (older instrumentation)
+  flow:
+    tau_sec: 0.1
+    noise_sigma: 0.3
+  pressure:
+    tau_sec: 0.05
+    noise_sigma: 8.0
+  level:
+    tau_sec: 1.0
+    noise_sigma: 0.15
+
+safety:
+  overspeed_trip_pct: 112  # Slightly higher for older units
+  overspeed_alarm_pct: 106
+  overpressure_trip_pct: 160
+  min_head_m: 80.0         # Higher min head (run-of-river)
+  min_flow_pct: 15.0       # Higher min flow
+  gate_mismatch_pct: 7.0
+  gate_mismatch_delay_sec: 8.0
+  breaker_mismatch_delay_sec: 0.8
+
+control:
+  kp_gate: 1.5             # More conservative for older units
+  ki_gate: 0.05
+  no_load_gate_pct: 8.0    # Higher no-load gate
+  sync_speed_band_pct: 0.8
+  sync_phase_deg: 15.0
+  min_power_for_breaker_mw: 0.5

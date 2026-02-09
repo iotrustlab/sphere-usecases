@@ -1,0 +1,43 @@
+api_version: sphere.mergetb.io/v1
+kind: SliceDefinition
+
+metadata:
+  slice_id: ps-hydro-water-only-slice-01
+  usecase_id: power-hydro-ps1
+  version: "1.0.0"
+  description: Hydraulics-focused slice covering reservoir, penstock, and gate subsystems.
+
+active_groups:
+  - actuators
+  - sensors
+
+diagram:
+  asset: "power-hydro-water.svg"
+
+overlay_tags:
+  # Reservoir
+  - HY_Res_Level
+  - HY_Head
+
+  # Penstock
+  - HY_Flow
+  - HY_Pressure
+
+  # Gate
+  - HY_Gate_Pos
+  - HY_Gate_Cmd
+
+  # Spillway
+  - HY_Spill_Sts
+
+  # Related alarms
+  - HY_Alarm_GateMismatch
+  - HY_Alarm_LowLevel
+
+trend_tags:
+  - HY_Res_Level
+  - HY_Head
+  - HY_Flow
+  - HY_Gate_Pos
+
+notes: Hydraulics-only slice for water path analysis. Useful for penstock dynamics studies and gate actuator validation.

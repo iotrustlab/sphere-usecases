@@ -1,0 +1,46 @@
+api_version: sphere.mergetb.io/v1
+kind: SliceDefinition
+
+metadata:
+  slice_id: ps-hydro-electrical-only-slice-01
+  usecase_id: power-hydro-ps1
+  version: "1.0.0"
+  description: Electrical-focused slice covering generator, breaker, and grid interface.
+
+active_groups:
+  - actuators
+  - sensors
+  - trips
+  - system
+
+diagram:
+  asset: "power-hydro-electrical.svg"
+
+overlay_tags:
+  # Generator
+  - HY_Speed_Pct
+  - HY_Freq_Hz
+  - HY_Power_MW
+  - HY_Power_Setpoint_MW
+
+  # Breaker
+  - HY_Breaker_Sts
+  - HY_Breaker_Cmd
+
+  # Trips (safety-critical)
+  - HY_Trip_Overspeed
+  - HY_Trip_Overpressure
+
+  # System state
+  - HY_State_Running
+  - HY_State_Tripped
+
+  # Related alarms
+  - HY_Alarm_BreakerMismatch
+
+trend_tags:
+  - HY_Power_MW
+  - HY_Speed_Pct
+  - HY_Freq_Hz
+
+notes: Electrical-only slice for generator and grid interface analysis. Useful for synchronization studies and trip response validation.
