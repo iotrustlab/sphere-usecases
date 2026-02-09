@@ -12,6 +12,28 @@ Reservoir → Penstock → Wicket Gate → Turbine → Generator → Breaker →
 
 This model is designed to be parameterized via profile overlays to support different site configurations (small hydro, run-of-river, high-head Francis, low-head Kaplan, etc.).
 
+## Canonical Units
+
+All internal calculations use SI units. Tag values are reported in engineering units as shown:
+
+| Tag | Unit | Description |
+|-----|------|-------------|
+| HY_Res_Level | m | Reservoir/forebay water level |
+| HY_Head | m | Net hydraulic head at turbine |
+| HY_Flow | m³/s | Turbine water flow rate |
+| HY_Pressure | kPa | Penstock pressure (≈ H × 9.81) |
+| HY_Speed_Pct | % | Turbine speed as % of sync |
+| HY_Freq_Hz | Hz | Generator electrical frequency |
+| HY_Power_MW | MW | Generator electrical output |
+| HY_Gate_Pos | % | Wicket gate position (0-100) |
+| HY_Gate_Cmd | % | Wicket gate command (0-100) |
+| HY_Power_Setpoint_MW | MW | Power control setpoint |
+| HY_Breaker_* | 0/1 | Boolean status/command |
+| HY_Spill_* | 0/1 | Boolean status/command |
+| HY_State_* | 0/1 | Boolean state flags |
+| HY_Trip_* | 0/1 | Boolean trip indicators |
+| HY_Alarm_* | 0/1 | Boolean alarm flags |
+
 ## Physical Equations
 
 ### 1. Reservoir Mass Balance
@@ -218,7 +240,29 @@ On any trip:
 5. Transition to TRIPPED state
 6. Require manual reset after conditions clear
 
-## Profile Differences
+## Profile Hierarchy
+
+Profiles follow a hierarchy with inheritance:
+
+```
+generic.yaml (base)
+    └── demo.yaml (10x speedup)
+    └── realistic.yaml (research-grounded)
+            └── olmsted.yaml (site-specific overlay)
+```
+
+### Timing Constants by Profile
+
+| Parameter | Realistic | Demo | Unit |
+|-----------|-----------|------|------|
+| Gate travel time | 10.0 | 1.0 | s |
+| Gate tau (servo) | 1.0 | 0.1 | s |
+| Penstock tau | 5.0 | 0.5 | s |
+| Breaker open | 0.06 | 0.2 | s |
+| Breaker close | 0.05 | 0.2 | s |
+| Speed sensor tau | 0.005 | 0.001 | s |
+| Flow sensor tau | 0.05 | 0.01 | s |
+| Level sensor tau | 0.5 | 0.1 | s |
 
 ### Realistic Profile
 
@@ -241,6 +285,86 @@ Site-specific overlay for Olmsted Hydroelectric:
 - Unit 2: 3.304 MW, 3.4 m³/s, 103m head
 - Unit 3: 0.272 MW (micro)
 - Unit 4: 0.160 MW (micro)
+
+## k_q Calibration
+
+The flow coefficient `k_q` relates gate position, head, and flow:
+
+```
+Q = k_q × (gate/100) × √H
+```
+
+### Derivation
+
+At rated conditions (full gate, rated head):
+```
+Q_max = k_q × (100/100) × √H_rated
+k_q = Q_max / √H_rated
+```
+
+For the generic model (Q_max = 100 m³/s, H_rated = 100m):
+```
+k_q = 100 / √100 = 100 / 10 = 10
+```
+
+### Verification
+
+At 50% gate, 100m head:
+```
+Q = 10 × 0.5 × √100 = 10 × 0.5 × 10 = 50 m³/s ✓
+```
+
+At full gate, 64m head (low reservoir):
+```
+Q = 10 × 1.0 × √64 = 10 × 8 = 80 m³/s ✓ (reduced flow at lower head)
+```
+
+## Known Simplifications
+
+The generic hydro model makes several simplifying assumptions:
+
+### 1. Frequency Locked on Grid
+
+When breaker is closed, generator frequency is locked to grid (60 Hz nominal). No governor dynamics or frequency regulation modeled.
+
+**Impact**: Cannot simulate frequency response or AGC participation.
+
+### 2. Constant Head Assumption
+
+Head loss through penstock is not modeled. Effective head depends only on reservoir level and static head difference.
+
+**Impact**: Overestimates flow and power at high flow rates.
+
+### 3. No Water Hammer
+
+Pressure transients from rapid gate closure are not modeled. Penstock pressure is approximated as `H × 9.81` kPa.
+
+**Impact**: Cannot simulate overpressure trips from fast gate operations.
+
+### 4. No Cavitation
+
+Suction side pressure limits (tailwater submergence, sigma) not checked.
+
+**Impact**: Cannot detect cavitation conditions at low tailwater or high power.
+
+### 5. Single Operating Point Efficiency
+
+Turbine and generator efficiencies are constant, not curves.
+
+**Impact**: Overestimates efficiency at partial loads.
+
+### 6. Simplified Reservoir
+
+No hydrograph input—inflow is constant. Reservoir is modeled as prismatic (constant area).
+
+**Impact**: Cannot simulate flood events or seasonal variations.
+
+### Future Enhancements (PS-2)
+
+- Speed state with governor dynamics
+- Head loss toggle for penstock friction
+- Efficiency curves for turbine/generator
+- Water hammer model for pressure transients
 
 ## Invariant Rules Rationale
 

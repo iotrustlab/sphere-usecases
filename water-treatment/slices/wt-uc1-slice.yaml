@@ -15,7 +15,7 @@ active_groups:
   - p3
 
 diagram:
-  asset: "water-treatment-p1.svg"
+  asset: "water-treatment.png"
 
 overlay_tags:
   # P1 key indicators
@@ -23,8 +23,13 @@ overlay_tags:
   - RW_Pump_Speed
   - RW_Pump_Flow
   - RW_Pump_Sts
+  - RW_Pump_Fault
+  - RW_Pump_Start
+  - RW_Pump_Stop
   - RW_Tank_PR_Valve
+  - RW_Tank_PR_Valve_Sts
   - RW_Tank_P_Valve
+  - RW_Tank_P_Valve_Sts
   # P2 chemical levels
   - ChemTreat_NaCl_Level
   - ChemTreat_NaOCl_Level

@@ -12,7 +12,7 @@ active_groups:
   - sensors
 
 diagram:
-  asset: "power-hydro-water.svg"
+  asset: "power-hydro.svg"  # Uses full diagram; overlay filtering handles tag subsetting
 
 overlay_tags:
   # Reservoir

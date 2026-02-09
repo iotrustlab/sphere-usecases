@@ -8,6 +8,10 @@ metadata:
     Water Distribution UC0 tag contract. Covers supply line (intake + chemical dosing),
     distribution grid (elevated and consumer tanks), and return water system.
     Derived from RoviSys FunctionalSpec wiring and P&ID diagram components.
+  process_models:
+    - "docs/process-models/wd-supply-line.md"
+    - "docs/process-models/wd-distribution-grid.md"
+    - "docs/process-models/wd-return-water.md"
 
 tags:
   # --- Supply Line ---

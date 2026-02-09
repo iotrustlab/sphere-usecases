@@ -1,0 +1,32 @@
+[
+  {
+    "type": "start",
+    "timestamp": "2025-06-15T10:10:00Z",
+    "message": "Run started (load following)"
+  },
+  {
+    "type": "setpoint",
+    "timestamp": "2025-06-15T10:10:00Z",
+    "message": "Setpoint: 40 MW"
+  },
+  {
+    "type": "setpoint",
+    "timestamp": "2025-06-15T10:10:20Z",
+    "message": "Setpoint: 60 MW"
+  },
+  {
+    "type": "setpoint",
+    "timestamp": "2025-06-15T10:10:40Z",
+    "message": "Setpoint: 50 MW"
+  },
+  {
+    "type": "health",
+    "timestamp": "2025-06-15T10:10:30Z",
+    "message": "Health OK - tracking setpoint"
+  },
+  {
+    "type": "stop",
+    "timestamp": "2025-06-15T10:11:00Z",
+    "message": "Run completed"
+  }
+]

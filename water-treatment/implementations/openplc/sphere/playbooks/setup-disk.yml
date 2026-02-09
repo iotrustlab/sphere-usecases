@@ -56,6 +56,85 @@
         state: directory
         mode: '0711'
 
+    # Relocate /tmp to extra disk (root is only 2GB on moddeter VMs)
+    - name: Create tmp directory on extra disk
+      ansible.builtin.file:
+        path: "{{ mount_point }}/tmp"
+        state: directory
+        mode: '1777'
+
+    - name: Check if /tmp is already a symlink
+      ansible.builtin.stat:
+        path: /tmp
+      register: tmp_stat
+
+    - name: Remove original /tmp directory
+      ansible.builtin.file:
+        path: /tmp
+        state: absent
+      when: tmp_stat.stat.isdir is defined and tmp_stat.stat.isdir and not tmp_stat.stat.islnk
+
+    - name: Symlink /tmp to extra disk
+      ansible.builtin.file:
+        src: "{{ mount_point }}/tmp"
+        dest: /tmp
+        state: link
+        force: true
+      when: tmp_stat.stat.islnk is not defined or not tmp_stat.stat.islnk
+
+    # Relocate containerd to extra disk (runtime tasks need writable space)
+    - name: Create containerd directory on extra disk
+      ansible.builtin.file:
+        path: "{{ mount_point }}/containerd"
+        state: directory
+        mode: '0711'
+
+    - name: Check if containerd dir is already a symlink
+      ansible.builtin.stat:
+        path: /var/lib/containerd
+      register: containerd_stat
+
+    - name: Stop containerd before relocation
+      ansible.builtin.systemd:
+        name: containerd
+        state: stopped
+      when: containerd_stat.stat.exists and not (containerd_stat.stat.islnk | default(false))
+      failed_when: false
+
+    - name: Copy containerd data to extra disk
+      ansible.builtin.command:
+        cmd: rsync -a /var/lib/containerd/ {{ mount_point }}/containerd/
+      when: containerd_stat.stat.exists and containerd_stat.stat.isdir and not (containerd_stat.stat.islnk | default(false))
+      failed_when: false
+
+    - name: Remove original containerd directory
+      ansible.builtin.file:
+        path: /var/lib/containerd
+        state: absent
+      when: containerd_stat.stat.exists and not (containerd_stat.stat.islnk | default(false))
+
+    - name: Symlink containerd to extra disk
+      ansible.builtin.file:
+        src: "{{ mount_point }}/containerd"
+        dest: /var/lib/containerd
+        state: link
+        force: true
+
+    - name: Start containerd after relocation
+      ansible.builtin.systemd:
+        name: containerd
+        state: started
+      failed_when: false
+
+    # Create ansible remote tmp on extra disk
+    - name: Create ansible tmp directory on extra disk
+      ansible.builtin.file:
+        path: "{{ mount_point }}/.ansible/tmp"
+        state: directory
+        mode: '0755'
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+
     - name: Display disk info
       ansible.builtin.command:
         cmd: df -h {{ mount_point }}
@@ -67,3 +146,9 @@
         msg: |
           Extra disk mounted at {{ mount_point }}:
           {{ disk_info.stdout }}
+
+          Symlinks created:
+            /tmp -> {{ mount_point }}/tmp
+            /var/lib/containerd -> {{ mount_point }}/containerd
+
+          Ansible remote tmp: {{ mount_point }}/.ansible/tmp

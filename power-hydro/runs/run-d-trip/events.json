@@ -1,0 +1,37 @@
+[
+  {
+    "type": "start",
+    "timestamp": "2025-06-15T10:15:00Z",
+    "message": "Run started (trip scenario)"
+  },
+  {
+    "type": "fault",
+    "timestamp": "2025-06-15T10:15:15Z",
+    "message": "Grid fault - breaker opens"
+  },
+  {
+    "type": "alarm",
+    "timestamp": "2025-06-15T10:15:18Z",
+    "message": "Speed rising above 105%"
+  },
+  {
+    "type": "trip",
+    "timestamp": "2025-06-15T10:15:20Z",
+    "message": "OVERSPEED TRIP - gate closing"
+  },
+  {
+    "type": "state",
+    "timestamp": "2025-06-15T10:15:20Z",
+    "message": "State: RUNNING -\u003e TRIPPED"
+  },
+  {
+    "type": "health",
+    "timestamp": "2025-06-15T10:15:40Z",
+    "message": "Unit secured in TRIPPED state"
+  },
+  {
+    "type": "stop",
+    "timestamp": "2025-06-15T10:16:00Z",
+    "message": "Run completed"
+  }
+]

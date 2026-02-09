@@ -1,0 +1,23 @@
+{
+  "usecase_id": "water-treatment-uc1",
+  "contract_version": "1.0.0",
+  "backend_type": "openplc",
+  "endpoints": [
+    "10.100.0.10:502",
+    "10.100.0.20:502"
+  ],
+  "mapping_file": "/mnt/data/deploy/openplc_map.yaml",
+  "start_utc": "2026-01-29T05:31:59.637654302Z",
+  "end_utc": "2026-01-29T05:32:29.640514074Z",
+  "poll_interval_ms": 500,
+  "tag_selection": "headline",
+  "tags": [
+    "RW_Tank_Level",
+    "RW_Pump_Speed",
+    "RW_Pump_Flow",
+    "UF_UFFT_Tank_Level",
+    "SYS_IDLE",
+    "SYS_RUNNING",
+    "Alarm_RW_Tank_HH"
+  ]
+}

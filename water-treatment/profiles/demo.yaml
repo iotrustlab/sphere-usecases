@@ -63,7 +63,7 @@ alarms:
   # Lower HH threshold for demo (triggers faster)
   # This matches the legacy ST code: HH at 80% span
   RW_Tank:
-    span_mm: 1500
+    span_mm: 1200       # Matches tag_contract.yaml range [0, 1200]
     ll_pct: 10
     l_pct: 20
     h_pct: 70
@@ -79,7 +79,7 @@ alarms:
 physics:
   # Same physical dimensions as realistic
   RW_Tank:
-    max_mm: 1500
+    max_mm: 1200         # Matches tag_contract.yaml range [0, 1200]
     area_m2: 12.0
     pump_max_lpm: 567
     inflow_lpm: 189

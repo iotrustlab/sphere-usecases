@@ -1,0 +1,7 @@
+Invariant Check Report
+Bundle: run-b-startup
+Rules: power-hydro.yaml
+Samples: 120
+Violations: 0
+
+  No violations detected.
