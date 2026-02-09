@@ -53,8 +53,9 @@ Total: 21 tags across 5 groups. See `tag_contract.yaml` for full definitions.
 ## Current Status
 
 - Tag contract, diagram, overlay, slice, golden runs: **complete**
-- OpenPLC mapping: **placeholder** (structurally valid, addresses are provisional — no PLC program exists yet)
-- Live PLC integration: **not started** (synthetic golden runs only)
+- OpenPLC mapping: **defined** (addresses aligned to controller/simulator ST)
+- OpenPLC controller + simulator: **available** (ST source in `implementations/openplc/st/`)
+- Live PLC integration: **not started** (golden runs remain synthetic)
 
 ## References
 

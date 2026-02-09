@@ -8,9 +8,9 @@
 
 ## Control logic
 
-- Control logic implementation is **incomplete** for Water Distribution.
-- No PLC program (ST or ladder) exists yet for WD; golden runs use synthetic data.
-- The same applies to Water Treatment — WT control logic covers only P1 raw water intake.
+- Control logic exists for Water Distribution (OpenPLC ST in `implementations/openplc/st/`).
+- Golden runs currently use synthetic data profiles; live PLC execution is not yet used for run bundles.
+- Water Treatment control logic still covers only P1 raw water intake.
 
 ## Golden runs
 
@@ -25,5 +25,5 @@
 
 ## Simulation
 
-- No OpenPLC or Rockwell simulation exists for WD yet.
-- The tag contract defines the interface; backend mapping will be added when simulation is available.
+- OpenPLC simulator ST exists for WD (`implementations/openplc/st/wd_simulator.st`).
+- The tag contract defines the interface; mapping is aligned to the current ST addresses.

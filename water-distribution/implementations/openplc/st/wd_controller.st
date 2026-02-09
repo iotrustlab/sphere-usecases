@@ -120,8 +120,8 @@ VAR
     supply_tank_high_sp : REAL := 1200.0;       (* Stop pump above this [mm] *)
     supply_tank_hh_sp : REAL := 1200.0;         (* HH alarm threshold [mm] *)
 
-    grid_elev_low_sp : REAL := 2000.0;          (* Open valve below this [mm] *)
-    grid_elev_high_sp : REAL := 5000.0;         (* Close valve above this [mm] *)
+    grid_elev_low_sp : REAL := 600.0;           (* Open valve below this [mm] *)
+    grid_elev_high_sp : REAL := 1600.0;         (* Close valve above this [mm] *)
 
     rws_tank_low_sp : REAL := 300.0;            (* Start pump below this [mm] *)
     rws_tank_high_sp : REAL := 1200.0;          (* Stop pump above this [mm] *)
