@@ -1,0 +1,94 @@
+{
+  "tool": "invariant-check",
+  "version": "1.1.0",
+  "timestamp": "2026-02-08T19:41:54.413391+00:00",
+  "rules_file": "water-distribution.yaml",
+  "source_bundle": "run-b-flow",
+  "total_samples": 60,
+  "total_violations": 11,
+  "violations": [
+    {
+      "rule": "range",
+      "tag": "Supply_Pump_Flow",
+      "sample": 2,
+      "value": -0.33,
+      "bound": "min=0"
+    },
+    {
+      "rule": "range",
+      "tag": "Supply_Pump_Flow",
+      "sample": 4,
+      "value": -0.44,
+      "bound": "min=0"
+    },
+    {
+      "rule": "range",
+      "tag": "Supply_Pump_Flow",
+      "sample": 5,
+      "value": -0.2,
+      "bound": "min=0"
+    },
+    {
+      "rule": "range",
+      "tag": "Supply_Pump_Flow",
+      "sample": 6,
+      "value": -0.19,
+      "bound": "min=0"
+    },
+    {
+      "rule": "range",
+      "tag": "Supply_Pump_Flow",
+      "sample": 10,
+      "value": -0.25,
+      "bound": "min=0"
+    },
+    {
+      "rule": "correlation",
+      "name": "supply-pump-on-implies-flow",
+      "sample": 10,
+      "condition": "Supply_Pump_Sts=1.0",
+      "check": "Supply_Pump_Flow > 0",
+      "actual": -0.25
+    },
+    {
+      "rule": "correlation",
+      "name": "supply-pump-off-implies-no-flow",
+      "sample": 0,
+      "condition": "Supply_Pump_Sts=0.0",
+      "check": "Supply_Pump_Flow <= 0.1",
+      "actual": 0.41
+    },
+    {
+      "rule": "correlation",
+      "name": "supply-pump-off-implies-no-flow",
+      "sample": 1,
+      "condition": "Supply_Pump_Sts=0.0",
+      "check": "Supply_Pump_Flow <= 0.1",
+      "actual": 0.18
+    },
+    {
+      "rule": "correlation",
+      "name": "supply-pump-off-implies-no-flow",
+      "sample": 3,
+      "condition": "Supply_Pump_Sts=0.0",
+      "check": "Supply_Pump_Flow <= 0.1",
+      "actual": 0.22
+    },
+    {
+      "rule": "correlation",
+      "name": "supply-pump-off-implies-no-flow",
+      "sample": 8,
+      "condition": "Supply_Pump_Sts=0.0",
+      "check": "Supply_Pump_Flow <= 0.1",
+      "actual": 0.4
+    },
+    {
+      "rule": "correlation",
+      "name": "supply-pump-off-implies-no-flow",
+      "sample": 9,
+      "condition": "Supply_Pump_Sts=0.0",
+      "check": "Supply_Pump_Flow <= 0.1",
+      "actual": 0.37
+    }
+  ]
+}

@@ -14,7 +14,7 @@ active_groups:
   - system
 
 diagram:
-  asset: "power-hydro-electrical.svg"
+  asset: "power-hydro.svg"  # Uses full diagram; overlay filtering handles tag subsetting
 
 overlay_tags:
   # Generator

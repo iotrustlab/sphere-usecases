@@ -28,6 +28,10 @@ metadata:
   references:
     - "USC24A-FDS-001 Rev B (RoviSys Functional Specification)"
     - "USC24A-IOL-001 (USC Finalized IO List)"
+  process_models:
+    - "docs/process-models/wt-p1-raw-water.md"
+    - "docs/process-models/wt-p2-chemical-treatment.md"
+    - "docs/process-models/wt-p3-ultrafiltration.md"
 
 # Tags grouped by process and role
 tags:

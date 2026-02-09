@@ -1,0 +1,46 @@
+api_version: sphere.mergetb.io/v1
+kind: SliceDefinition
+metadata:
+  slice_id: wt-uc1-p1-only
+  usecase_id: water-treatment-uc1
+  version: "1.0.0"
+  description: >
+    P1 only - Raw Water Intake. Focused slice for Process 1 analysis
+    covering raw water tank, pump, and associated valves.
+
+active_groups:
+  - p1
+  - system
+  - alarms
+
+diagram:
+  asset: "water-treatment.png"
+
+overlay_tags:
+  # P1 sensors
+  - RW_Tank_Level
+  - RW_Pump_Flow
+  # P1 actuators
+  - RW_Pump_Speed
+  - RW_Tank_PR_Valve
+  - RW_Tank_P_Valve
+  # P1 status
+  - RW_Pump_Sts
+  - RW_Pump_Fault
+  - RW_Tank_PR_Valve_Sts
+  - RW_Tank_P_Valve_Sts
+  # System state
+  - SYS_IDLE
+  - SYS_RUNNING
+  # Key alarm
+  - Alarm_RW_Tank_HH
+
+trend_tags:
+  - RW_Tank_Level
+  - RW_Pump_Speed
+  - RW_Pump_Flow
+
+notes: >
+  Single-process slice for P1 (Raw Water Intake). Use this slice for
+  focused analysis of the raw water subsystem without chemical treatment
+  or ultrafiltration noise in the display.

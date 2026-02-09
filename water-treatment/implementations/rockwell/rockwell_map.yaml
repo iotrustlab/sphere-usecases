@@ -1,0 +1,198 @@
+# Rockwell Backend Mapping: Canonical Tag -> CIP Path
+#
+# Maps each canonical tag name from tag_contract.yaml to its Rockwell
+# CIP (Common Industrial Protocol) path for CIP/EtherNet-IP access.
+#
+# PLACEHOLDER: This file will be populated when Rockwell access is restored.
+# CIP paths are derived from the L5X tag exports and UDT definitions.
+#
+# Format: canonical_name -> Rockwell tag path (Program:MainProgram.UDT.Member)
+
+api_version: sphere.mergetb.io/v1
+kind: BackendMapping
+metadata:
+  backend: rockwell
+  protocol: cip_ethernet_ip
+
+mappings:
+  # ─── Process 1: Raw Water System ─────────────────────────────────────
+  RW_Tank_Level:
+    cip_path: "P1.RW_Tank_tnk_lvl"
+    data_type: REAL
+
+  RW_Pump_Flow:
+    cip_path: "P1.RW_Pump_flow"
+    data_type: REAL
+
+  RW_Pump_Speed:
+    cip_path: "P1.RW_Pump"
+    data_type: REAL
+
+  RW_Tank_PR_Valve_Sts:
+    cip_path: "P1.RW_Tank_PR_Valve_sts"
+    data_type: BOOL
+
+  RW_Tank_P6B_Valve_Sts:
+    cip_path: "P1.RW_Tank_P6B_Valve_sts"
+    data_type: BOOL
+
+  RW_Tank_P_Valve_Sts:
+    cip_path: "P1.RW_Tank_P_Valve_sts"
+    data_type: BOOL
+
+  RW_Pump_Sts:
+    cip_path: "P1.RW_Pump_sts"
+    data_type: BOOL
+
+  RW_Pump_Fault:
+    cip_path: "P1.RW_Pump_fault"
+    data_type: BOOL
+
+  RW_Tank_PR_Valve:
+    cip_path: "P1.RW_Tank_PR_Valve"
+    data_type: BOOL
+
+  RW_Tank_P6B_Valve:
+    cip_path: "P1.RW_Tank_P6B_Valve"
+    data_type: BOOL
+
+  RW_Tank_P_Valve:
+    cip_path: "P1.RW_Tank_P_Valve"
+    data_type: BOOL
+
+  RW_Pump_Start:
+    cip_path: "P1.RW_Pump_start"
+    data_type: BOOL
+
+  RW_Pump_Stop:
+    cip_path: "P1.RW_Pump_stop"
+    data_type: BOOL
+
+  # ─── Process 2: Chemical Treatment ───────────────────────────────────
+  ChemTreat_NaCl_Level:
+    cip_path: "P2.ChemTreat_NaCl_Tank_tnk_lvl"
+    data_type: REAL
+
+  ChemTreat_NaOCl_Level:
+    cip_path: "P2.ChemTreat_NaOCl_Tank_tnk_lvl"
+    data_type: REAL
+
+  ChemTreat_HCl_Level:
+    cip_path: "P2.ChemTreat_HCl_Tank_tnk_lvl"
+    data_type: REAL
+
+  ChemTreat_NaCl_Valve_Sts:
+    cip_path: "P2.ChemTreat_NaCl_Tank_Valve_sts"
+    data_type: BOOL
+
+  ChemTreat_NaOCl_Valve_Sts:
+    cip_path: "P2.ChemTreat_NaOCl_Tank_Valve_sts"
+    data_type: BOOL
+
+  ChemTreat_HCl_Valve_Sts:
+    cip_path: "P2.ChemTreat_HCl_Tank_Valve_sts"
+    data_type: BOOL
+
+  ChemTreat_NaCl_Valve:
+    cip_path: "P2.ChemTreat_NaCl_Tank_Valve"
+    data_type: BOOL
+
+  ChemTreat_NaOCl_Valve:
+    cip_path: "P2.ChemTreat_NaOCl_Tank_Valve"
+    data_type: BOOL
+
+  ChemTreat_HCl_Valve:
+    cip_path: "P2.ChemTreat_HCl_Tank_Valve"
+    data_type: BOOL
+
+  # ─── Process 3: Ultrafiltration ──────────────────────────────────────
+  UF_UFFT_Tank_Level:
+    cip_path: "P3.Ultrafiltration_UFFT_Tank_tnk_lvl"
+    data_type: REAL
+
+  UF_UFFT_Tank_Valve_Sts:
+    cip_path: "P3.Ultrafiltration_UFFT_Tank_Valve_sts"
+    data_type: BOOL
+
+  UF_Drain_Valve_Sts:
+    cip_path: "P3.Ultrafiltration_UF_Drain_Valve_sts"
+    data_type: BOOL
+
+  UF_ROFT_Valve_Sts:
+    cip_path: "P3.Ultrafiltration_UF_ROFT_Valve_sts"
+    data_type: BOOL
+
+  UF_BWP_Valve_Sts:
+    cip_path: "P3.Ultrafiltration_UF_BWP_Valve_sts"
+    data_type: BOOL
+
+  UF_UFFT_Tank_Valve:
+    cip_path: "P3.Ultrafiltration_UFFT_Tank_Valve"
+    data_type: BOOL
+
+  UF_Drain_Valve:
+    cip_path: "P3.Ultrafiltration_UF_Drain_Valve"
+    data_type: BOOL
+
+  UF_ROFT_Valve:
+    cip_path: "P3.Ultrafiltration_UF_ROFT_Valve"
+    data_type: BOOL
+
+  UF_BWP_Valve:
+    cip_path: "P3.Ultrafiltration_UF_BWP_Valve"
+    data_type: BOOL
+
+  # ─── System State ────────────────────────────────────────────────────
+  SYS_IDLE:
+    cip_path: "P1_SYS.IDLE"
+    data_type: BOOL
+
+  SYS_START:
+    cip_path: "P1_SYS.START"
+    data_type: BOOL
+
+  SYS_RUNNING:
+    cip_path: "P1_SYS.RUNNING"
+    data_type: BOOL
+
+  SYS_SHUTDOWN:
+    cip_path: "P1_SYS.SHUTDOWN"
+    data_type: BOOL
+
+  SYS_Permissives_Ready:
+    cip_path: "P1_SYS.Permissives_Ready"
+    data_type: BOOL
+
+  # ─── Alarms ──────────────────────────────────────────────────────────
+  Alarm_RW_Tank_LL:
+    cip_path: "Alarms.LL_alarm"
+    data_type: BOOL
+
+  Alarm_RW_Tank_L:
+    cip_path: "Alarms.L_alarm"
+    data_type: BOOL
+
+  Alarm_RW_Tank_H:
+    cip_path: "Alarms.H_alarm"
+    data_type: BOOL
+
+  Alarm_RW_Tank_HH:
+    cip_path: "Alarms.HH_alarm"
+    data_type: BOOL
+
+  # ─── HMI ─────────────────────────────────────────────────────────────
+  HMI_Start_PB:
+    cip_path: "HMI.Start_PB"
+    data_type: BOOL
+
+  HMI_Stop_PB:
+    cip_path: "HMI.Stop_PB"
+    data_type: BOOL
+
+  HMI_Start_Active:
+    cip_path: "HMI.Start_Active"
+    data_type: BOOL
+
+  HMI_Stop_Active:
+    cip_path: "HMI.Stop_Active"
+    data_type: BOOL

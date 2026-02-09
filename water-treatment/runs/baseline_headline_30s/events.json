@@ -1,0 +1,17 @@
+[
+  {
+    "type": "start",
+    "timestamp": "2026-01-29T05:31:59.637738362Z",
+    "message": "Run started: 7 tags, poll 500ms, duration 30s"
+  },
+  {
+    "type": "health",
+    "timestamp": "2026-01-29T05:31:59.637738922Z",
+    "message": "Controller: OK, Simulator: OK"
+  },
+  {
+    "type": "stop",
+    "timestamp": "2026-01-29T05:32:29.640440914Z",
+    "message": "Run completed: 60 samples"
+  }
+]
