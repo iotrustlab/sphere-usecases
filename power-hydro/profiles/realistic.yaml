@@ -1,0 +1,147 @@
+# Realistic simulation profile for SPHERE Power Systems - Hydro Station (PS-1)
+# Research-grounded defaults for accurate physical modeling
+#
+# Sources:
+#   - DOE Hydropower Handbook (fundamentals, power equations)
+#   - IEEE C37.013 (AC HV generator circuit breakers)
+#   - PNNL Governor Studies (gate dynamics, time constants)
+#   - ASCE/EPRI Hydropower guidelines (penstock sizing, water hammer)
+#   - Francis/Kaplan turbine literature (efficiency curves)
+#   - Synchronous generator specifications (efficiency, inertia)
+
+api_version: sphere.mergetb.io/v1
+kind: SimProfile
+metadata:
+  name: realistic
+  version: "1.0.0"
+  description: Research-grounded realistic timing for hydro station validation
+  basis: "DOE Hydropower Handbook, IEEE C37.013, PNNL Governor Studies, EPRI guidelines"
+
+timing:
+  dt_sec: 0.1              # Simulation timestep
+  poll_interval_ms: 500    # Tag polling interval
+
+# ─── Reservoir ──────────────────────────────────────────────────────────────
+reservoir:
+  # Default reservoir/forebay dimensions
+  # Research: varies widely, using moderate size for simulation
+  area_m2: 10000           # 10^4 m2 (1 hectare) forebay area
+  initial_level_m: 20.0    # Starting water level
+  max_level_m: 25.0        # High water mark
+  min_level_m: 5.0         # Minimum operating level
+  inflow_m3s: 50.0         # Natural inflow rate (matches typical turbine capacity)
+
+# ─── Penstock ───────────────────────────────────────────────────────────────
+penstock:
+  # Water conduit from reservoir to turbine
+  # Research: tau = L / (g * A / Q_rated), typically 1-20s
+  length_m: 500            # 500m penstock length
+  diameter_m: 2.0          # 2m diameter
+  tau_sec: 5.0             # Flow inertia time constant
+
+  # Water hammer limits
+  # Research: pressure rise can be 50-200% of static head
+  max_pressure_rise_pct: 150  # Trip at 150% overpressure
+
+# ─── Turbine ────────────────────────────────────────────────────────────────
+turbine:
+  # Francis/Kaplan turbine parameters
+  # Power = rho * g * Q * H * eta_t
+  #       = 1000 * 9.81 * Q * H * 0.90
+  q_max_m3s: 100.0         # Maximum flow rate
+  eta_t: 0.90              # Turbine hydraulic efficiency (70-95% range)
+
+  # Flow coefficient (calibration factor)
+  # Q = k_q * gate_pos * sqrt(H)
+  k_q: 10.0                # Calibrated for q_max at full gate/100m head
+
+# ─── Generator ──────────────────────────────────────────────────────────────
+generator:
+  # Synchronous generator parameters
+  eta_g: 0.97              # Generator electrical efficiency (90-99% range)
+  p_rated_mw: 80.0         # Rated power output
+  sync_speed_rpm: 150      # Synchronous speed (for low-head unit)
+  poles: 48                # Number of poles (60 Hz / (150/60) = 48)
+  inertia_h_sec: 4.0       # Inertia constant (H = 2-8s typical)
+
+# ─── Wicket Gate ────────────────────────────────────────────────────────────
+gate:
+  # Wicket gate actuator dynamics
+  # Research: 5-30s full stroke time, 3-20%/s slew rate
+  travel_time_sec: 10.0    # Full stroke time (0-100%)
+  slew_rate_pct_s: 10.0    # Maximum velocity (%/s)
+  tau_servo_sec: 1.0       # Servo response time constant
+
+  # Emergency closure
+  emergency_close_sec: 3.0 # Fast close time for trips
+
+# ─── Breaker ────────────────────────────────────────────────────────────────
+breaker:
+  # Generator circuit breaker (IEEE C37.013)
+  # Research: 10-100ms for HV breakers
+  open_time_sec: 0.06      # 60ms (3-5 cycles at 60Hz)
+  close_time_sec: 0.05     # 50ms
+
+  # Arc interruption delay
+  arc_time_sec: 0.02       # Additional 20ms for arc extinction
+
+# ─── Sensors ────────────────────────────────────────────────────────────────
+sensors:
+  # Speed/frequency measurement
+  # Research: PLC update rates 1-10ms, digital encoders
+  speed:
+    tau_sec: 0.005         # 5ms response time
+    noise_sigma: 0.1       # % of reading
+
+  # Flow measurement (ultrasonic or differential pressure)
+  # Research: 10-100ms response, filtered output
+  flow:
+    tau_sec: 0.05          # 50ms response time
+    noise_sigma: 0.5       # m3/s
+
+  # Pressure measurement (strain gauge/piezo)
+  # Research: fast response, filtered for noise
+  pressure:
+    tau_sec: 0.02          # 20ms response time
+    noise_sigma: 5.0       # kPa
+
+  # Level measurement (ultrasonic/radar)
+  # Research: 100-1000ms for stable reading
+  level:
+    tau_sec: 0.5           # 500ms response time
+    noise_sigma: 0.1       # m
+
+# ─── Safety Limits ──────────────────────────────────────────────────────────
+safety:
+  # Overspeed protection
+  # Research: 110-120% of sync speed is standard trip point
+  overspeed_trip_pct: 110  # Trip at 110% of synchronous speed
+  overspeed_alarm_pct: 105 # Alarm at 105%
+
+  # Overpressure protection (water hammer)
+  # Research: 150-200% of static head
+  overpressure_trip_pct: 150  # Trip at 150% of static pressure
+
+  # Low head protection
+  # Research: minimum head for turbine operation varies by design
+  min_head_m: 10.0         # Minimum operating head
+  min_flow_pct: 10.0       # Minimum flow (% of rated) - stall limit
+
+  # Mismatch alarm timing
+  gate_mismatch_pct: 5.0   # Alarm if |cmd - pos| > 5%
+  gate_mismatch_delay_sec: 5.0  # After 5 seconds
+  breaker_mismatch_delay_sec: 0.5  # After 500ms
+
+# ─── Control Parameters ─────────────────────────────────────────────────────
+control:
+  # Governor tuning (power control loop)
+  kp_gate: 2.0             # Proportional gain (gate adjustment per MW error)
+  ki_gate: 0.1             # Integral gain (slow trim)
+
+  # Startup parameters
+  no_load_gate_pct: 5.0    # Gate position for no-load sync
+  sync_speed_band_pct: 0.5 # Speed match tolerance for breaker close
+  sync_phase_deg: 10.0     # Phase angle tolerance for sync
+
+  # Shutdown parameters
+  min_power_for_breaker_mw: 1.0  # Minimum power before opening breaker

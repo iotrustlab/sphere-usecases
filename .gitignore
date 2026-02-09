@@ -66,6 +66,11 @@ dist/
 *.vcxproj.filters
 *.vcxproj.user
 
+# Exception: Allow OpenPLC implementation source files (IEC 61131-3)
+!**/implementations/openplc/**/*.st
+!**/implementations/openplc/**/*.ld
+!**/implementations/openplc/**/*.fbd
+
 # Simulation specific
 *.sim
 *.simulation
