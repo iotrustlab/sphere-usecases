@@ -19,11 +19,11 @@
  *
  * Register Mapping (from openplc_map.yaml):
  *   Holding Registers (Commands from Controller via Bridge):
- *     %IW200: Supply_Pump_Speed command
- *     %IW201: RWS_Pump_Speed command
- *     %IX3.0: Supply_Tank_Valve command
- *     %IX3.1: Grid_Elev_Valve command
- *     %IX3.2: RWS_Tank_Valve command
+ *     %QW200: Supply_Pump_Speed command
+ *     %QW201: RWS_Pump_Speed command
+ *     %QX3.0: Supply_Tank_Valve command
+ *     %QX3.1: Grid_Elev_Valve command
+ *     %QX3.2: RWS_Tank_Valve command
  *
  *   Holding Registers (Sensor outputs to Controller via Bridge):
  *     %QW300: Supply_Tank_Level
@@ -49,11 +49,11 @@
 
 VAR_GLOBAL
     (* --- Command Inputs (from Controller via Bridge) --- *)
-    cmd_supply_pump_speed AT %IW200 : REAL;     (* Supply pump speed cmd [%] *)
-    cmd_rws_pump_speed AT %IW201 : REAL;        (* RWS pump speed cmd [%] *)
-    cmd_supply_valve AT %IX3.0 : BOOL;          (* Supply valve command *)
-    cmd_grid_elev_valve AT %IX3.1 : BOOL;       (* Elevated tank valve cmd *)
-    cmd_rws_valve AT %IX3.2 : BOOL;             (* RWS valve command *)
+    cmd_supply_pump_speed AT %QW200 : REAL;     (* Supply pump speed cmd [%] *)
+    cmd_rws_pump_speed AT %QW201 : REAL;        (* RWS pump speed cmd [%] *)
+    cmd_supply_valve AT %QX3.0 : BOOL;          (* Supply valve command *)
+    cmd_grid_elev_valve AT %QX3.1 : BOOL;       (* Elevated tank valve cmd *)
+    cmd_rws_valve AT %QX3.2 : BOOL;             (* RWS valve command *)
 
     (* --- Sensor Outputs (to Controller via Bridge) --- *)
     out_supply_tank_level AT %QW300 : REAL;     (* Supply tank level [mm] *)
