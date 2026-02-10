@@ -2,18 +2,6 @@ Invariant Check Report
 Bundle: run-b-flow
 Rules: water-distribution.yaml
 Samples: 60
-Violations: 11
+Violations: 0
 
-  correlation: 6 violations
-    sample 10: supply-pump-on-implies-flow — Supply_Pump_Sts=1.0, expected Supply_Pump_Flow > 0, got -0.25
-    sample 0: supply-pump-off-implies-no-flow — Supply_Pump_Sts=0.0, expected Supply_Pump_Flow <= 0.1, got 0.41
-    sample 1: supply-pump-off-implies-no-flow — Supply_Pump_Sts=0.0, expected Supply_Pump_Flow <= 0.1, got 0.18
-    sample 3: supply-pump-off-implies-no-flow — Supply_Pump_Sts=0.0, expected Supply_Pump_Flow <= 0.1, got 0.22
-    sample 8: supply-pump-off-implies-no-flow — Supply_Pump_Sts=0.0, expected Supply_Pump_Flow <= 0.1, got 0.4
-    ... and 1 more
-  range: 5 violations
-    sample 2: Supply_Pump_Flow=-0.33 (min=0)
-    sample 4: Supply_Pump_Flow=-0.44 (min=0)
-    sample 5: Supply_Pump_Flow=-0.2 (min=0)
-    sample 6: Supply_Pump_Flow=-0.19 (min=0)
-    sample 10: Supply_Pump_Flow=-0.25 (min=0)
+  No violations detected.

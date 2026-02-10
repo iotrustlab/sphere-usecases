@@ -1,7 +1,7 @@
 {
   "tool": "invariant-check",
   "version": "1.1.0",
-  "timestamp": "2026-02-09T20:32:13.396427+00:00",
+  "timestamp": "2026-02-10T00:37:56.023598+00:00",
   "rules_file": "power-hydro.yaml",
   "source_bundle": "run-b-startup",
   "total_samples": 120,
