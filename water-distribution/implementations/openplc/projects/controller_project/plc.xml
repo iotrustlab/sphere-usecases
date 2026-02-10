@@ -1,0 +1,360 @@
+<?xml version='1.0' encoding='utf-8'?>
+<project xmlns:ns1="http://www.plcopen.org/xml/tc6_0201" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.plcopen.org/xml/tc6_0201">
+  <fileHeader companyName="CrossPLC" productName="WD_Controller" productVersion="1.0" creationDateTime="2026-02-10T12:27:43" />
+  <contentHeader name="WD_Controller" modificationDateTime="2026-02-10T12:27:43">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="10" y="10" />
+      </fbd>
+      <ld>
+        <scaling x="10" y="10" />
+      </ld>
+      <sfc>
+        <scaling x="10" y="10" />
+      </sfc>
+    </coordinateInfo>
+  </contentHeader>
+  <types>
+    <dataTypes />
+    <pous>
+      <pou name="MainProgram" pouType="program">
+        <interface>
+          <inputVars>
+            <variable name="ai_supply_tank_level">
+              <type>
+                <REAL;      (* Supply tank level  />
+              </type>
+            </variable>
+            <variable name="ai_supply_pump_flow">
+              <type>
+                <REAL;       (* Supply pump flow  />
+              </type>
+            </variable>
+            <variable name="ai_supply_naocl_level">
+              <type>
+                <REAL;     (* NaOCl tank level  />
+              </type>
+            </variable>
+            <variable name="ai_supply_nh4cl_level">
+              <type>
+                <REAL;     (* NH4Cl tank level  />
+              </type>
+            </variable>
+            <variable name="ai_grid_elev_level">
+              <type>
+                <REAL;        (* Elevated tank level  />
+              </type>
+            </variable>
+            <variable name="ai_grid_consum_level">
+              <type>
+                <REAL;      (* Consumer tank level  />
+              </type>
+            </variable>
+            <variable name="ai_rws_tank_level">
+              <type>
+                <REAL;         (* RWS tank level  />
+              </type>
+            </variable>
+            <variable name="di_supply_pump_sts">
+              <type>
+                <BOOL;        (* Supply pump running *) />
+              </type>
+            </variable>
+            <variable name="di_supply_mixer_sts">
+              <type>
+                <BOOL;       (* Supply mixer running *) />
+              </type>
+            </variable>
+            <variable name="di_supply_valve_sts">
+              <type>
+                <BOOL;       (* Supply valve open *) />
+              </type>
+            </variable>
+            <variable name="di_grid_elev_valve_sts">
+              <type>
+                <BOOL;    (* Elevated tank valve open *) />
+              </type>
+            </variable>
+            <variable name="di_rws_pump_sts">
+              <type>
+                <BOOL;           (* RWS pump running *) />
+              </type>
+            </variable>
+            <variable name="di_rws_valve_sts">
+              <type>
+                <BOOL;          (* RWS valve open *) />
+              </type>
+            </variable>
+            <variable name="hmi_start">
+              <type>
+                <BOOL;                 (* Start button *) />
+              </type>
+            </variable>
+            <variable name="hmi_stop">
+              <type>
+                <BOOL;                  (* Stop button *) />
+              </type>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="ao_supply_pump_speed">
+              <type>
+                <REAL;      (* Supply pump speed  />
+              </type>
+            </variable>
+            <variable name="ao_rws_pump_speed">
+              <type>
+                <REAL;         (* RWS pump speed  />
+              </type>
+            </variable>
+            <variable name="do_supply_valve">
+              <type>
+                <BOOL;           (* Supply valve command *) />
+              </type>
+            </variable>
+            <variable name="do_grid_elev_valve">
+              <type>
+                <BOOL;        (* Elevated tank valve command *) />
+              </type>
+            </variable>
+            <variable name="do_rws_valve">
+              <type>
+                <BOOL;              (* RWS valve command *) />
+              </type>
+            </variable>
+            <variable name="do_sys_idle">
+              <type>
+                <BOOL;               (* System idle state *) />
+              </type>
+            </variable>
+            <variable name="do_sys_running">
+              <type>
+                <BOOL;            (* System running state *) />
+              </type>
+            </variable>
+            <variable name="do_alarm_supply_hh">
+              <type>
+                <BOOL;        (* Supply tank HH alarm *) />
+              </type>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="sys_state">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="permissive_supply_ok">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="permissive_grid_ok">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="permissives_ready">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="supply_tank_low_sp">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="supply_tank_high_sp">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="supply_tank_hh_sp">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="grid_elev_low_sp">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="grid_elev_high_sp">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="rws_tank_low_sp">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="rws_tank_high_sp">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="supply_pump_normal_speed">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="rws_pump_normal_speed">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="supply_pump_cmd">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="rws_pump_cmd">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+          </localVars>
+        </interface>
+        <body>
+          <ST>
+            <xhtml:p>(* State constants *)
+  (* STATE_IDLE = 0; STATE_START = 1; STATE_RUNNING = 2; STATE_SHUTDOWN = 3 *)
+
+  CASE sys_state OF
+
+    0: (* STATE_IDLE - System is idle, waiting for start command *)
+      do_sys_idle := TRUE;
+      do_sys_running := FALSE;
+
+      (* All outputs off in idle *)
+      ao_supply_pump_speed := 0.0;
+      ao_rws_pump_speed := 0.0;
+      do_supply_valve := FALSE;
+      do_grid_elev_valve := FALSE;
+      do_rws_valve := FALSE;
+
+      (* Transition: Start button pressed *)
+      IF hmi_start AND NOT hmi_stop THEN
+        sys_state := 1;
+      END_IF;
+
+    1: (* STATE_START - Starting up, check permissives *)
+      do_sys_idle := FALSE;
+      do_sys_running := FALSE;
+
+      (* Check permissives *)
+      permissive_supply_ok := (ai_supply_tank_level &gt; 300.0);
+      permissive_grid_ok := (ai_grid_elev_level &lt; 5500.0);
+      permissives_ready := permissive_supply_ok AND permissive_grid_ok;
+
+      (* Transition: Permissives met -&gt; RUNNING *)
+      IF permissives_ready THEN
+        sys_state := 2;
+      END_IF;
+
+      (* Transition: Stop pressed -&gt; SHUTDOWN *)
+      IF hmi_stop THEN
+        sys_state := 3;
+      END_IF;
+
+    2: (* STATE_RUNNING - Normal operation *)
+      do_sys_idle := FALSE;
+      do_sys_running := TRUE;
+
+      (* SUPPLY LINE CONTROL *)
+      (* Level-based pump control *)
+      IF ai_supply_tank_level &lt;= supply_tank_low_sp THEN
+        supply_pump_cmd := TRUE;
+      ELSIF ai_supply_tank_level &gt;= supply_tank_high_sp THEN
+        supply_pump_cmd := FALSE;
+      END_IF;
+
+      (* Set pump speed *)
+      IF supply_pump_cmd THEN
+        ao_supply_pump_speed := supply_pump_normal_speed;
+        do_supply_valve := TRUE;
+      ELSE
+        ao_supply_pump_speed := 0.0;
+        do_supply_valve := FALSE;
+      END_IF;
+
+      (* Supply tank HH alarm *)
+      IF ai_supply_tank_level &gt;= supply_tank_hh_sp THEN
+        do_alarm_supply_hh := TRUE;
+      ELSE
+        do_alarm_supply_hh := FALSE;
+      END_IF;
+
+      (* DISTRIBUTION GRID CONTROL *)
+      IF ai_grid_elev_level &lt;= grid_elev_low_sp THEN
+        do_grid_elev_valve := TRUE;
+      ELSIF ai_grid_elev_level &gt;= grid_elev_high_sp THEN
+        do_grid_elev_valve := FALSE;
+      END_IF;
+
+      (* RETURN WATER SYSTEM CONTROL *)
+      IF ai_rws_tank_level &gt;= rws_tank_high_sp THEN
+        rws_pump_cmd := TRUE;
+      ELSIF ai_rws_tank_level &lt;= rws_tank_low_sp THEN
+        rws_pump_cmd := FALSE;
+      END_IF;
+
+      IF rws_pump_cmd THEN
+        ao_rws_pump_speed := rws_pump_normal_speed;
+        do_rws_valve := TRUE;
+      ELSE
+        ao_rws_pump_speed := 0.0;
+        do_rws_valve := FALSE;
+      END_IF;
+
+      (* Transition: Stop pressed -&gt; SHUTDOWN *)
+      IF hmi_stop THEN
+        sys_state := 3;
+      END_IF;
+
+    3: (* STATE_SHUTDOWN - Shutting down *)
+      do_sys_idle := FALSE;
+      do_sys_running := FALSE;
+
+      (* Stop all pumps *)
+      ao_supply_pump_speed := 0.0;
+      ao_rws_pump_speed := 0.0;
+      supply_pump_cmd := FALSE;
+      rws_pump_cmd := FALSE;
+
+      (* Close all valves *)
+      do_supply_valve := FALSE;
+      do_grid_elev_valve := FALSE;
+      do_rws_valve := FALSE;
+
+      (* Clear alarms *)
+      do_alarm_supply_hh := FALSE;
+
+      (* Clear permissives *)
+      permissive_supply_ok := FALSE;
+      permissive_grid_ok := FALSE;
+      permissives_ready := FALSE;
+
+      (* Transition: Stop released -&gt; IDLE *)
+      IF NOT hmi_stop THEN
+        sys_state := 0;
+      END_IF;
+
+  END_CASE;</xhtml:p>
+          </ST>
+        </body>
+      </pou>
+    </pous>
+  </types>
+  <instances>
+    <configurations>
+      <configuration name="Config0">
+        <resource name="Res0">
+          <task name="task_MainProgram" priority="0" interval="T#100ms" />
+          <pouInstance name="MainProgram_instance" typeName="MainProgram" />
+        </resource>
+      </configuration>
+    </configurations>
+  </instances>
+</project>

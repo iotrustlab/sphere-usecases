@@ -1,0 +1,598 @@
+<?xml version='1.0' encoding='utf-8'?>
+<project xmlns:ns1="http://www.plcopen.org/xml/tc6_0201" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.plcopen.org/xml/tc6_0201">
+  <fileHeader companyName="CrossPLC" productName="WD_Simulator" productVersion="1.0" creationDateTime="2026-02-10T12:27:51" />
+  <contentHeader name="WD_Simulator" modificationDateTime="2026-02-10T12:27:51">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="10" y="10" />
+      </fbd>
+      <ld>
+        <scaling x="10" y="10" />
+      </ld>
+      <sfc>
+        <scaling x="10" y="10" />
+      </sfc>
+    </coordinateInfo>
+  </contentHeader>
+  <types>
+    <dataTypes />
+    <pous>
+      <pou name="MainProgram" pouType="program">
+        <interface>
+          <inputVars>
+            <variable name="cmd_supply_pump_speed">
+              <type>
+                <REAL;     (* Supply pump speed cmd  />
+              </type>
+            </variable>
+            <variable name="cmd_rws_pump_speed">
+              <type>
+                <REAL;        (* RWS pump speed cmd  />
+              </type>
+            </variable>
+            <variable name="cmd_supply_valve">
+              <type>
+                <BOOL;          (* Supply valve command *) />
+              </type>
+            </variable>
+            <variable name="cmd_grid_elev_valve">
+              <type>
+                <BOOL;       (* Elevated tank valve cmd *) />
+              </type>
+            </variable>
+            <variable name="cmd_rws_valve">
+              <type>
+                <BOOL;             (* RWS valve command *) />
+              </type>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="out_supply_tank_level">
+              <type>
+                <REAL;     (* Supply tank level  />
+              </type>
+            </variable>
+            <variable name="out_supply_pump_flow">
+              <type>
+                <REAL;      (* Supply pump flow  />
+              </type>
+            </variable>
+            <variable name="out_supply_naocl_level">
+              <type>
+                <REAL;    (* NaOCl tank level  />
+              </type>
+            </variable>
+            <variable name="out_supply_nh4cl_level">
+              <type>
+                <REAL;    (* NH4Cl tank level  />
+              </type>
+            </variable>
+            <variable name="out_grid_elev_level">
+              <type>
+                <REAL;       (* Elevated tank level  />
+              </type>
+            </variable>
+            <variable name="out_grid_consum_level">
+              <type>
+                <REAL;     (* Consumer tank level  />
+              </type>
+            </variable>
+            <variable name="out_rws_tank_level">
+              <type>
+                <REAL;        (* RWS tank level  />
+              </type>
+            </variable>
+            <variable name="out_supply_pump_sts">
+              <type>
+                <BOOL;       (* Supply pump running *) />
+              </type>
+            </variable>
+            <variable name="out_supply_mixer_sts">
+              <type>
+                <BOOL;      (* Supply mixer running *) />
+              </type>
+            </variable>
+            <variable name="out_supply_valve_sts">
+              <type>
+                <BOOL;      (* Supply valve open *) />
+              </type>
+            </variable>
+            <variable name="out_grid_elev_valve_sts">
+              <type>
+                <BOOL;   (* Elevated tank valve open *) />
+              </type>
+            </variable>
+            <variable name="out_rws_pump_sts">
+              <type>
+                <BOOL;          (* RWS pump running *) />
+              </type>
+            </variable>
+            <variable name="out_rws_valve_sts">
+              <type>
+                <BOOL;         (* RWS valve open *) />
+              </type>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="DT_SEC">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="MOTORIZED_VALVE_DELAY">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="PUMP_SPINUP_DELAY">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="SUPPLY_TANK_AREA_M2">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="SUPPLY_TANK_MAX_MM">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="SUPPLY_INFLOW_LPM">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="SUPPLY_PUMP_MAX_LPM">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="NAOCL_TANK_AREA_M2">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="NAOCL_DOSE_LPM">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="NH4CL_TANK_AREA_M2">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="NH4CL_DOSE_LPM">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="ELEV_TANK_AREA_M2">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="ELEV_TANK_MAX_MM">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="CONSUM_TANK_AREA_M2">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="CONSUM_TANK_MAX_MM">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="GRID_DEMAND_LPM">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="ELEV_DRAIN_LPM">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="RWS_TANK_AREA_M2">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="RWS_TANK_MAX_MM">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="RWS_PUMP_MAX_LPM">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="RETURN_FRACTION">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="supply_tank_level">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="naocl_tank_level">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="nh4cl_tank_level">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="grid_elev_level">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="grid_consum_level">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="rws_tank_level">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="supply_valve_timer">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="supply_valve_state">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="grid_elev_valve_timer">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="grid_elev_valve_state">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="rws_valve_timer">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="rws_valve_state">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="supply_pump_timer">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="supply_pump_state">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="supply_pump_actual_speed">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="rws_pump_timer">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="rws_pump_state">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="rws_pump_actual_speed">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="supply_pump_flow">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="rws_pump_flow">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="grid_demand_actual">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="return_flow">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="mixer_running">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="delta_level">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="flow_in">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="flow_out">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+          </localVars>
+        </interface>
+        <body>
+          <ST>
+            <xhtml:p>(* =====================================================================
+     VALVE DELAY MODELING
+     ===================================================================== *)
+
+  (* Supply Tank Valve *)
+  IF cmd_supply_valve AND NOT supply_valve_state THEN
+    supply_valve_timer := supply_valve_timer + 1;
+    IF supply_valve_timer &gt;= MOTORIZED_VALVE_DELAY THEN
+      supply_valve_state := TRUE;
+      supply_valve_timer := MOTORIZED_VALVE_DELAY;
+    END_IF;
+  ELSIF NOT cmd_supply_valve AND supply_valve_state THEN
+    supply_valve_timer := supply_valve_timer - 1;
+    IF supply_valve_timer &lt;= 0 THEN
+      supply_valve_state := FALSE;
+      supply_valve_timer := 0;
+    END_IF;
+  ELSIF cmd_supply_valve AND supply_valve_state THEN
+    supply_valve_timer := MOTORIZED_VALVE_DELAY;
+  ELSE
+    supply_valve_timer := 0;
+  END_IF;
+
+  (* Grid Elevated Tank Valve *)
+  IF cmd_grid_elev_valve AND NOT grid_elev_valve_state THEN
+    grid_elev_valve_timer := grid_elev_valve_timer + 1;
+    IF grid_elev_valve_timer &gt;= MOTORIZED_VALVE_DELAY THEN
+      grid_elev_valve_state := TRUE;
+      grid_elev_valve_timer := MOTORIZED_VALVE_DELAY;
+    END_IF;
+  ELSIF NOT cmd_grid_elev_valve AND grid_elev_valve_state THEN
+    grid_elev_valve_timer := grid_elev_valve_timer - 1;
+    IF grid_elev_valve_timer &lt;= 0 THEN
+      grid_elev_valve_state := FALSE;
+      grid_elev_valve_timer := 0;
+    END_IF;
+  ELSIF cmd_grid_elev_valve AND grid_elev_valve_state THEN
+    grid_elev_valve_timer := MOTORIZED_VALVE_DELAY;
+  ELSE
+    grid_elev_valve_timer := 0;
+  END_IF;
+
+  (* RWS Tank Valve *)
+  IF cmd_rws_valve AND NOT rws_valve_state THEN
+    rws_valve_timer := rws_valve_timer + 1;
+    IF rws_valve_timer &gt;= MOTORIZED_VALVE_DELAY THEN
+      rws_valve_state := TRUE;
+      rws_valve_timer := MOTORIZED_VALVE_DELAY;
+    END_IF;
+  ELSIF NOT cmd_rws_valve AND rws_valve_state THEN
+    rws_valve_timer := rws_valve_timer - 1;
+    IF rws_valve_timer &lt;= 0 THEN
+      rws_valve_state := FALSE;
+      rws_valve_timer := 0;
+    END_IF;
+  ELSIF cmd_rws_valve AND rws_valve_state THEN
+    rws_valve_timer := MOTORIZED_VALVE_DELAY;
+  ELSE
+    rws_valve_timer := 0;
+  END_IF;
+
+  (* =====================================================================
+     PUMP DELAY MODELING
+     ===================================================================== *)
+
+  (* Supply Pump *)
+  IF cmd_supply_pump_speed &gt; 0.0 THEN
+    IF NOT supply_pump_state THEN
+      supply_pump_timer := supply_pump_timer + 1;
+      IF supply_pump_timer &gt;= PUMP_SPINUP_DELAY THEN
+        supply_pump_state := TRUE;
+      END_IF;
+    END_IF;
+    IF supply_pump_state THEN
+      IF supply_pump_actual_speed &lt; cmd_supply_pump_speed THEN
+        supply_pump_actual_speed := supply_pump_actual_speed + 1.0;
+        IF supply_pump_actual_speed &gt; cmd_supply_pump_speed THEN
+          supply_pump_actual_speed := cmd_supply_pump_speed;
+        END_IF;
+      ELSIF supply_pump_actual_speed &gt; cmd_supply_pump_speed THEN
+        supply_pump_actual_speed := supply_pump_actual_speed - 1.0;
+        IF supply_pump_actual_speed &lt; cmd_supply_pump_speed THEN
+          supply_pump_actual_speed := cmd_supply_pump_speed;
+        END_IF;
+      END_IF;
+    END_IF;
+  ELSE
+    supply_pump_timer := 0;
+    supply_pump_state := FALSE;
+    supply_pump_actual_speed := 0.0;
+  END_IF;
+
+  (* RWS Pump *)
+  IF cmd_rws_pump_speed &gt; 0.0 THEN
+    IF NOT rws_pump_state THEN
+      rws_pump_timer := rws_pump_timer + 1;
+      IF rws_pump_timer &gt;= PUMP_SPINUP_DELAY THEN
+        rws_pump_state := TRUE;
+      END_IF;
+    END_IF;
+    IF rws_pump_state THEN
+      IF rws_pump_actual_speed &lt; cmd_rws_pump_speed THEN
+        rws_pump_actual_speed := rws_pump_actual_speed + 1.0;
+        IF rws_pump_actual_speed &gt; cmd_rws_pump_speed THEN
+          rws_pump_actual_speed := cmd_rws_pump_speed;
+        END_IF;
+      ELSIF rws_pump_actual_speed &gt; cmd_rws_pump_speed THEN
+        rws_pump_actual_speed := rws_pump_actual_speed - 1.0;
+        IF rws_pump_actual_speed &lt; cmd_rws_pump_speed THEN
+          rws_pump_actual_speed := cmd_rws_pump_speed;
+        END_IF;
+      END_IF;
+    END_IF;
+  ELSE
+    rws_pump_timer := 0;
+    rws_pump_state := FALSE;
+    rws_pump_actual_speed := 0.0;
+  END_IF;
+
+  (* =====================================================================
+     FLOW CALCULATIONS
+     ===================================================================== *)
+
+  IF supply_pump_state AND supply_valve_state THEN
+    supply_pump_flow := (supply_pump_actual_speed / 100.0) * SUPPLY_PUMP_MAX_LPM;
+  ELSE
+    supply_pump_flow := 0.0;
+  END_IF;
+
+  IF rws_pump_state AND rws_valve_state THEN
+    rws_pump_flow := (rws_pump_actual_speed / 100.0) * RWS_PUMP_MAX_LPM;
+  ELSE
+    rws_pump_flow := 0.0;
+  END_IF;
+
+  grid_demand_actual := GRID_DEMAND_LPM;
+  return_flow := grid_demand_actual * RETURN_FRACTION;
+
+  (* =====================================================================
+     MASS BALANCE CALCULATIONS
+     ===================================================================== *)
+
+  (* Supply Tank Mass Balance *)
+  flow_in := SUPPLY_INFLOW_LPM + rws_pump_flow;
+  flow_out := supply_pump_flow;
+  delta_level := ((flow_in - flow_out) / SUPPLY_TANK_AREA_M2) * DT_SEC / 60.0 * 1000.0;
+  supply_tank_level := supply_tank_level + delta_level;
+
+  IF supply_tank_level &lt; 0.0 THEN
+    supply_tank_level := 0.0;
+  ELSIF supply_tank_level &gt; SUPPLY_TANK_MAX_MM THEN
+    supply_tank_level := SUPPLY_TANK_MAX_MM;
+  END_IF;
+
+  (* Chemical Tank Drain *)
+  IF supply_pump_state THEN
+    delta_level := (NAOCL_DOSE_LPM / NAOCL_TANK_AREA_M2) * DT_SEC / 60.0 * 1000.0;
+    naocl_tank_level := naocl_tank_level - delta_level;
+    IF naocl_tank_level &lt; 0.0 THEN
+      naocl_tank_level := 0.0;
+    END_IF;
+
+    delta_level := (NH4CL_DOSE_LPM / NH4CL_TANK_AREA_M2) * DT_SEC / 60.0 * 1000.0;
+    nh4cl_tank_level := nh4cl_tank_level - delta_level;
+    IF nh4cl_tank_level &lt; 0.0 THEN
+      nh4cl_tank_level := 0.0;
+    END_IF;
+  END_IF;
+
+  (* Elevated Tank Mass Balance *)
+  IF grid_elev_valve_state THEN
+    flow_in := supply_pump_flow;
+  ELSE
+    flow_in := 0.0;
+  END_IF;
+  flow_out := ELEV_DRAIN_LPM;
+  delta_level := ((flow_in - flow_out) / ELEV_TANK_AREA_M2) * DT_SEC / 60.0 * 1000.0;
+  grid_elev_level := grid_elev_level + delta_level;
+
+  IF grid_elev_level &lt; 0.0 THEN
+    grid_elev_level := 0.0;
+  ELSIF grid_elev_level &gt; ELEV_TANK_MAX_MM THEN
+    grid_elev_level := ELEV_TANK_MAX_MM;
+  END_IF;
+
+  (* Consumer Tank Mass Balance *)
+  flow_in := ELEV_DRAIN_LPM;
+  flow_out := grid_demand_actual;
+  delta_level := ((flow_in - flow_out) / CONSUM_TANK_AREA_M2) * DT_SEC / 60.0 * 1000.0;
+  grid_consum_level := grid_consum_level + delta_level;
+
+  IF grid_consum_level &lt; 0.0 THEN
+    grid_consum_level := 0.0;
+  ELSIF grid_consum_level &gt; CONSUM_TANK_MAX_MM THEN
+    grid_consum_level := CONSUM_TANK_MAX_MM;
+  END_IF;
+
+  (* RWS Tank Mass Balance *)
+  flow_in := return_flow;
+  flow_out := rws_pump_flow;
+  delta_level := ((flow_in - flow_out) / RWS_TANK_AREA_M2) * DT_SEC / 60.0 * 1000.0;
+  rws_tank_level := rws_tank_level + delta_level;
+
+  IF rws_tank_level &lt; 0.0 THEN
+    rws_tank_level := 0.0;
+  ELSIF rws_tank_level &gt; RWS_TANK_MAX_MM THEN
+    rws_tank_level := RWS_TANK_MAX_MM;
+  END_IF;
+
+  (* =====================================================================
+     OUTPUT UPDATES
+     ===================================================================== *)
+
+  out_supply_tank_level := supply_tank_level;
+  out_supply_pump_flow := supply_pump_flow;
+  out_supply_naocl_level := naocl_tank_level;
+  out_supply_nh4cl_level := nh4cl_tank_level;
+  out_grid_elev_level := grid_elev_level;
+  out_grid_consum_level := grid_consum_level;
+  out_rws_tank_level := rws_tank_level;
+
+  out_supply_pump_sts := supply_pump_state;
+  out_supply_mixer_sts := mixer_running;
+  out_supply_valve_sts := supply_valve_state;
+  out_grid_elev_valve_sts := grid_elev_valve_state;
+  out_rws_pump_sts := rws_pump_state;
+  out_rws_valve_sts := rws_valve_state;</xhtml:p>
+          </ST>
+        </body>
+      </pou>
+    </pous>
+  </types>
+  <instances>
+    <configurations>
+      <configuration name="Config0">
+        <resource name="Res0">
+          <task name="task_MainProgram" priority="0" interval="T#100ms" />
+          <pouInstance name="MainProgram_instance" typeName="MainProgram" />
+        </resource>
+      </configuration>
+    </configurations>
+  </instances>
+</project>
