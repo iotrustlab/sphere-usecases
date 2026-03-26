@@ -18,31 +18,35 @@ Usage:
     python modbus_bridge.py [--controller HOST:PORT] [--simulator HOST:PORT]
 """
 
+import os
+import sys
+
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path = [entry for entry in sys.path if entry not in ("", SCRIPT_DIR)]
+sys.path.insert(0, SCRIPT_DIR)
+
 import argparse
 import logging
-import os
 import signal
-import sys
 import time
 import threading
 
-try:
-    from pymodbus.client import ModbusTcpClient
-    from pymodbus.exceptions import ConnectionException
-    from pymodbus.pdu import ExceptionResponse
-except ImportError:
-    print("Error: pymodbus required.  pip install pymodbus")
-    sys.exit(1)
+from modbus_raw import ConnectionException, ExceptionResponse, ModbusTcpClient
 
 log = logging.getLogger("modbus_bridge")
+MODBUS_DEVICE_ID = int(os.environ.get("MODBUS_DEVICE_ID", "1"))
 
 
 class ModbusBridge:
     """Bidirectional Modbus bridge between controller and simulator PLCs."""
 
     def __init__(self, ctrl_host, ctrl_port, sim_host, sim_port, cycle_ms=100):
-        self.ctrl = ModbusTcpClient(ctrl_host, port=ctrl_port, timeout=2)
-        self.sim = ModbusTcpClient(sim_host, port=sim_port, timeout=2)
+        self.ctrl = ModbusTcpClient(
+            ctrl_host, port=ctrl_port, timeout=2, unit_id=MODBUS_DEVICE_ID
+        )
+        self.sim = ModbusTcpClient(
+            sim_host, port=sim_port, timeout=2, unit_id=MODBUS_DEVICE_ID
+        )
         self.cycle_sec = cycle_ms / 1000.0
         self._stop = threading.Event()
         self._thread = None
@@ -51,6 +55,7 @@ class ModbusBridge:
         self.cycles = 0
         self.errors = 0
         self.last_cycle_ms = 0.0
+        self.last_error_stage = "none"
 
     # ------------------------------------------------------------------
     # Connection management
@@ -58,8 +63,15 @@ class ModbusBridge:
     def connect(self, retries=30, delay=2):
         """Connect to both PLCs with retry."""
         for attempt in range(1, retries + 1):
-            ctrl_ok = self.ctrl.connect()
-            sim_ok = self.sim.connect()
+            try:
+                ctrl_ok = self.ctrl.connect()
+            except ConnectionException:
+                ctrl_ok = False
+
+            try:
+                sim_ok = self.sim.connect()
+            except ConnectionException:
+                sim_ok = False
             if ctrl_ok and sim_ok:
                 log.info("Connected to both PLCs")
                 return True
@@ -81,7 +93,11 @@ class ModbusBridge:
     def _read_coils(client, address, count):
         """Read coils, return list of int (0/1) or None on error."""
         try:
-            rr = client.read_coils(address, count)
+            rr = client.read_coils(
+                address=address,
+                count=count,
+                device_id=MODBUS_DEVICE_ID,
+            )
             if rr is None or isinstance(rr, ExceptionResponse) or rr.isError():
                 return None
             return [1 if b else 0 for b in rr.bits[:count]]
@@ -93,7 +109,11 @@ class ModbusBridge:
     def _read_hr(client, address, count):
         """Read holding registers, return list of int or None."""
         try:
-            rr = client.read_holding_registers(address, count)
+            rr = client.read_holding_registers(
+                address=address,
+                count=count,
+                device_id=MODBUS_DEVICE_ID,
+            )
             if rr is None or isinstance(rr, ExceptionResponse) or rr.isError():
                 return None
             return list(rr.registers[:count])
@@ -105,7 +125,11 @@ class ModbusBridge:
     def _write_hr(client, address, values):
         """Write multiple holding registers. Returns True on success."""
         try:
-            rr = client.write_registers(address, values)
+            rr = client.write_registers(
+                address=address,
+                values=values,
+                device_id=MODBUS_DEVICE_ID,
+            )
             if rr is None or isinstance(rr, ExceptionResponse) or rr.isError():
                 return False
             return True
@@ -119,38 +143,53 @@ class ModbusBridge:
     def _cycle(self):
         """Execute one bridge cycle. Returns True if all transfers succeeded."""
         ok = True
+        self.last_error_stage = "none"
 
         # 1. Controller coils 40-51 → simulator HR 200-211  (valve/pump commands)
         coils = self._read_coils(self.ctrl, 40, 12)
         if coils is not None:
             if not self._write_hr(self.sim, 200, coils):
                 ok = False
+                self.last_error_stage = "write_sim_200"
         else:
             ok = False
+            self.last_error_stage = "read_ctrl_40"
 
         # 2. Controller HR 100 (pump speed) → simulator HR 220
         speed = self._read_hr(self.ctrl, 100, 1)
         if speed is not None:
             if not self._write_hr(self.sim, 220, speed):
                 ok = False
+                if self.last_error_stage == "none":
+                    self.last_error_stage = "write_sim_220"
         else:
             ok = False
+            if self.last_error_stage == "none":
+                self.last_error_stage = "read_ctrl_100"
 
         # 3. Simulator HR 300-305 (tank levels) → controller HR 300-305
         levels = self._read_hr(self.sim, 300, 6)
         if levels is not None:
             if not self._write_hr(self.ctrl, 300, levels):
                 ok = False
+                if self.last_error_stage == "none":
+                    self.last_error_stage = "write_ctrl_300"
         else:
             ok = False
+            if self.last_error_stage == "none":
+                self.last_error_stage = "read_sim_300"
 
         # 4. Simulator HR 320-331 (valve/pump status) → controller HR 320-331
         status = self._read_hr(self.sim, 320, 12)
         if status is not None:
             if not self._write_hr(self.ctrl, 320, status):
                 ok = False
+                if self.last_error_stage == "none":
+                    self.last_error_stage = "write_ctrl_320"
         else:
             ok = False
+            if self.last_error_stage == "none":
+                self.last_error_stage = "read_sim_320"
 
         return ok
 
@@ -169,8 +208,13 @@ class ModbusBridge:
                 self.errors += 1
 
             if self.cycles % 100 == 0:
-                log.info("cycles=%d  errors=%d  last=%.1fms",
-                         self.cycles, self.errors, self.last_cycle_ms)
+                log.info(
+                    "cycles=%d  errors=%d  last=%.1fms  stage=%s",
+                    self.cycles,
+                    self.errors,
+                    self.last_cycle_ms,
+                    self.last_error_stage,
+                )
 
             sleep = self.cycle_sec - elapsed
             if sleep > 0:

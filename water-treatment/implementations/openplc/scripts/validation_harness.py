@@ -41,6 +41,8 @@ except ImportError:
     print("Error: pymodbus required.  pip install pymodbus")
     sys.exit(1)
 
+MODBUS_DEVICE_ID = int(os.environ.get("MODBUS_DEVICE_ID", "1"))
+
 # Import bridge from sibling module
 SCRIPT_DIR = Path(__file__).resolve().parent
 sys.path.insert(0, str(SCRIPT_DIR))
@@ -48,14 +50,31 @@ from modbus_bridge import ModbusBridge, parse_host_port
 
 log = logging.getLogger("validation_harness")
 
-# Default paths (in cps-enclave-model repo)
-_ENCLAVE_MODEL_ROOT = SCRIPT_DIR.parent.parent.parent.parent.parent / "cps-enclave-model"
-DEFAULT_RULES = str(_ENCLAVE_MODEL_ROOT / "tools" / "defense" / "rules" / "water-treatment.yaml")
-DEFAULT_CHECKER = str(_ENCLAVE_MODEL_ROOT / "tools" / "defense" / "invariant_check.py")
+def resolve_enclave_model_root() -> Path | None:
+    """Find cps-enclave-model without assuming a developer-specific checkout path."""
+    env_path = os.environ.get("CPS_ENCLAVE_MODEL_PATH")
+    if env_path:
+        candidate = Path(env_path).expanduser().resolve()
+        if candidate.exists():
+            return candidate
+
+    for parent in [SCRIPT_DIR, *SCRIPT_DIR.parents]:
+        candidate = parent / "cps-enclave-model"
+        if candidate.exists():
+            return candidate.resolve()
+
+    return None
+
+
+_ENCLAVE_MODEL_ROOT = resolve_enclave_model_root()
+DEFAULT_RULES = str(_ENCLAVE_MODEL_ROOT / "tools" / "defense" / "rules" / "water-treatment.yaml") if _ENCLAVE_MODEL_ROOT else ""
+DEFAULT_CHECKER = str(_ENCLAVE_MODEL_ROOT / "tools" / "defense" / "invariant_check.py") if _ENCLAVE_MODEL_ROOT else ""
 DEFAULT_PROFILE = str(SCRIPT_DIR.parent.parent.parent / "profiles" / "realistic.yaml")
 
 # Try to import sim primitives for profile loading
 try:
+    if _ENCLAVE_MODEL_ROOT is None:
+        raise ImportError("cps-enclave-model repo not found")
     sys.path.insert(0, str(_ENCLAVE_MODEL_ROOT))
     from sim.primitives import load_profile, SimProfile
     HAS_PRIMITIVES = True
@@ -79,7 +98,11 @@ CONTROLLER_HR_TAGS = [
 def read_hr(client, address, count):
     """Read holding registers, return list or None."""
     try:
-        rr = client.read_holding_registers(address, count)
+        rr = client.read_holding_registers(
+            address=address,
+            count=count,
+            device_id=MODBUS_DEVICE_ID,
+        )
         if rr is None or isinstance(rr, ExceptionResponse) or rr.isError():
             return None
         return list(rr.registers[:count])
@@ -90,7 +113,11 @@ def read_hr(client, address, count):
 def read_coils(client, address, count):
     """Read coils, return list of 0/1 or None."""
     try:
-        rr = client.read_coils(address, count)
+        rr = client.read_coils(
+            address=address,
+            count=count,
+            device_id=MODBUS_DEVICE_ID,
+        )
         if rr is None or isinstance(rr, ExceptionResponse) or rr.isError():
             return None
         return [1 if b else 0 for b in rr.bits[:count]]
@@ -209,24 +236,24 @@ def execute_action(action, ctrl_client, sim_client):
     """Execute a scenario timeline action."""
     if action == "hmi_start":
         # Write coil 0 = True (HMI Start PB)
-        ctrl_client.write_coil(0, True)
-        ctrl_client.write_coil(1, False)
+        ctrl_client.write_coil(address=0, value=True, device_id=MODBUS_DEVICE_ID)
+        ctrl_client.write_coil(address=1, value=False, device_id=MODBUS_DEVICE_ID)
         return "HMI Start pressed"
     elif action == "hmi_stop":
-        ctrl_client.write_coil(0, False)
-        ctrl_client.write_coil(1, True)
+        ctrl_client.write_coil(address=0, value=False, device_id=MODBUS_DEVICE_ID)
+        ctrl_client.write_coil(address=1, value=True, device_id=MODBUS_DEVICE_ID)
         return "HMI Stop pressed"
     elif action == "hmi_estop":
         # Same as stop but immediate
-        ctrl_client.write_coil(0, False)
-        ctrl_client.write_coil(1, True)
+        ctrl_client.write_coil(address=0, value=False, device_id=MODBUS_DEVICE_ID)
+        ctrl_client.write_coil(address=1, value=True, device_id=MODBUS_DEVICE_ID)
         return "Emergency stop pressed"
     elif action.startswith("set_sim_level:"):
         # Format: set_sim_level:register:value
         parts = action.split(":")
         reg = int(parts[1])
         val = int(parts[2])
-        sim_client.write_register(reg, val)
+        sim_client.write_register(address=reg, value=val, device_id=MODBUS_DEVICE_ID)
         return f"Set simulator HR {reg} = {val}"
     else:
         log.warning("Unknown action: %s", action)
@@ -368,6 +395,8 @@ def main():
             log.info("Loaded profile: %s (v%s)", profile.metadata.name, profile.metadata.version)
         except Exception as e:
             log.warning("Failed to load profile %s: %s", args.profile, e)
+    elif args.profile and not os.path.exists(args.profile):
+        log.warning("Profile not found at %s", args.profile)
     elif args.profile and os.path.exists(args.profile):
         log.warning("sim.primitives not available, profile metadata will be limited")
         # Still record profile path even without full parsing
@@ -495,6 +524,10 @@ def main():
     log.info("Collection done: %.1fs, %d events", time.monotonic() - start_time, len(events))
 
     # Run invariant check
+    if not args.invariant_rules:
+        log.warning("Invariant rules path not configured; skipping invariant check")
+    if not args.invariant_checker:
+        log.warning("Invariant checker path not configured; skipping invariant check")
     report_dir = run_invariant_check(
         tags_tmp, args.invariant_rules, args.invariant_checker, args.output)
 

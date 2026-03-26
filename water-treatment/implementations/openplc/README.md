@@ -78,7 +78,7 @@ pytest tests/test_e2e.py -v
 ansible-playbook ansible/playbooks/test-modbus.yml
 
 # Run operator interface
-python scripts/operator.py
+python scripts/operator_cli.py
 ```
 
 ### Validation
@@ -118,7 +118,7 @@ openplc/
 │       ├── plc.xml
 │       └── beremiz.xml
 ├── scripts/
-│   ├── operator.py         # CLI operator interface
+│   ├── operator_cli.py     # CLI operator interface
 │   ├── historian_collector.py  # Tag data collection
 │   └── requirements.txt    # Python dependencies
 ├── st/                     # Flat ST files (for reference)

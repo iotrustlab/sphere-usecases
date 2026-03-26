@@ -76,6 +76,8 @@ dist/
 *.simulation
 simulation_data/
 simulation_results/
+water-treatment/implementations/openplc/artifacts/
+water-treatment/implementations/openplc/docker-compose.yml
 
 # Documentation build
 docs/_build/

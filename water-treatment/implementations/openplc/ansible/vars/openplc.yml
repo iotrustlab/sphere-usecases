@@ -9,9 +9,13 @@ docker_network_subnet: "10.100.0.0/24"
 openplc_image_name: sphere-openplc
 openplc_image_tag: latest
 
+# Default repo layout assumes cps-enclave-model is a sibling of sphere-usecases.
+# Override with: CPS_ENCLAVE_MODEL_PATH=/path/to/cps-enclave-model
+default_cps_enclave_model_path: "{{ (playbook_dir + '/../../../../../../cps-enclave-model') | realpath }}"
+
 # Path to cps-enclave-model repo (contains OpenPLC Dockerfile)
 # Override with: -e cps_enclave_model_path=/path/to/cps-enclave-model
-cps_enclave_model_path: "{{ lookup('env', 'CPS_ENCLAVE_MODEL_PATH') | default('~/Development/cps-enclave-model', true) }}"
+cps_enclave_model_path: "{{ lookup('env', 'CPS_ENCLAVE_MODEL_PATH') | default(default_cps_enclave_model_path, true) }}"
 openplc_dockerfile_path: "{{ cps_enclave_model_path }}/docker/openplc"
 
 openplc_version: master  # Git commit/branch for reproducibility

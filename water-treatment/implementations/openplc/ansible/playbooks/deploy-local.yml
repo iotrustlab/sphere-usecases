@@ -180,5 +180,5 @@
           Next steps:
             1. Open WebUI to verify PLC programs loaded
             2. Run E2E tests: pytest ../tests/test_e2e.py -v
-            3. Start operator interface: python ../scripts/operator.py
+            3. Start operator interface: python ../scripts/operator_cli.py
           ============================================

@@ -26,9 +26,10 @@
     assets_dir: /mnt/data/assets
     slice_path: /mnt/data/slices/wt-uc1-slice.yaml
     build_dir: /tmp/viewer-build
+    platform_repo_root: "{{ lookup('env', 'CPS_ENCLAVE_MODEL_PATH') | default((playbook_dir + '/../../../../../../cps-enclave-model') | realpath, true) }}"
     # Local source paths (relative to playbook)
-    viewer_src: "{{ playbook_dir }}/../../../../cps-enclave-model/cps-enclave-viewer"
-    usecase_src: "{{ playbook_dir }}/../../../.."
+    viewer_src: "{{ platform_repo_root }}/cps-enclave-viewer"
+    usecase_src: "{{ (playbook_dir + '/../../../..') | realpath }}"
 
   tasks:
     - name: Create data directories
@@ -81,8 +82,8 @@
         - { src: "{{ viewer_src }}/cmd/",           dest: "cps-enclave-viewer/cmd/" }
         - { src: "{{ viewer_src }}/web/",           dest: "cps-enclave-viewer/web/" }
         # The Dockerfile needs the Go module files at the repo root
-        - { src: "{{ playbook_dir }}/../../../../cps-enclave-model/go.mod", dest: "go.mod" }
-        - { src: "{{ playbook_dir }}/../../../../cps-enclave-model/go.sum", dest: "go.sum" }
+        - { src: "{{ platform_repo_root }}/go.mod", dest: "go.mod" }
+        - { src: "{{ platform_repo_root }}/go.sum", dest: "go.sum" }
 
     - name: Check if viewer image already exists
       community.docker.docker_image_info:

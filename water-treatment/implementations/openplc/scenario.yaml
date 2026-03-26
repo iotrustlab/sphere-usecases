@@ -39,7 +39,7 @@ spec:
     - name: controller
       type: openplc
       role: controller
-      program_path: projects/controller_project/plc.xml
+      program_path: projects/controller_project/controller_final.st
       io_map_path: configs/modbus_map.yaml
       network:
         ip_address: "10.100.0.10"
@@ -47,7 +47,7 @@ spec:
       backend_config:
         # Use master branch by default; pin to specific commit for reproducibility
         version: master
-        project_format: xml
+        project_format: st
         scan_cycle_ms: 50
         webui_enabled: true
         webui_port: 8080
@@ -55,24 +55,34 @@ spec:
     - name: simulator
       type: openplc
       role: simulator
-      program_path: projects/simulator_project/plc.xml
+      program_path: projects/simulator_project/simulator_final.st
       io_map_path: configs/modbus_map.yaml
       network:
         ip_address: "10.100.0.20"
         modbus_port: 503
       backend_config:
         version: master
-        project_format: xml
+        project_format: st
         scan_cycle_ms: 50
         webui_enabled: true
         webui_port: 8081
 
   # Infrastructure services
   infrastructure:
+    bridge:
+      enabled: true
+      image: python:3.11-slim
+      script: scripts/modbus_bridge.py
+      args:
+        - --cycle-ms
+        - "100"
+
     historian:
       enabled: true
       image: python:3.11-slim
       script: scripts/historian_collector.py
+      environment:
+        BRIDGE_MODE: "true"
       poll_rate_ms: 500
       output_path: /logs/tags.csv
       output_format: csv
@@ -85,7 +95,7 @@ spec:
     operator_ui:
       enabled: true
       type: cli
-      script: scripts/operator.py
+      script: scripts/operator_cli.py
 
   # Lifecycle hooks (scripts in scripts/ directory)
   hooks:

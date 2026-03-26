@@ -26,6 +26,25 @@ except ImportError:
     pytest.skip("pymodbus not installed", allow_module_level=True)
 
 
+MODBUS_DEVICE_ID = int(os.environ.get("MODBUS_DEVICE_ID", "1"))
+
+
+def read_coils(client, address, count):
+    return client.read_coils(address=address, count=count, device_id=MODBUS_DEVICE_ID)
+
+
+def read_holding_registers(client, address, count):
+    return client.read_holding_registers(
+        address=address,
+        count=count,
+        device_id=MODBUS_DEVICE_ID,
+    )
+
+
+def write_coil(client, address, value):
+    return client.write_coil(address=address, value=value, device_id=MODBUS_DEVICE_ID)
+
+
 def pytest_addoption(parser):
     """Add command line options for test configuration"""
     parser.addoption("--controller-host", default="localhost", help="Controller PLC host")
@@ -68,13 +87,13 @@ class TestConnectivity:
     def test_controller_read_coils(self, controller):
         """Should be able to read coils from controller"""
         controller.connect()
-        result = controller.read_coils(0, 10)
+        result = read_coils(controller, 0, 10)
         assert not result.isError(), f"Failed to read coils: {result}"
 
     def test_simulator_read_registers(self, simulator):
-        """Should be able to read input registers from simulator"""
+        """Should be able to read bridge holding registers from simulator"""
         simulator.connect()
-        result = simulator.read_input_registers(70, 6)
+        result = read_holding_registers(simulator, 300, 6)
         assert not result.isError(), f"Failed to read registers: {result}"
 
 
@@ -90,30 +109,30 @@ class TestIOMapping:
         "RW_Pump_Stop": 44,
     }
 
-    INPUT_REGISTER_ADDRESSES = {
-        "RW_Tank_Level": 70,
-        "RW_Pump_Flow": 71,
-        "UF_UFFT_Tank_Level": 75,
+    HOLDING_REGISTER_ADDRESSES = {
+        "RW_Tank_Level": 300,
+        "RW_Pump_Flow": 301,
+        "UF_UFFT_Tank_Level": 305,
     }
 
     def test_controller_coils_readable(self, controller):
         """All controller coils should be readable"""
         controller.connect()
         for name, addr in self.COIL_ADDRESSES.items():
-            result = controller.read_coils(addr, 1)
+            result = read_coils(controller, addr, 1)
             assert not result.isError(), f"Failed to read coil {name} at {addr}"
 
     def test_simulator_registers_readable(self, simulator):
-        """All simulator input registers should be readable"""
+        """All simulator bridge holding registers should be readable"""
         simulator.connect()
-        for name, addr in self.INPUT_REGISTER_ADDRESSES.items():
-            result = simulator.read_input_registers(addr, 1)
+        for name, addr in self.HOLDING_REGISTER_ADDRESSES.items():
+            result = read_holding_registers(simulator, addr, 1)
             assert not result.isError(), f"Failed to read register {name} at {addr}"
 
     def test_tank_level_in_range(self, simulator):
         """Tank level should be within valid range (0-1200mm)"""
         simulator.connect()
-        result = simulator.read_input_registers(70, 1)
+        result = read_holding_registers(simulator, 300, 1)
         assert not result.isError()
         level = result.registers[0]
         assert 0 <= level <= 1200, f"Tank level {level} out of range [0, 1200]"
@@ -127,26 +146,26 @@ class TestControlLogic:
         controller.connect()
 
         # Clear both buttons first
-        controller.write_coil(0, False)  # Start button
-        controller.write_coil(1, False)  # Stop button
+        write_coil(controller, 0, False)  # Start button
+        write_coil(controller, 1, False)  # Stop button
         time.sleep(0.1)
 
         # Press start
-        result = controller.write_coil(0, True)
+        result = write_coil(controller, 0, True)
         assert not result.isError(), "Failed to press start button"
 
         # Verify start is set
-        result = controller.read_coils(0, 1)
+        result = read_coils(controller, 0, 1)
         assert not result.isError()
         assert result.bits[0], "Start button not set"
 
         # Press stop
-        result = controller.write_coil(1, True)
+        result = write_coil(controller, 1, True)
         assert not result.isError(), "Failed to press stop button"
 
         # Clear both
-        controller.write_coil(0, False)
-        controller.write_coil(1, False)
+        write_coil(controller, 0, False)
+        write_coil(controller, 1, False)
 
 
 class TestDataIntegrity:
@@ -156,13 +175,13 @@ class TestDataIntegrity:
         """Analog values should not be NaN or extreme"""
         simulator.connect()
 
-        # Read all analog inputs
-        result = simulator.read_input_registers(70, 6)
+        # Read all bridged analog values
+        result = read_holding_registers(simulator, 300, 6)
         assert not result.isError()
 
         for i, value in enumerate(result.registers):
             # Check for reasonable values (not overflow/underflow)
-            assert value < 65535, f"Register {70+i} appears to be overflow"
+            assert value < 65535, f"Register {300+i} appears to be overflow"
 
     def test_consecutive_reads_stable(self, simulator):
         """Consecutive reads should return consistent values"""
@@ -170,7 +189,7 @@ class TestDataIntegrity:
 
         values = []
         for _ in range(5):
-            result = simulator.read_input_registers(70, 1)
+            result = read_holding_registers(simulator, 300, 1)
             assert not result.isError()
             values.append(result.registers[0])
             time.sleep(0.05)
@@ -196,13 +215,13 @@ class TestSmokeTest:
         assert simulator.connect(), "Simulator not responding"
 
         # Read tank level
-        result = simulator.read_input_registers(70, 1)
+        result = read_holding_registers(simulator, 300, 1)
         assert not result.isError(), "Cannot read tank level"
         level = result.registers[0]
         print(f"Tank level: {level} mm")
 
         # Read valve commands
-        result = controller.read_coils(40, 5)
+        result = read_coils(controller, 40, 5)
         assert not result.isError(), "Cannot read valve commands"
         print(f"Valve states: {result.bits[:5]}")
 

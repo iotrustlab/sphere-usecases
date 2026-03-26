@@ -127,7 +127,7 @@ openplc/
 │       ├── plc.xml
 │       └── beremiz.xml
 ├── scripts/
-│   ├── operator.py         # Operator interface
+│   ├── operator_cli.py     # Operator interface
 │   └── poll_tags.py        # Tag polling for historian
 ├── tests/
 │   └── test_e2e.py         # End-to-end tests
@@ -160,7 +160,7 @@ docker-compose logs -f
 # Simulator: http://localhost:8081
 
 # Run operator interface
-python scripts/operator.py
+python scripts/operator_cli.py
 
 # Stop the scenario
 docker-compose down

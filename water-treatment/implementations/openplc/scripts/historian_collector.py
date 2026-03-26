@@ -22,10 +22,15 @@ Environment Variables:
     POLL_RATE_MS: Polling rate in milliseconds
 """
 
-import argparse
-import csv
 import os
 import sys
+
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path = [entry for entry in sys.path if entry not in ("", SCRIPT_DIR)]
+sys.path.insert(0, SCRIPT_DIR)
+
+import argparse
+import csv
 import time
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -35,13 +40,9 @@ from typing import Dict, List, Any, Optional, Tuple
 # Bridge mode uses holding registers 300-331 on the simulator
 # instead of input registers and discrete inputs.
 
-try:
-    from pymodbus.client import ModbusTcpClient
-    from pymodbus.exceptions import ModbusException, ConnectionException
-    from pymodbus.pdu import ExceptionResponse
-except ImportError:
-    print("Error: pymodbus is required. Install with: pip install pymodbus")
-    sys.exit(1)
+from modbus_raw import ConnectionException, ExceptionResponse, ModbusError, ModbusTcpClient
+
+MODBUS_DEVICE_ID = int(os.environ.get("MODBUS_DEVICE_ID", "1"))
 
 
 class DataQuality(Enum):
@@ -99,7 +100,12 @@ class PLCConnection:
         """Establish connection to PLC"""
         try:
             if self.client is None:
-                self.client = ModbusTcpClient(self.host, port=self.port, timeout=3)
+                self.client = ModbusTcpClient(
+                    self.host,
+                    port=self.port,
+                    timeout=3,
+                    unit_id=MODBUS_DEVICE_ID,
+                )
 
             self.connected = self.client.connect()
             if self.connected:
@@ -258,13 +264,29 @@ class HistorianCollector:
             response = None
 
             if batch.register_type == "coil":
-                response = client.read_coils(batch.start_address, batch.count)
+                response = client.read_coils(
+                    address=batch.start_address,
+                    count=batch.count,
+                    device_id=MODBUS_DEVICE_ID,
+                )
             elif batch.register_type == "discrete_input":
-                response = client.read_discrete_inputs(batch.start_address, batch.count)
+                response = client.read_discrete_inputs(
+                    address=batch.start_address,
+                    count=batch.count,
+                    device_id=MODBUS_DEVICE_ID,
+                )
             elif batch.register_type == "holding_register":
-                response = client.read_holding_registers(batch.start_address, batch.count)
+                response = client.read_holding_registers(
+                    address=batch.start_address,
+                    count=batch.count,
+                    device_id=MODBUS_DEVICE_ID,
+                )
             elif batch.register_type == "input_register":
-                response = client.read_input_registers(batch.start_address, batch.count)
+                response = client.read_input_registers(
+                    address=batch.start_address,
+                    count=batch.count,
+                    device_id=MODBUS_DEVICE_ID,
+                )
 
             if response is None or isinstance(response, ExceptionResponse) or response.isError():
                 plc.consecutive_failures += 1
@@ -317,7 +339,7 @@ class HistorianCollector:
                     quality=DataQuality.DISCONNECTED,
                     timestamp=timestamp
                 )
-        except ModbusException as e:
+        except ModbusError as e:
             plc.consecutive_failures += 1
             plc.last_error = str(e)
             for tag in batch.tags:

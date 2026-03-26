@@ -6,7 +6,7 @@ A simple CLI operator interface for controlling and monitoring the
 water treatment Process One scenario.
 
 Usage:
-    python operator.py [--controller HOST] [--simulator HOST]
+    python operator_cli.py [--controller HOST] [--simulator HOST]
 
 Commands:
     start    - Start the process (press Start button)
@@ -16,8 +16,13 @@ Commands:
     quit     - Exit the operator interface
 """
 
-import argparse
+import os
 import sys
+
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path = [entry for entry in sys.path if entry not in ("", SCRIPT_DIR)]
+
+import argparse
 import time
 from dataclasses import dataclass
 from typing import Optional
@@ -28,6 +33,8 @@ try:
 except ImportError:
     print("Error: pymodbus is required. Install with: pip install pymodbus")
     sys.exit(1)
+
+MODBUS_DEVICE_ID = int(os.environ.get("MODBUS_DEVICE_ID", "1"))
 
 
 @dataclass
@@ -58,13 +65,18 @@ class ProcessState:
 class OperatorInterface:
     """Operator interface for water treatment control"""
 
-    # Modbus addresses (from modbus_map.yaml)
-    ADDR_START_BTN = 0      # Coil for HMI Start button
-    ADDR_STOP_BTN = 1       # Coil for HMI Stop button
-    ADDR_RW_TANK_LEVEL = 70  # Input register
-    ADDR_UF_TANK_LEVEL = 75  # Input register
-    ADDR_PUMP_STS = 19       # Discrete input
-    ADDR_PUMP_FAULT = 20     # Discrete input
+    # Modbus addresses (bridge mode)
+    ADDR_START_BTN = 0          # Controller coil for HMI Start button
+    ADDR_STOP_BTN = 1           # Controller coil for HMI Stop button
+    ADDR_SYS_IDLE = 56          # Controller system state coils
+    ADDR_SYS_START = 57
+    ADDR_SYS_RUNNING = 58
+    ADDR_SYS_SHUTDOWN = 59
+    ADDR_SYS_PERMISSIVES = 60
+    ADDR_RW_TANK_LEVEL = 300    # Simulator holding registers (bridge outputs)
+    ADDR_UF_TANK_LEVEL = 305
+    ADDR_PUMP_STS = 323         # Simulator holding register status word
+    ADDR_PUMP_FAULT = 324
 
     def __init__(self, controller_host: str = "localhost",
                  controller_port: int = 502,
@@ -88,8 +100,16 @@ class OperatorInterface:
         """Press the Start button"""
         try:
             # Set Start button, clear Stop button
-            self.controller.write_coil(self.ADDR_START_BTN, True)
-            self.controller.write_coil(self.ADDR_STOP_BTN, False)
+            self.controller.write_coil(
+                address=self.ADDR_START_BTN,
+                value=True,
+                device_id=MODBUS_DEVICE_ID,
+            )
+            self.controller.write_coil(
+                address=self.ADDR_STOP_BTN,
+                value=False,
+                device_id=MODBUS_DEVICE_ID,
+            )
             return True
         except ModbusException as e:
             print(f"Error starting process: {e}")
@@ -99,8 +119,16 @@ class OperatorInterface:
         """Press the Stop button"""
         try:
             # Set Stop button, clear Start button
-            self.controller.write_coil(self.ADDR_STOP_BTN, True)
-            self.controller.write_coil(self.ADDR_START_BTN, False)
+            self.controller.write_coil(
+                address=self.ADDR_STOP_BTN,
+                value=True,
+                device_id=MODBUS_DEVICE_ID,
+            )
+            self.controller.write_coil(
+                address=self.ADDR_START_BTN,
+                value=False,
+                device_id=MODBUS_DEVICE_ID,
+            )
             return True
         except ModbusException as e:
             print(f"Error stopping process: {e}")
@@ -111,38 +139,45 @@ class OperatorInterface:
         try:
             state = ProcessState()
 
-            # Read tank levels from simulator
-            result = self.simulator.read_input_registers(self.ADDR_RW_TANK_LEVEL, 1)
+            # Read bridged tank levels from simulator holding registers
+            result = self.simulator.read_holding_registers(
+                address=self.ADDR_RW_TANK_LEVEL,
+                count=1,
+                device_id=MODBUS_DEVICE_ID,
+            )
             if not result.isError():
                 state.rw_tank_level = result.registers[0]
 
-            result = self.simulator.read_input_registers(self.ADDR_UF_TANK_LEVEL, 1)
+            result = self.simulator.read_holding_registers(
+                address=self.ADDR_UF_TANK_LEVEL,
+                count=1,
+                device_id=MODBUS_DEVICE_ID,
+            )
             if not result.isError():
                 state.uf_tank_level = result.registers[0]
 
-            # Read pump status
-            result = self.simulator.read_discrete_inputs(self.ADDR_PUMP_STS, 1)
+            # Read bridged status words from simulator holding registers
+            result = self.simulator.read_holding_registers(
+                address=self.ADDR_PUMP_STS,
+                count=2,
+                device_id=MODBUS_DEVICE_ID,
+            )
             if not result.isError():
-                state.pump_running = result.bits[0]
+                state.pump_running = result.registers[0] != 0
+                state.pump_fault = result.registers[1] != 0
 
-            result = self.simulator.read_discrete_inputs(self.ADDR_PUMP_FAULT, 1)
+            # Read controller state coils directly
+            result = self.controller.read_coils(
+                address=self.ADDR_SYS_IDLE,
+                count=5,
+                device_id=MODBUS_DEVICE_ID,
+            )
             if not result.isError():
-                state.pump_fault = result.bits[0]
-
-            # Read HMI buttons to determine state
-            result = self.controller.read_coils(self.ADDR_START_BTN, 2)
-            if not result.isError():
-                start_active = result.bits[0]
-                stop_active = result.bits[1]
-
-                if stop_active:
-                    state.shutdown = True
-                elif start_active and state.rw_tank_level > 250 and state.uf_tank_level < 1000:
-                    state.running = True
-                elif start_active:
-                    state.start = True
-                else:
-                    state.idle = True
+                state.idle = result.bits[0]
+                state.start = result.bits[1]
+                state.running = result.bits[2]
+                state.shutdown = result.bits[3]
+                state.permissives_ready = result.bits[4]
 
             return state
 

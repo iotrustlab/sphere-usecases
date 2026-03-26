@@ -12,6 +12,7 @@ set -e
 
 EXPERIMENT_NAME="openplc-water"
 PROJECT="$USER"  # Uses personal project
+SPHERE_SSH_KEY_PATH="${SPHERE_SSH_KEY_PATH:-$HOME/.ssh/merge_key}"
 
 echo "=== SPHERE OpenPLC Water Treatment Setup ==="
 echo ""
@@ -52,24 +53,24 @@ Host jump
     HostName jump.sphere-testbed.net
     Port 2022
     User $USER
-    IdentityFile ~/.ssh/merge_key
+    IdentityFile ${SPHERE_SSH_KEY_PATH}
 
 Host x0-$USER
     HostName x0-$USER
     User $USER
-    IdentityFile ~/.ssh/merge_key
+    IdentityFile ${SPHERE_SSH_KEY_PATH}
     ProxyJump jump
 
 Host controller
     HostName controller
     User $USER
-    IdentityFile ~/.ssh/merge_key
+    IdentityFile ${SPHERE_SSH_KEY_PATH}
     ProxyJump x0-$USER
 
 Host simulator
     HostName simulator
     User $USER
-    IdentityFile ~/.ssh/merge_key
+    IdentityFile ${SPHERE_SSH_KEY_PATH}
     ProxyJump x0-$USER
 EOF
 
@@ -104,6 +105,7 @@ echo "=== Setup Complete ==="
 echo ""
 echo "SSH config written to: ssh_config"
 echo "Ansible inventory written to: inventory.ini"
+echo "SSH key path: ${SPHERE_SSH_KEY_PATH}"
 echo ""
 echo "Next steps:"
 echo "  1. Test SSH access: ssh -F ssh_config controller"
