@@ -364,174 +364,174 @@
                 <derived name="P3_UDT" />
               </type>
             </variable>
-            <variable name="di_2_0" address="%IX2.0">
+            <variable name="di_2_0">
               <type>
                 <BOOL />
               </type>
             </variable>
-            <variable name="di_2_1" address="%IX2.1">
+            <variable name="di_2_1">
               <type>
                 <BOOL />
               </type>
             </variable>
-            <variable name="di_2_10" address="%IX2.10">
+            <variable name="di_2_10">
               <type>
                 <BOOL />
               </type>
             </variable>
-            <variable name="di_2_11" address="%IX2.11">
+            <variable name="di_2_11">
               <type>
                 <BOOL />
               </type>
             </variable>
-            <variable name="di_2_2" address="%IX2.2">
+            <variable name="di_2_2">
               <type>
                 <BOOL />
               </type>
             </variable>
-            <variable name="di_2_3" address="%IX2.3">
+            <variable name="di_2_3">
               <type>
                 <BOOL />
               </type>
             </variable>
-            <variable name="di_2_4" address="%IX2.4">
+            <variable name="di_2_4">
               <type>
                 <BOOL />
               </type>
             </variable>
-            <variable name="di_2_5" address="%IX2.5">
+            <variable name="di_2_5">
               <type>
                 <BOOL />
               </type>
             </variable>
-            <variable name="di_2_6" address="%IX2.6">
+            <variable name="di_2_6">
               <type>
                 <BOOL />
               </type>
             </variable>
-            <variable name="di_2_8" address="%IX2.8">
+            <variable name="di_2_8">
               <type>
                 <BOOL />
               </type>
             </variable>
-            <variable name="di_2_9" address="%IX2.9">
+            <variable name="di_2_9">
               <type>
                 <BOOL />
               </type>
             </variable>
-            <variable name="ai_7_0" address="%IW70">
+            <variable name="ai_7_0">
               <type>
                 <REAL />
               </type>
             </variable>
-            <variable name="di_7_ch0halarm" address="%IX7.0">
+            <variable name="di_7_ch0halarm">
               <type>
                 <BOOL />
               </type>
             </variable>
-            <variable name="di_7_ch0hhalarm" address="%IX7.0">
+            <variable name="di_7_ch0hhalarm">
               <type>
                 <BOOL />
               </type>
             </variable>
-            <variable name="di_7_ch0lalarm" address="%IX7.0">
+            <variable name="di_7_ch0lalarm">
               <type>
                 <BOOL />
               </type>
             </variable>
-            <variable name="di_7_ch0llalarm" address="%IX7.0">
+            <variable name="di_7_ch0llalarm">
               <type>
                 <BOOL />
               </type>
             </variable>
-            <variable name="ai_7_1" address="%IW71">
+            <variable name="ai_7_1">
               <type>
                 <REAL />
               </type>
             </variable>
-            <variable name="ai_7_2" address="%IW72">
+            <variable name="ai_7_2">
               <type>
                 <REAL />
               </type>
             </variable>
-            <variable name="ai_7_3" address="%IW73">
+            <variable name="ai_7_3">
               <type>
                 <REAL />
               </type>
             </variable>
-            <variable name="ai_7_4" address="%IW74">
+            <variable name="ai_7_4">
               <type>
                 <REAL />
               </type>
             </variable>
-            <variable name="ai_7_5" address="%IW75">
+            <variable name="ai_7_5">
               <type>
                 <REAL />
               </type>
             </variable>
           </inputVars>
           <outputVars>
-            <variable name="ao_10_0" address="%QW100">
+            <variable name="ao_10_0">
               <type>
                 <REAL />
               </type>
             </variable>
-            <variable name="do_5_0" address="%QX5.0">
+            <variable name="do_5_0">
               <type>
                 <BOOL />
               </type>
             </variable>
-            <variable name="do_5_1" address="%QX5.1">
+            <variable name="do_5_1">
               <type>
                 <BOOL />
               </type>
             </variable>
-            <variable name="do_5_10" address="%QX5.10">
+            <variable name="do_5_10">
               <type>
                 <BOOL />
               </type>
             </variable>
-            <variable name="do_5_11" address="%QX5.11">
+            <variable name="do_5_11">
               <type>
                 <BOOL />
               </type>
             </variable>
-            <variable name="do_5_2" address="%QX5.2">
+            <variable name="do_5_2">
               <type>
                 <BOOL />
               </type>
             </variable>
-            <variable name="do_5_3" address="%QX5.3">
+            <variable name="do_5_3">
               <type>
                 <BOOL />
               </type>
             </variable>
-            <variable name="do_5_4" address="%QX5.4">
+            <variable name="do_5_4">
               <type>
                 <BOOL />
               </type>
             </variable>
-            <variable name="do_5_5" address="%QX5.5">
+            <variable name="do_5_5">
               <type>
                 <BOOL />
               </type>
             </variable>
-            <variable name="do_5_6" address="%QX5.6">
+            <variable name="do_5_6">
               <type>
                 <BOOL />
               </type>
             </variable>
-            <variable name="do_5_7" address="%QX5.7">
+            <variable name="do_5_7">
               <type>
                 <BOOL />
               </type>
             </variable>
-            <variable name="do_5_8" address="%QX5.8">
+            <variable name="do_5_8">
               <type>
                 <BOOL />
               </type>
             </variable>
-            <variable name="do_5_9" address="%QX5.9">
+            <variable name="do_5_9">
               <type>
                 <BOOL />
               </type>
@@ -875,7 +875,7 @@ end_if;
               <xhtml:p>Rockwell: Local:7:I.Ch0HAlarm</xhtml:p>
             </documentation>
           </variable>
-          <variable name="di_7_ch0hhalarm" address="%IX7.0">
+          <variable name="di_7_ch0hhalarm" address="%IX7.1">
             <type>
               <BOOL />
             </type>
@@ -883,7 +883,7 @@ end_if;
               <xhtml:p>Rockwell: Local:7:I.Ch0HHAlarm</xhtml:p>
             </documentation>
           </variable>
-          <variable name="di_7_ch0lalarm" address="%IX7.0">
+          <variable name="di_7_ch0lalarm" address="%IX7.2">
             <type>
               <BOOL />
             </type>
@@ -891,7 +891,7 @@ end_if;
               <xhtml:p>Rockwell: Local:7:I.Ch0LAlarm</xhtml:p>
             </documentation>
           </variable>
-          <variable name="di_7_ch0llalarm" address="%IX7.0">
+          <variable name="di_7_ch0llalarm" address="%IX7.3">
             <type>
               <BOOL />
             </type>

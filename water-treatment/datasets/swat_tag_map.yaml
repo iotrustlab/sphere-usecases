@@ -1,0 +1,202 @@
+# SWaT to SPHERE Tag Mapping
+#
+# Maps SWaT dataset tags to SPHERE canonical tag names.
+# SWaT has 6 stages; SPHERE P1-P3 map roughly to SWaT stages 1-3.
+#
+# Reference:
+#   SWaT dataset: https://itrust.sutd.edu.sg/itrust-labs_datasets/
+#   Paper: Goh et al., "A Dataset to Support Research in the Design of
+#          Secure Water Treatment Systems", 2017
+#
+# Usage with swat_loader.py:
+#   python tools/datasets/swat_loader.py \
+#       --input SWaT_Dataset_Attack_v0.csv \
+#       --output /tmp/swat-bundle/
+
+api_version: sphere.mergetb.io/v1
+kind: TagMapping
+metadata:
+  name: swat-to-sphere
+  version: "1.0.0"
+  source_dataset: "SWaT v1 (iTrust/SUTD)"
+  description: >
+    Maps SWaT water treatment tags to SPHERE Water Treatment UC1 canonical names.
+    Only Stage 1-3 tags are mapped (P1-P3 equivalent). Stage 4-6 reserved for
+    future SPHERE P4-P8 expansion.
+
+# SWaT Stage 1 -> SPHERE P1 (Raw Water Intake)
+stage_1:
+  description: "Raw water intake and storage"
+  tags:
+    FIT101:
+      sphere_tag: RW_Pump_Flow
+      description: "Raw water flow meter"
+      swat_units: "m3/h"
+      sphere_units: "L/min"
+      scale_factor: 16.67  # m3/h to L/min
+
+    LIT101:
+      sphere_tag: RW_Tank_Level
+      description: "Raw water tank level"
+      swat_units: "mm"
+      sphere_units: "mm"
+      scale_factor: 1.0
+
+    MV101:
+      sphere_tag: RW_Tank_PR_Valve_Sts
+      description: "Motorized valve 101 - tank inlet"
+      swat_encoding: "1=closed, 2=open"
+      sphere_encoding: "0=closed, 1=open"
+      transform: "(value == 2) ? 1 : 0"
+
+    P101:
+      sphere_tag: RW_Pump_Sts
+      description: "Primary raw water pump"
+      swat_encoding: "1=off, 2=on"
+      sphere_encoding: "0=off, 1=on"
+      transform: "(value == 2) ? 1 : 0"
+
+    P102:
+      sphere_tag: RW_Pump_Backup_Sts
+      description: "Backup raw water pump"
+      sphere_new: true
+      notes: "Not in current SPHERE contract, needs addition"
+
+# SWaT Stage 2 -> SPHERE P2 (Chemical Treatment)
+stage_2:
+  description: "Chemical dosing and treatment"
+  tags:
+    AIT201:
+      sphere_tag: ChemTreat_pH
+      description: "pH analyzer"
+      sphere_new: true
+
+    AIT202:
+      sphere_tag: ChemTreat_ORP
+      description: "Oxidation-reduction potential"
+      sphere_new: true
+
+    AIT203:
+      sphere_tag: ChemTreat_Conductivity
+      description: "Conductivity sensor"
+      sphere_new: true
+
+    FIT201:
+      sphere_tag: ChemTreat_Feed_Flow
+      description: "Chemical feed flow"
+      sphere_new: true
+
+    MV201:
+      sphere_tag: ChemTreat_NaCl_Valve_Sts
+      description: "Chemical dosing inlet valve"
+      transform: "(value == 2) ? 1 : 0"
+
+    P201:
+      sphere_tag: ChemTreat_NaCl_Pump_Sts
+      description: "NaCl dosing pump"
+      sphere_new: true
+
+    P202:
+      sphere_tag: ChemTreat_NaOCl_Pump_Sts
+      description: "NaOCl dosing pump"
+      sphere_new: true
+
+    P203:
+      sphere_tag: ChemTreat_HCl_Pump_Sts
+      description: "HCl dosing pump"
+      sphere_new: true
+
+    P204:
+      sphere_tag: ChemTreat_NaOH_Pump_Sts
+      description: "NaOH dosing pump"
+      sphere_new: true
+
+    P205:
+      sphere_tag: ChemTreat_Polymer_Pump_Sts
+      description: "Polymer dosing pump"
+      sphere_new: true
+
+    P206:
+      sphere_tag: ChemTreat_Transfer_Pump_Sts
+      description: "Transfer pump to UF"
+      sphere_new: true
+
+# SWaT Stage 3 -> SPHERE P3 (Ultrafiltration)
+stage_3:
+  description: "Ultrafiltration membrane system"
+  tags:
+    DPIT301:
+      sphere_tag: UF_Diff_Pressure
+      description: "UF differential pressure"
+      sphere_new: true
+
+    FIT301:
+      sphere_tag: UF_Feed_Flow
+      description: "UF feed flow rate"
+      sphere_new: true
+
+    LIT301:
+      sphere_tag: UF_UFFT_Tank_Level
+      description: "UF feed tank level"
+
+    MV301:
+      sphere_tag: UF_UFFT_Tank_Valve_Sts
+      description: "UF inlet valve"
+      transform: "(value == 2) ? 1 : 0"
+
+    MV302:
+      sphere_tag: UF_Drain_Valve_Sts
+      description: "UF drain valve"
+      transform: "(value == 2) ? 1 : 0"
+
+    MV303:
+      sphere_tag: UF_ROFT_Valve_Sts
+      description: "UF to RO feed tank valve"
+      transform: "(value == 2) ? 1 : 0"
+
+    MV304:
+      sphere_tag: UF_BWP_Valve_Sts
+      description: "UF backwash valve"
+      transform: "(value == 2) ? 1 : 0"
+
+    P301:
+      sphere_tag: UF_Feed_Pump_Sts
+      description: "UF feed pump"
+      sphere_new: true
+
+    P302:
+      sphere_tag: UF_Backwash_Pump_Sts
+      description: "UF backwash pump"
+      sphere_new: true
+
+# Unmapped SWaT tags (Stage 4-6)
+# These are candidates for SPHERE P4-P8 expansion
+unmapped:
+  stage_4:
+    description: "Reverse Osmosis"
+    tags: [AIT401, AIT402, FIT401, LIT401, P401, P402, P403, P404, UV401]
+
+  stage_5:
+    description: "Post-treatment and storage"
+    tags: [AIT501, AIT502, AIT503, AIT504, FIT501, FIT502, FIT503, FIT504, P501, P502, PIT501, PIT502, PIT503]
+
+  stage_6:
+    description: "Backwash and discharge"
+    tags: [FIT601, P601, P602, P603]
+
+# Calibration notes
+calibration:
+  notes: >
+    SWaT data was collected at 1-second intervals over 11 days (7 normal + 4 attack).
+    SPHERE profiles should be calibrated against SWaT steady-state values and
+    rate-of-change statistics.
+
+  expected_ranges:
+    LIT101: [250, 800]      # mm, typical operating range
+    FIT101: [2.0, 3.0]      # m3/h
+    LIT301: [500, 1000]     # mm
+
+  attack_detection_baseline: >
+    The SWaT attack dataset contains 36 labeled attack scenarios affecting
+    different combinations of tags. SPHERE invariant rules should detect
+    these attacks with <10% false positive rate on normal data.
