@@ -373,8 +373,8 @@ def main():
     parser.add_argument("--output", required=True, help="Output run bundle directory")
     parser.add_argument("--profile", default=os.environ.get("SIM_PROFILE", DEFAULT_PROFILE),
                         help="Simulation profile YAML (default: realistic)")
-    parser.add_argument("--controller", default=os.environ.get("CONTROLLER_ADDR", "controller:502"))
-    parser.add_argument("--simulator", default=os.environ.get("SIMULATOR_ADDR", "simulator:503"))
+    parser.add_argument("--controller", default=os.environ.get("CONTROLLER_ADDR", "localhost:1502"))
+    parser.add_argument("--simulator", default=os.environ.get("SIMULATOR_ADDR", "localhost:1503"))
     parser.add_argument("--cycle-ms", type=int, default=100, help="Bridge cycle time")
     parser.add_argument("--invariant-rules", default=os.environ.get("INVARIANT_RULES", DEFAULT_RULES))
     parser.add_argument("--invariant-checker", default=os.environ.get("INVARIANT_CHECKER", DEFAULT_CHECKER))

@@ -43,14 +43,14 @@ spec:
       io_map_path: configs/modbus_map.yaml
       network:
         ip_address: "10.100.0.10"
-        modbus_port: 502
+        modbus_port: 1502
       backend_config:
         # Use master branch by default; pin to specific commit for reproducibility
         version: master
         project_format: st
         scan_cycle_ms: 50
         webui_enabled: true
-        webui_port: 8080
+        webui_port: 18080
 
     - name: simulator
       type: openplc
@@ -59,18 +59,18 @@ spec:
       io_map_path: configs/modbus_map.yaml
       network:
         ip_address: "10.100.0.20"
-        modbus_port: 503
+        modbus_port: 1503
       backend_config:
         version: master
         project_format: st
         scan_cycle_ms: 50
         webui_enabled: true
-        webui_port: 8081
+        webui_port: 18081
 
   # Infrastructure services
   infrastructure:
     bridge:
-      enabled: true
+      enabled: false
       image: python:3.11-slim
       script: scripts/modbus_bridge.py
       args:
@@ -78,7 +78,7 @@ spec:
         - "100"
 
     historian:
-      enabled: true
+      enabled: false
       image: python:3.11-slim
       script: scripts/historian_collector.py
       environment:

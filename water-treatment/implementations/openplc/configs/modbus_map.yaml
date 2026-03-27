@@ -28,6 +28,23 @@ coils:
   - name: HMI_Stop_Active
     address: 3           # %QX0.3
     description: "HMI Stop Active (written by controller)"
+  - name: HMI_Reset_PB
+    address: 4           # %QX0.4
+    description: "Testbed reset pushbutton (written by external client)"
+
+  # Agent/process control plane %QX1.0-1.3
+  - name: P2_Selected
+    address: 8           # %QX1.0
+    description: "Select Process 2 (manual dosing) for external agent control"
+  - name: P2_NaCl_Cmd
+    address: 9           # %QX1.1
+    description: "External manual command for NaCl dosing valve"
+  - name: P2_NaOCl_Cmd
+    address: 10          # %QX1.2
+    description: "External manual command for NaOCl dosing valve"
+  - name: P2_HCl_Cmd
+    address: 11          # %QX1.3
+    description: "External manual command for HCl dosing valve"
 
   # Process 1: Raw Water System
   - name: RW_Tank_PR_Valve
@@ -192,6 +209,59 @@ holding_registers:
   - name: Bridge_Cmd_Pump_Speed
     address: 220
     description: "Bridge: pump speed → simulator"
+
+  # ── Testbed admin registers ──
+  - name: Admin_Init_RW_Tank_Level
+    address: 340
+    description: "Initial RW tank level applied on simulator reset"
+  - name: Admin_Init_UF_UFFT_Tank_Level
+    address: 341
+    description: "Initial UF tank level applied on simulator reset"
+  - name: Admin_Init_ChemTreat_NaCl_Level
+    address: 342
+    description: "Initial NaCl tank level applied on simulator reset"
+  - name: Admin_Init_ChemTreat_NaOCl_Level
+    address: 343
+    description: "Initial NaOCl tank level applied on simulator reset"
+  - name: Admin_Init_ChemTreat_HCl_Level
+    address: 344
+    description: "Initial HCl tank level applied on simulator reset"
+  - name: Admin_Reset_Seq
+    address: 349
+    description: "Increment to trigger a full simulator reset"
+  - name: Admin_Apply_RW_Tank_Level
+    address: 360
+    description: "Runtime RW tank override value"
+  - name: Admin_Apply_UF_UFFT_Tank_Level
+    address: 361
+    description: "Runtime UF tank override value"
+  - name: Admin_Apply_ChemTreat_NaCl_Level
+    address: 362
+    description: "Runtime NaCl tank override value"
+  - name: Admin_Apply_ChemTreat_NaOCl_Level
+    address: 363
+    description: "Runtime NaOCl tank override value"
+  - name: Admin_Apply_ChemTreat_HCl_Level
+    address: 364
+    description: "Runtime HCl tank override value"
+  - name: Admin_Apply_RW_Tank_Level_Flag
+    address: 365
+    description: "Apply RW tank override on next Admin_Apply_Seq"
+  - name: Admin_Apply_UF_UFFT_Tank_Level_Flag
+    address: 366
+    description: "Apply UF tank override on next Admin_Apply_Seq"
+  - name: Admin_Apply_ChemTreat_NaCl_Level_Flag
+    address: 367
+    description: "Apply NaCl override on next Admin_Apply_Seq"
+  - name: Admin_Apply_ChemTreat_NaOCl_Level_Flag
+    address: 368
+    description: "Apply NaOCl override on next Admin_Apply_Seq"
+  - name: Admin_Apply_ChemTreat_HCl_Level_Flag
+    address: 369
+    description: "Apply HCl override on next Admin_Apply_Seq"
+  - name: Admin_Apply_Seq
+    address: 370
+    description: "Increment to apply runtime overrides"
 
   # Sensor outputs (written by simulator, read by bridge, written to controller)
   - name: Bridge_RW_Tank_Level

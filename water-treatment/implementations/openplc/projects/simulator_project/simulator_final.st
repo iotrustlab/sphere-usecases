@@ -31,8 +31,11 @@ PROGRAM SimulatorProgram
     uf_bwp_open : BOOL := FALSE;
     uf_bwp_timer : INT := 0;
 
+    init_done : BOOL := FALSE;
     pump_timer : INT := 0;
     pump_requested : BOOL := FALSE;
+    admin_reset_seq_seen : INT := 0;
+    admin_apply_seq_seen : INT := 0;
 
     (* ===== Constants ===== *)
     DT_SEC : REAL := 0.1;            (* 100ms scan interval *)
@@ -61,6 +64,23 @@ PROGRAM SimulatorProgram
     cmd_uf_roft : INT;       (* 0/1  UF ROFT valve command *)
     cmd_uf_bwp : INT;        (* 0/1  UF BWP valve command *)
     cmd_pump_speed : INT;    (* 0-100  pump speed % *)
+    admin_init_rw_level : INT;   (* reset baseline: RW tank level *)
+    admin_init_uf_level : INT;   (* reset baseline: UF tank level *)
+    admin_init_nacl_level : INT; (* reset baseline: NaCl tank *)
+    admin_init_naocl_level : INT;(* reset baseline: NaOCl tank *)
+    admin_init_hcl_level : INT;  (* reset baseline: HCl tank *)
+    admin_reset_seq : INT;       (* increments trigger full sim reset *)
+    admin_apply_rw_level : INT;  (* runtime RW level override *)
+    admin_apply_uf_level : INT;  (* runtime UF level override *)
+    admin_apply_nacl_level : INT;(* runtime NaCl level override *)
+    admin_apply_naocl_level : INT;(* runtime NaOCl level override *)
+    admin_apply_hcl_level : INT; (* runtime HCl level override *)
+    admin_apply_rw_flag : INT;   (* 0/1 apply override *)
+    admin_apply_uf_flag : INT;
+    admin_apply_nacl_flag : INT;
+    admin_apply_naocl_flag : INT;
+    admin_apply_hcl_flag : INT;
+    admin_apply_seq : INT;       (* increments trigger level apply *)
 
     (* ===== Bridge sensor outputs - read by bridge ===== *)
     out_rw_level : INT;      (* RW tank level mm *)
@@ -82,6 +102,98 @@ PROGRAM SimulatorProgram
     out_uf_roft_sts : INT;
     out_uf_bwp_sts : INT;
   END_VAR
+
+  IF NOT init_done THEN
+    rw_tank_level := 600.0;
+    uf_tank_level := 400.0;
+    nacl_level := 800.0;
+    naocl_level := 800.0;
+    hcl_level := 800.0;
+    pump_running := FALSE;
+    pump_flow := 0.0;
+    pr_valve_open := FALSE;
+    pr_valve_timer := 0;
+    p6b_valve_open := FALSE;
+    p6b_valve_timer := 0;
+    p_valve_open := FALSE;
+    p_valve_timer := 0;
+    nacl_valve_open := FALSE;
+    nacl_valve_timer := 0;
+    naocl_valve_open := FALSE;
+    naocl_valve_timer := 0;
+    hcl_valve_open := FALSE;
+    hcl_valve_timer := 0;
+    uf_valve_open := FALSE;
+    uf_valve_timer := 0;
+    uf_drain_open := FALSE;
+    uf_drain_timer := 0;
+    uf_roft_open := FALSE;
+    uf_roft_timer := 0;
+    uf_bwp_open := FALSE;
+    uf_bwp_timer := 0;
+    pump_timer := 0;
+    pump_requested := FALSE;
+    admin_reset_seq_seen := admin_reset_seq;
+    admin_apply_seq_seen := admin_apply_seq;
+    init_done := TRUE;
+  END_IF;
+
+  (* ========================================================= *)
+  (* 0. Testbed admin hooks                                    *)
+  (*    These registers let the host reset or perturb the sim  *)
+  (*    without rebuilding images or restarting the stack.     *)
+  (* ========================================================= *)
+  IF admin_reset_seq <> admin_reset_seq_seen THEN
+    admin_reset_seq_seen := admin_reset_seq;
+    rw_tank_level := INT_TO_REAL(admin_init_rw_level);
+    uf_tank_level := INT_TO_REAL(admin_init_uf_level);
+    nacl_level := INT_TO_REAL(admin_init_nacl_level);
+    naocl_level := INT_TO_REAL(admin_init_naocl_level);
+    hcl_level := INT_TO_REAL(admin_init_hcl_level);
+    pump_running := FALSE;
+    pump_flow := 0.0;
+    pr_valve_open := FALSE;
+    pr_valve_timer := 0;
+    p6b_valve_open := FALSE;
+    p6b_valve_timer := 0;
+    p_valve_open := FALSE;
+    p_valve_timer := 0;
+    nacl_valve_open := FALSE;
+    nacl_valve_timer := 0;
+    naocl_valve_open := FALSE;
+    naocl_valve_timer := 0;
+    hcl_valve_open := FALSE;
+    hcl_valve_timer := 0;
+    uf_valve_open := FALSE;
+    uf_valve_timer := 0;
+    uf_drain_open := FALSE;
+    uf_drain_timer := 0;
+    uf_roft_open := FALSE;
+    uf_roft_timer := 0;
+    uf_bwp_open := FALSE;
+    uf_bwp_timer := 0;
+    pump_timer := 0;
+    pump_requested := FALSE;
+  END_IF;
+
+  IF admin_apply_seq <> admin_apply_seq_seen THEN
+    admin_apply_seq_seen := admin_apply_seq;
+    IF admin_apply_rw_flag <> 0 THEN
+      rw_tank_level := INT_TO_REAL(admin_apply_rw_level);
+    END_IF;
+    IF admin_apply_uf_flag <> 0 THEN
+      uf_tank_level := INT_TO_REAL(admin_apply_uf_level);
+    END_IF;
+    IF admin_apply_nacl_flag <> 0 THEN
+      nacl_level := INT_TO_REAL(admin_apply_nacl_level);
+    END_IF;
+    IF admin_apply_naocl_flag <> 0 THEN
+      naocl_level := INT_TO_REAL(admin_apply_naocl_level);
+    END_IF;
+    IF admin_apply_hcl_flag <> 0 THEN
+      hcl_level := INT_TO_REAL(admin_apply_hcl_level);
+    END_IF;
+  END_IF;
 
   (* ========================================================= *)
   (* 1. Update valve status with delay                         *)
@@ -492,6 +604,23 @@ CONFIGURATION Config0
     cmd_uf_roft AT %QW210 : INT;
     cmd_uf_bwp AT %QW211 : INT;
     cmd_pump_speed AT %QW220 : INT;
+    admin_init_rw_level AT %QW340 : INT;
+    admin_init_uf_level AT %QW341 : INT;
+    admin_init_nacl_level AT %QW342 : INT;
+    admin_init_naocl_level AT %QW343 : INT;
+    admin_init_hcl_level AT %QW344 : INT;
+    admin_reset_seq AT %QW349 : INT;
+    admin_apply_rw_level AT %QW360 : INT;
+    admin_apply_uf_level AT %QW361 : INT;
+    admin_apply_nacl_level AT %QW362 : INT;
+    admin_apply_naocl_level AT %QW363 : INT;
+    admin_apply_hcl_level AT %QW364 : INT;
+    admin_apply_rw_flag AT %QW365 : INT;
+    admin_apply_uf_flag AT %QW366 : INT;
+    admin_apply_nacl_flag AT %QW367 : INT;
+    admin_apply_naocl_flag AT %QW368 : INT;
+    admin_apply_hcl_flag AT %QW369 : INT;
+    admin_apply_seq AT %QW370 : INT;
     (* Bridge sensor outputs *)
     out_rw_level AT %QW300 : INT;
     out_rw_flow AT %QW301 : INT;

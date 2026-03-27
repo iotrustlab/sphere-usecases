@@ -1,2 +1,2 @@
-# Python dependencies for water treatment scenario scripts
-pymodbus>=3.0.0
+# Runtime sidecars use only the Python standard library plus modbus_raw.py.
+# Host-side helpers that still use pymodbus should install it explicitly.

@@ -1,5 +1,6 @@
 scenario_id: "wt-uc1-low-level-block"
-description: "RW tank below 250mm — permissives should block transition to RUNNING"
+process_id: "WT-P1"
+description: "Experimental: RW tank below 250mm should block transition to RUNNING"
 duration_sec: 60
 poll_interval_ms: 500
 
@@ -14,5 +15,16 @@ timeline:
   - { time_sec: 5, action: hmi_start }
   # System should stay in START (permissive[0] = FALSE)
   - { time_sec: 50, action: hmi_stop }
+
+expectations:
+  final_state: SHUTDOWN
+  must_reach_states: [START]
+  must_not_reach_states: [RUNNING]
+  final_equals:
+    SYS_Permissives_Ready: 0
+    RW_Pump_Sts: 0
+    RW_Pump_Flow: 0
+  ever_nonzero:
+    - Alarm_RW_Tank_LL
 
 reference_bundle: null

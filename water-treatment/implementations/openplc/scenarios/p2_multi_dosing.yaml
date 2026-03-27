@@ -1,0 +1,99 @@
+scenario_id: "wt-p2-multi-dosing"
+process_id: "WT-P2"
+description: "Normal Process 2 run with sequential NaCl, NaOCl, and HCl dosing under a running plant"
+duration_sec: 120
+poll_interval_ms: 500
+
+initial_conditions:
+  RW_Tank_Level: 600
+  UF_UFFT_Tank_Level: 400
+  ChemTreat_NaCl_Level: 800
+  ChemTreat_NaOCl_Level: 800
+  ChemTreat_HCl_Level: 800
+
+timeline:
+  - time_sec: 5
+    action:
+      process_id: WT-P1
+      type: hmi_start
+  - time_sec: 8
+    action:
+      process_id: WT-P2
+      type: select_process
+      active: true
+  - time_sec: 10
+    action:
+      process_id: WT-P2
+      type: set_manual_valve
+      chemical: NaCl
+      open: true
+  - time_sec: 32
+    action:
+      process_id: WT-P2
+      type: set_manual_valve
+      chemical: NaCl
+      open: false
+  - time_sec: 36
+    action:
+      process_id: WT-P2
+      type: set_manual_valve
+      chemical: NaOCl
+      open: true
+  - time_sec: 58
+    action:
+      process_id: WT-P2
+      type: set_manual_valve
+      chemical: NaOCl
+      open: false
+  - time_sec: 62
+    action:
+      process_id: WT-P2
+      type: set_manual_valve
+      chemical: HCl
+      open: true
+  - time_sec: 84
+    action:
+      process_id: WT-P2
+      type: set_manual_valve
+      chemical: HCl
+      open: false
+  - time_sec: 88
+    action:
+      process_id: WT-P2
+      type: select_process
+      active: false
+  - time_sec: 100
+    action:
+      process_id: WT-P1
+      type: hmi_stop
+
+expectations:
+  final_state: SHUTDOWN
+  must_reach_states: [RUNNING]
+  event_count:
+    hmi_start: 1
+    hmi_stop: 1
+  events_lead_to_state:
+    hmi_start: RUNNING
+    hmi_stop: SHUTDOWN
+  min_samples: 180
+  must_change:
+    - ChemTreat_NaCl_Level
+    - ChemTreat_NaOCl_Level
+    - ChemTreat_HCl_Level
+  ever_nonzero:
+    - ChemTreat_NaCl_Valve_Sts
+    - ChemTreat_NaOCl_Valve_Sts
+    - ChemTreat_HCl_Valve_Sts
+  final_equals:
+    ChemTreat_NaCl_Valve_Sts: 0
+    ChemTreat_NaOCl_Valve_Sts: 0
+    ChemTreat_HCl_Valve_Sts: 0
+    P2_Selected: 0
+    P2_NaCl_Cmd: 0
+    P2_NaOCl_Cmd: 0
+    P2_HCl_Cmd: 0
+    RW_Pump_Sts: 0
+    RW_Pump_Flow: 0
+
+reference_bundle: null

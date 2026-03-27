@@ -1,4 +1,5 @@
 scenario_id: "wt-uc1-emergency-stop"
+process_id: "WT-P1"
 description: "Start, run 30s, emergency stop"
 duration_sec: 60
 poll_interval_ms: 500
@@ -13,5 +14,19 @@ initial_conditions:
 timeline:
   - { time_sec: 5, action: hmi_start }
   - { time_sec: 35, action: hmi_estop }
+
+expectations:
+  final_state: SHUTDOWN
+  must_reach_states: [RUNNING, SHUTDOWN]
+  event_count:
+    hmi_start: 1
+    hmi_estop: 1
+  events_lead_to_state:
+    hmi_start: RUNNING
+    hmi_estop: SHUTDOWN
+  min_samples: 90
+  final_equals:
+    RW_Pump_Sts: 0
+    RW_Pump_Flow: 0
 
 reference_bundle: null

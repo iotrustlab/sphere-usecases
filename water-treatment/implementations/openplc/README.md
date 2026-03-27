@@ -1,6 +1,12 @@
 # Water Treatment - OpenPLC Implementation
 
-This implementation runs the water treatment Process One (P1) scenario using OpenPLC runtime containers.
+This implementation runs the water treatment Process One (P1) scenario using
+OpenPLC runtime containers.
+
+The recommended way to interact with it is now the agent-facing testbed
+controller in `scripts/openplc_testbed.py`. That wrapper keeps the environment
+separate from future runtime agents and supports repeated scenario execution
+without rebuilding Docker images for every run.
 
 ## Overview
 
@@ -59,13 +65,59 @@ docker-compose logs -f
 docker-compose down
 ```
 
+### Option 3: Agent-Facing Testbed Controller
+
+For repeated experiments, use the testbed controller instead of manually
+restarting containers. It keeps the stack warm, reuses built Docker images,
+recreates only the PLC services when needed, and exposes JSON-friendly
+commands future agents can call.
+
+```bash
+# Bring the stack up without rebuilding if images already exist
+python3 scripts/openplc_testbed.py up
+
+# Inspect the current process observation
+python3 scripts/openplc_testbed.py observe
+
+# Reset to a scenario's initial conditions
+python3 scripts/openplc_testbed.py reset --scenario scenarios/nominal_startup.yaml
+
+# Apply a single action
+python3 scripts/openplc_testbed.py act hmi_start
+
+# Execute a full scenario with artifacts
+python3 scripts/openplc_testbed.py run-scenario scenarios/nominal_startup.yaml \
+  --output-dir artifacts/nominal_startup
+
+# Run the full readiness suite
+python3 scripts/openplc_testbed.py readiness-suite --output-root artifacts/readiness
+```
+
+The testbed controller is the intended integration surface for future
+`ics-agent` roles:
+
+- `observe` returns a normalized process snapshot
+- `act` applies one external action
+- `reset` prepares the testbed for a new run
+- `run-scenario` executes a scenario and writes artifacts
+- `readiness-suite` validates repeated action/state interaction end to end
+
+The wrapper is now process-aware. It exposes two currently supported process
+identifiers:
+
+- `WT-P1` — raw water transfer
+- `WT-P2` — manual chemical dosing
+
+Future agent/runtime code can pass a `process_id` in structured action
+descriptors and scenario YAMLs while still using one shared environment API.
+
 ### Access Points
 
 After deployment:
-- **Controller WebUI**: http://localhost:8080
-- **Simulator WebUI**: http://localhost:8081
-- **Controller Modbus**: localhost:502
-- **Simulator Modbus**: localhost:503
+- **Controller WebUI**: http://localhost:18080
+- **Simulator WebUI**: http://localhost:18081
+- **Controller Modbus**: localhost:1502
+- **Simulator Modbus**: localhost:1503
 
 ### Testing
 
@@ -80,6 +132,41 @@ ansible-playbook ansible/playbooks/test-modbus.yml
 # Run operator interface
 python scripts/operator_cli.py
 ```
+
+### Supported Agent-Facing Readiness Scenarios
+
+The default readiness suite currently validates the supported action/state
+interaction surface:
+
+- `scenarios/nominal_startup.yaml`
+- `scenarios/emergency_stop.yaml`
+- `scenarios/restart_cycle.yaml`
+- `scenarios/long_nominal_run.yaml`
+- `scenarios/p2_nacl_dosing.yaml`
+- `scenarios/p2_multi_dosing.yaml`
+
+These scenarios verify that an external agent or harness can:
+
+- bring the stack up without rebuilding images
+- reset the environment between runs
+- observe current telemetry/state
+- apply HMI-style actions such as start, stop, and estop
+- apply process-scoped dosing actions for Process 2
+- drive expected controller state transitions
+- collect reproducible per-run artifacts
+
+### Experimental Scenarios
+
+Two richer scenarios are included but should currently be treated as
+experimental:
+
+- `scenarios/low_level_block.yaml`
+- `scenarios/alarm_hh.yaml`
+
+They depend on forcing non-default initial conditions and runtime sensor
+perturbations on the externally reachable Modbus plane. The simulator supports
+an internal admin plane for this, but that path is not yet as reliable as the
+validated action/state contract used by the default readiness suite.
 
 ### Validation
 
@@ -163,6 +250,41 @@ This scenario is designed to work with the SPHERE CPS infrastructure:
 - Historian collector follows SPHERE collector patterns
 - Supports fault injection hooks (planned)
 
+## Agent/Testbed Boundary
+
+The OpenPLC water testbed is intended to act as an environment module for
+future runtime agents. The recommended integration surface is:
+
+- `scripts/openplc_testbed.py observe`
+- `scripts/openplc_testbed.py act ...`
+- `scripts/openplc_testbed.py reset ...`
+- `scripts/openplc_testbed.py run-scenario ...`
+
+That keeps agent logic outside the testbed while still allowing efficient
+scenario execution and telemetry collection.
+
+For Process 2, the current normal-operation interface is manual/external logic:
+
+- select Process 2 via the wrapper
+- open/close NaCl, NaOCl, or HCl dosing valves
+- observe valve status and tank depletion through the normalized telemetry
+
+This matches the current UC1 process model, where chemical dosing is modeled
+but not automatically controlled by the PLC state machine.
+
+### Fast Repeated Execution
+
+The current wrapper is designed for repeated experiments:
+
+- Docker images are reused instead of rebuilt each run
+- runtime `.st` programs are mounted from `artifacts/runtime/`
+- controller/simulator persistent state is cleared between runs
+- a host-side Modbus bridge is started once the PLCs are ready
+- scenario artifacts are written per run under `artifacts/`
+
+This makes it practical to execute multiple lightweight readiness checks before
+future attacker/defender/observer agents are added.
+
 ## Troubleshooting
 
 ### Docker CLI version error
@@ -188,6 +310,13 @@ source .venv/bin/activate
 - Verify ports 502/503 are exposed correctly
 - Ensure PLC is in RUN mode (check logs for "Initializing OpenPLC in RUN mode")
 - Test with: `docker exec openplc-controller /workdir/.venv/bin/python3 -c "from pymodbus.client.sync import ModbusTcpClient; c=ModbusTcpClient('10.100.0.20',502); print(c.connect())"`
+
+### Experimental scenario doesn't behave as expected
+- First validate the supported interface with:
+  `python3 scripts/openplc_testbed.py readiness-suite`
+- Prefer the four supported readiness scenarios for future agent integration
+- Treat sensor-forcing and non-default initial-condition scenarios as
+  experimental until the external Modbus-plane behavior is tightened further
 
 ### OpenPLC compilation fails
 - Check container logs for compilation errors

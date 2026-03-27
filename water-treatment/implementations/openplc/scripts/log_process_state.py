@@ -250,9 +250,9 @@ def summarize(rows: list[dict[str, object]]) -> list[str]:
 def main() -> int:
     parser = argparse.ArgumentParser(description="Log live water-treatment process state")
     parser.add_argument("--controller-host", default="localhost")
-    parser.add_argument("--controller-port", type=int, default=502)
+    parser.add_argument("--controller-port", type=int, default=1502)
     parser.add_argument("--simulator-host", default="localhost")
-    parser.add_argument("--simulator-port", type=int, default=503)
+    parser.add_argument("--simulator-port", type=int, default=1503)
     parser.add_argument("--duration", type=float, default=20.0, help="Capture duration in seconds")
     parser.add_argument("--interval", type=float, default=1.0, help="Polling interval in seconds")
     parser.add_argument("--start-process", action="store_true", help="Pulse the controller start button before sampling")

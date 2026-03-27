@@ -2,6 +2,7 @@ TYPE
   HMI_UDT : STRUCT
     Start_PB : BOOL;
     Stop_PB : BOOL;
+    Reset_PB : BOOL;
     Start_Active : BOOL;
     Stop_Active : BOOL;
   END_STRUCT;
@@ -73,6 +74,7 @@ PROGRAM MainProgram
     HMI : HMI_UDT;
     Alarms : RW_tank_AL_UDT;
     GSV_Message : SYS_MESSAGES;
+    Init_Done : BOOL := FALSE;
     P1 : P1_UDT;
     P1_SYS : System_State_UDT;
     P2 : P2_UDT;
@@ -97,6 +99,12 @@ PROGRAM MainProgram
     hmi_0_1 : BOOL;  (* HMI_Stop_PB  - written by external client *)
     hmi_0_2 : BOOL;  (* HMI_Start_Active - written by controller *)
     hmi_0_3 : BOOL;  (* HMI_Stop_Active  - written by controller *)
+    hmi_0_4 : BOOL;  (* HMI_Reset_PB - written by external client *)
+    (* Process selection/manual P2 control coils %QX1.0-1.3 *)
+    p2_1_0 : BOOL;  (* P2_Selected - written by external client *)
+    p2_1_1 : BOOL;  (* P2_NaCl_Cmd - written by external client *)
+    p2_1_2 : BOOL;  (* P2_NaOCl_Cmd - written by external client *)
+    p2_1_3 : BOOL;  (* P2_HCl_Cmd - written by external client *)
     (* System state coils %QX7.0-7.4 *)
     sys_7_0 : BOOL;  (* SYS_IDLE *)
     sys_7_1 : BOOL;  (* SYS_START *)
@@ -129,10 +137,38 @@ PROGRAM MainProgram
     bridge_uf_bwp_sts : INT;     (* %QW331 - UF BWP valve status *)
   END_VAR
 
+  IF NOT Init_Done THEN
+    HMI.Start_Active := FALSE;
+    HMI.Stop_Active := FALSE;
+    P1_SYS.IDLE := TRUE;
+    P1_SYS.START := FALSE;
+    P1_SYS.RUNNING := FALSE;
+    P1_SYS.SHUTDOWN := FALSE;
+    P1_SYS.Permissives_Ready := FALSE;
+    P1.RW_Pump := 0.0;
+    P1.RW_Tank_PR_Valve := FALSE;
+    P1.RW_Tank_P_Valve := FALSE;
+    P1.RW_Pump_start := FALSE;
+    P1.RW_Pump_stop := TRUE;
+    P1.RW_Tank_P6B_Valve := FALSE;
+    P2.ChemTreat_NaCl_Tank_Valve := FALSE;
+    P2.ChemTreat_NaOCl_Tank_Valve := FALSE;
+    P2.ChemTreat_HCl_Tank_Valve := FALSE;
+    P3.Ultrafiltration_UFFT_Tank_Valve := FALSE;
+    P3.Ultrafiltration_UF_Drain_Valve := FALSE;
+    P3.Ultrafiltration_UF_ROFT_Valve := FALSE;
+    P3.Ultrafiltration_UF_BWP_Valve := FALSE;
+    Init_Done := TRUE;
+  END_IF;
+
   (* ===== HMI button latch ===== *)
   HMI.Start_PB := hmi_0_0;
   HMI.Stop_PB := hmi_0_1;
-  IF HMI.Start_PB THEN
+  HMI.Reset_PB := hmi_0_4;
+  IF HMI.Reset_PB THEN
+    HMI.Start_Active := FALSE;
+    HMI.Stop_Active := FALSE;
+  ELSIF HMI.Start_PB THEN
     HMI.Start_Active := TRUE;
     HMI.Stop_Active := FALSE;
   ELSIF HMI.Stop_PB THEN
@@ -173,7 +209,18 @@ PROGRAM MainProgram
   P1_SYS.Permissives_Ready := P1_SYS.Permissives[0] AND P1_SYS.Permissives[1];
 
   (* ===== State_change ===== *)
-  IF NOT HMI.Start_Active AND NOT HMI.Stop_Active THEN
+  IF HMI.Reset_PB THEN
+    P1_SYS.IDLE := TRUE;
+    P1_SYS.START := FALSE;
+    P1_SYS.RUNNING := FALSE;
+    P1_SYS.SHUTDOWN := FALSE;
+    P1_SYS.Permissives_Ready := FALSE;
+    P1.RW_Pump := 0.0;
+    P1.RW_Tank_PR_Valve := FALSE;
+    P1.RW_Tank_P_Valve := FALSE;
+    P1.RW_Pump_start := FALSE;
+    P1.RW_Pump_stop := TRUE;
+  ELSIF NOT HMI.Start_Active AND NOT HMI.Stop_Active THEN
     P1_SYS.IDLE := TRUE;
     P1_SYS.START := FALSE;
     P1_SYS.RUNNING := FALSE;
@@ -234,6 +281,17 @@ PROGRAM MainProgram
     END_IF;
   END_IF;
 
+  (* ===== Manual Process 2 control ===== *)
+  IF P1_SYS.RUNNING AND p2_1_0 THEN
+    P2.ChemTreat_NaCl_Tank_Valve := p2_1_1;
+    P2.ChemTreat_NaOCl_Tank_Valve := p2_1_2;
+    P2.ChemTreat_HCl_Tank_Valve := p2_1_3;
+  ELSE
+    P2.ChemTreat_NaCl_Tank_Valve := FALSE;
+    P2.ChemTreat_NaOCl_Tank_Valve := FALSE;
+    P2.ChemTreat_HCl_Tank_Valve := FALSE;
+  END_IF;
+
   (* ===== Wire outputs to coils/registers ===== *)
   do_5_0 := P1.RW_Tank_PR_Valve;
   do_5_1 := P1.RW_Tank_P6B_Valve;
@@ -280,11 +338,17 @@ CONFIGURATION Config0
     do_5_7 AT %QX5.7 : BOOL;
     do_5_8 AT %QX5.8 : BOOL;
     do_5_9 AT %QX5.9 : BOOL;
-    (* HMI coils %QX0.0-0.3 *)
+    (* HMI coils %QX0.0-0.4 *)
     hmi_0_0 AT %QX0.0 : BOOL;
     hmi_0_1 AT %QX0.1 : BOOL;
     hmi_0_2 AT %QX0.2 : BOOL;
     hmi_0_3 AT %QX0.3 : BOOL;
+    hmi_0_4 AT %QX0.4 : BOOL;
+    (* Process selection/manual P2 control coils %QX1.0-1.3 *)
+    p2_1_0 AT %QX1.0 : BOOL;
+    p2_1_1 AT %QX1.1 : BOOL;
+    p2_1_2 AT %QX1.2 : BOOL;
+    p2_1_3 AT %QX1.3 : BOOL;
     (* System state coils %QX7.0-7.4 *)
     sys_7_0 AT %QX7.0 : BOOL;
     sys_7_1 AT %QX7.1 : BOOL;

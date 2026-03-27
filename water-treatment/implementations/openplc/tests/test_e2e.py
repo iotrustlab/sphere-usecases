@@ -48,9 +48,9 @@ def write_coil(client, address, value):
 def pytest_addoption(parser):
     """Add command line options for test configuration"""
     parser.addoption("--controller-host", default="localhost", help="Controller PLC host")
-    parser.addoption("--controller-port", type=int, default=502, help="Controller Modbus port")
+    parser.addoption("--controller-port", type=int, default=1502, help="Controller Modbus port")
     parser.addoption("--simulator-host", default="localhost", help="Simulator PLC host")
-    parser.addoption("--simulator-port", type=int, default=503, help="Simulator Modbus port")
+    parser.addoption("--simulator-port", type=int, default=1503, help="Simulator Modbus port")
 
 
 @pytest.fixture(scope="module")

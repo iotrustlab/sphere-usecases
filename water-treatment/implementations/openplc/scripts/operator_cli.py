@@ -210,9 +210,9 @@ class OperatorInterface:
 def main():
     parser = argparse.ArgumentParser(description="Water Treatment Operator Interface")
     parser.add_argument("--controller", default="localhost", help="Controller PLC host")
-    parser.add_argument("--controller-port", type=int, default=502, help="Controller Modbus port")
+    parser.add_argument("--controller-port", type=int, default=1502, help="Controller Modbus port")
     parser.add_argument("--simulator", default="localhost", help="Simulator PLC host")
-    parser.add_argument("--simulator-port", type=int, default=503, help="Simulator Modbus port")
+    parser.add_argument("--simulator-port", type=int, default=1503, help="Simulator Modbus port")
     args = parser.parse_args()
 
     op = OperatorInterface(

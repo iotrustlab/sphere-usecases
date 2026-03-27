@@ -1,7 +1,7 @@
-scenario_id: "wt-uc1-nominal-startup"
+scenario_id: "wt-uc1-long-nominal-run"
 process_id: "WT-P1"
-description: "Clean startup, run 60s, clean shutdown"
-duration_sec: 90
+description: "Longer start-run-stop cycle to verify stable telemetry over time"
+duration_sec: 110
 poll_interval_ms: 500
 
 initial_conditions:
@@ -13,7 +13,7 @@ initial_conditions:
 
 timeline:
   - { time_sec: 5, action: hmi_start }
-  - { time_sec: 70, action: hmi_stop }
+  - { time_sec: 90, action: hmi_stop }
 
 expectations:
   final_state: SHUTDOWN
@@ -24,7 +24,7 @@ expectations:
   events_lead_to_state:
     hmi_start: RUNNING
     hmi_stop: SHUTDOWN
-  min_samples: 120
+  min_samples: 170
   final_equals:
     RW_Pump_Sts: 0
     RW_Pump_Flow: 0

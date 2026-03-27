@@ -148,6 +148,15 @@ class ModbusBridge:
         # 1. Controller coils 40-51 → simulator HR 200-211  (valve/pump commands)
         coils = self._read_coils(self.ctrl, 40, 12)
         if coils is not None:
+            # Manual Process 2 actions are issued through a small external
+            # control plane on controller coils 8-11. When selected, they
+            # override the dosing valve commands before the bridge writes the
+            # effective command vector into the simulator.
+            p2_controls = self._read_coils(self.ctrl, 8, 4)
+            if p2_controls is not None and p2_controls[0]:
+                coils[5] = p2_controls[1]
+                coils[6] = p2_controls[2]
+                coils[7] = p2_controls[3]
             if not self._write_hr(self.sim, 200, coils):
                 ok = False
                 self.last_error_stage = "write_sim_200"
