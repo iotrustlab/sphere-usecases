@@ -1,0 +1,87 @@
+# Harvey-inspired overspeed attack scenario for PS-1
+# Two-way manipulation:
+# 1) malicious breaker/gate command behavior
+# 2) spoofed speed/frequency/power telemetry
+
+scenario_id: "ps-hydro-harvey-overspeed"
+description: "Harvey-style overspeed induction with simultaneous sensor spoofing"
+duration_sec: 150
+poll_interval_ms: 500
+
+initial_conditions:
+  HY_Res_Level: 20.0
+  HY_Head: 120.0
+  HY_Gate_Pos: 0.0
+  HY_Breaker_Sts: false
+  HY_Power_MW: 0.0
+  HY_Speed_Pct: 0.0
+  HY_Freq_Hz: 0.0
+  HY_Run_Enable: true
+
+timeline:
+  - time_sec: 3
+    action: set_tag
+    tag: HY_Power_Setpoint_MW
+    value: 40.0
+    comment: "Establish nominal dispatch target"
+
+  - time_sec: 5
+    action: start_cmd
+    comment: "Normal startup to running state"
+
+  - time_sec: 45
+    action: attack_start
+    attack_id: harvey_overspeed
+    comment: "Begin coordinated command override + sensor spoof"
+
+  - time_sec: 110
+    action: attack_stop
+    attack_id: harvey_overspeed
+    comment: "Return control path to nominal"
+
+  - time_sec: 120
+    action: stop_cmd
+    comment: "Normal shutdown"
+
+attack:
+  id: harvey_overspeed
+  model: two_way_manipulation
+  command_overrides:
+    - tag: HY_Breaker_Cmd
+      mode: force
+      value: false
+      window_sec: [45, 110]
+      rationale: "Unload turbine while unit is running"
+    - tag: HY_Gate_Cmd
+      mode: clamp_min
+      value: 60.0
+      window_sec: [45, 110]
+      rationale: "Sustain mechanical input during breaker-open condition"
+
+  sensor_spoof:
+    - tag: HY_Speed_Pct
+      mode: hold
+      value: 100.0
+      window_sec: [45, 110]
+    - tag: HY_Freq_Hz
+      mode: hold
+      value: 60.0
+      window_sec: [45, 110]
+    - tag: HY_Power_MW
+      mode: hold
+      value: 40.0
+      window_sec: [45, 110]
+
+expected_state:
+  at_time_35:
+    HY_State_Running: true
+    HY_Breaker_Sts: true
+
+  at_time_70:
+    HY_State_Running: true
+
+  at_end:
+    HY_State_Idle: true
+    HY_Breaker_Sts: false
+
+reference_bundle: null
