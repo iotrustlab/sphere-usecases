@@ -1,0 +1,59 @@
+api_version: sphere.mergetb.io/v1
+kind: SliceDefinition
+metadata:
+  slice_id: grfics-te-full-slice-01
+  usecase_id: grfics-tennessee-eastman
+  version: "1.0.0"
+  description: >
+    GRFICSv3 Tennessee Eastman process visualization slice covering all
+    control valves, tank measurements, and composition analyzer. Shows
+    the complete reactor system for security research and demo.
+
+active_groups:
+  - feed
+  - purge
+  - product
+  - tank
+  - analyzer
+
+diagram:
+  asset: "grfics-te.svg"
+
+overlay_tags:
+  # Feed stream controls
+  - TE_Feed1_Valve_Pos
+  - TE_Feed1_Valve_SP
+  - TE_Feed1_Flow
+  - TE_Feed2_Valve_Pos
+  - TE_Feed2_Valve_SP
+  - TE_Feed2_Flow
+  # Purge stream controls
+  - TE_Purge_Valve_Pos
+  - TE_Purge_Valve_SP
+  - TE_Purge_Flow
+  # Product stream controls
+  - TE_Product_Valve_Pos
+  - TE_Product_Valve_SP
+  - TE_Product_Flow
+  # Tank measurements
+  - TE_Tank_Pressure
+  - TE_Tank_Level
+  # Analyzer
+  - TE_Purge_CompA
+  - TE_Purge_CompB
+  - TE_Purge_CompC
+
+trend_tags:
+  # Primary process variables for trending
+  - TE_Tank_Pressure
+  - TE_Tank_Level
+  - TE_Feed1_Flow
+  - TE_Purge_Flow
+  - TE_Product_Flow
+  - TE_Purge_CompA
+
+notes: >
+  Full Tennessee Eastman slice for GRFICSv3 integration. Includes all 4 valve
+  controls (feed1, feed2, purge, product), tank P&L, and analyzer. Trend tags
+  focus on key process variables that indicate reactor health and stability.
+  Diagram asset is a placeholder pending SVG creation.

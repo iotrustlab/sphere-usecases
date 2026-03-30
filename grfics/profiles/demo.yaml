@@ -1,0 +1,114 @@
+# Demo simulation profile for GRFICSv3 Tennessee Eastman Process
+#
+# Based on the C++ simulation parameters from TE_process.cc:
+#   - tauvlv = 2.77e-3 hours ≈ 10 seconds (valve time constant)
+#   - VT = 122.0 m³ (total vessel volume)
+#   - VLmax = 30.0 m³ (max liquid volume)
+#   - Tgas = 373 K (reactor temperature)
+#   - Rgas = 8.314 kJ/kmol·K
+#
+# This profile captures the actual GRFICSv3 physics for validation.
+
+api_version: sphere.mergetb.io/v1
+kind: SimProfile
+metadata:
+  name: grfics-te-demo
+  version: "1.0.0"
+  description: >
+    GRFICSv3 Tennessee Eastman process timing profile based on actual
+    simulation parameters from TE_process.cc.
+  basis: "GRFICSv3 simulation_vm/simulation/TE_process.cc"
+
+timing:
+  dt_sec: 0.1             # Simulation timestep (matches GRFICSv3)
+  poll_interval_ms: 500   # Tag polling interval
+
+actuators:
+  # Valve dynamics from TE_process.cc
+  # tauvlv = 2.77e-3 hours = 9.972 seconds ≈ 10s
+  control_valve:
+    tau_sec: 10.0
+    description: "First-order valve response, tau = 10s"
+
+  # All 4 valves use the same dynamics
+  overrides:
+    TE_Feed1_Valve:
+      type: control_valve
+    TE_Feed2_Valve:
+      type: control_valve
+    TE_Purge_Valve:
+      type: control_valve
+    TE_Product_Valve:
+      type: control_valve
+
+sensors:
+  # Pressure sensor (assumed fast)
+  pressure:
+    tau_sec: 0.5
+    noise_sigma: 5.0      # kPa
+
+  # Level sensor (assumed fast)
+  level:
+    tau_sec: 0.5
+    noise_sigma: 0.5      # %
+
+  # Analyzer (has sampling delay in real process)
+  # GRFICSv3: sampling_delay = 0.1 hours = 6 minutes
+  # For demo, we treat it as fast
+  analyzer:
+    tau_sec: 1.0
+    noise_sigma: 0.01     # mole fraction
+
+alarms:
+  # Tank pressure alarm thresholds
+  TE_Tank:
+    span_kPa: 3200
+    ll_pct: 56            # 1800 kPa
+    l_pct: 69             # 2200 kPa
+    h_pct: 94             # 3000 kPa
+    hh_pct: 100           # 3200 kPa
+
+physics:
+  # Reactor vessel parameters from TE_process.cc
+  reactor:
+    total_volume_m3: 122.0
+    max_liquid_m3: 30.0
+    temperature_K: 373.0
+    gas_constant: 8.314   # kJ/kmol·K
+
+  # Flow coefficients from TE_process.cc: cv[4] = {6.4046, 0.4246, 0.352, 0.0417}
+  flow_coefficients:
+    feed1_cv: 6.4046      # kmol/h per % valve
+    feed2_cv: 0.4246      # kmol/h per % valve
+    purge_cv: 0.352       # kmol/h per % valve per sqrt(kPa)
+    product_cv: 0.0417    # kmol/h per % valve per sqrt(kPa)
+
+  # Feed composition from TE_process.cc
+  feed1_composition:
+    ya1: 0.485            # Mole fraction A
+    yb1: 0.005            # Mole fraction B
+    yc1: 0.510            # Mole fraction C (1 - ya1 - yb1)
+
+  # Reaction kinetics from TE_process.cc
+  reaction:
+    kpar: 0.00117         # Pre-exponential rate constant
+    ncpar: 0.4            # Power on Pc in rate equation
+    # Rate = kpar * Pa^1.2 * Pc^0.4
+
+  # Liquid density
+  liquid_density_kmol_m3: 8.3
+
+  # Initial conditions (nominal operating point)
+  initial:
+    pressure_kPa: 2700
+    product_flow_kmol_h: 100
+    A_in_purge: 0.47
+    molar_D_kmol: 110     # Liquid product inventory
+
+notes: >
+  This profile captures the actual GRFICSv3 Tennessee Eastman simulation
+  physics. Key characteristics:
+  - Pressure responds to gas inventory via ideal gas law
+  - Flow is proportional to valve position (feed) or valve*sqrt(P-100) (outlet)
+  - Reaction A + C → D consumes gas and produces liquid
+  - Nominal operating point: ~2700 kPa, ~43% level, ~100 kmol/h product

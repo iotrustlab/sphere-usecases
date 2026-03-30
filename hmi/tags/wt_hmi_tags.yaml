@@ -1,0 +1,214 @@
+# FUXA HMI Tag Mapping: Water Treatment UC1
+#
+# Maps HMI controls and displays to Modbus addresses on the Controller PLC.
+# Connect FUXA to 10.100.0.10:502 (Modbus TCP)
+#
+# Reference: ../water-treatment/implementations/openplc/configs/modbus_map.yaml
+
+api_version: sphere.mergetb.io/v1
+kind: HMITagMapping
+metadata:
+  usecase: water-treatment
+  usecase_code: wt
+  controller_address: "10.100.0.10:502"
+
+# ─── HMI Controls (Write) ───────────────────────────────────────────────────
+controls:
+  Start_PB:
+    modbus_type: coil
+    address: 0              # %QX0.0
+    label: "Start"
+    description: "Start pushbutton - momentary pulse to initiate startup sequence"
+    widget: button
+    color: green
+
+  Stop_PB:
+    modbus_type: coil
+    address: 1              # %QX0.1
+    label: "Stop"
+    description: "Stop pushbutton - initiates controlled shutdown"
+    widget: button
+    color: red
+
+  Pump_Speed:
+    modbus_type: holding_register
+    address: 100            # %QW100
+    label: "Pump Speed"
+    description: "Raw water pump VFD speed setpoint"
+    widget: slider
+    units: "%"
+    range: [0, 100]
+    default: 50
+
+# ─── System State (Read-Only) ───────────────────────────────────────────────
+state:
+  IDLE:
+    modbus_type: coil
+    address: 56             # %QX7.0
+    label: "IDLE"
+    description: "System in idle state, ready to start"
+    widget: indicator
+    color_on: gray
+    color_off: dark_gray
+
+  START:
+    modbus_type: coil
+    address: 57             # %QX7.1
+    label: "STARTUP"
+    description: "System starting up"
+    widget: indicator
+    color_on: yellow
+    color_off: dark_gray
+
+  RUNNING:
+    modbus_type: coil
+    address: 58             # %QX7.2
+    label: "RUNNING"
+    description: "System running normally"
+    widget: indicator
+    color_on: green
+    color_off: dark_gray
+
+  SHUTDOWN:
+    modbus_type: coil
+    address: 59             # %QX7.3
+    label: "SHUTDOWN"
+    description: "System shutting down"
+    widget: indicator
+    color_on: orange
+    color_off: dark_gray
+
+  Permissives_Ready:
+    modbus_type: coil
+    address: 60             # %QX7.4
+    label: "READY"
+    description: "All permissives satisfied"
+    widget: indicator
+    color_on: green
+    color_off: red
+
+# ─── Sensors (Read-Only) ────────────────────────────────────────────────────
+sensors:
+  RW_Tank_Level:
+    modbus_type: holding_register
+    address: 300            # Bridge HR (from simulator)
+    label: "RW Tank Level"
+    description: "Raw water tank level"
+    widget: gauge
+    units: "mm"
+    range: [0, 1500]
+    alarm_hh: 1200
+    alarm_h: 1000
+    alarm_l: 400
+    alarm_ll: 200
+
+  RW_Pump_Flow:
+    modbus_type: holding_register
+    address: 301            # Bridge HR (from simulator)
+    label: "RW Pump Flow"
+    description: "Raw water pump discharge flow"
+    widget: gauge
+    units: "L/min"
+    range: [0, 200]
+
+  NaCl_Level:
+    modbus_type: holding_register
+    address: 302            # Bridge HR
+    label: "NaCl Level"
+    description: "Sodium chloride tank level"
+    widget: gauge
+    units: "mm"
+    range: [0, 1000]
+
+  NaOCl_Level:
+    modbus_type: holding_register
+    address: 303            # Bridge HR
+    label: "NaOCl Level"
+    description: "Sodium hypochlorite tank level"
+    widget: gauge
+    units: "mm"
+    range: [0, 1000]
+
+  HCl_Level:
+    modbus_type: holding_register
+    address: 304            # Bridge HR
+    label: "HCl Level"
+    description: "Hydrochloric acid tank level"
+    widget: gauge
+    units: "mm"
+    range: [0, 1000]
+
+  UF_Tank_Level:
+    modbus_type: holding_register
+    address: 305            # Bridge HR
+    label: "UF Tank Level"
+    description: "Ultrafiltration feed tank level"
+    widget: gauge
+    units: "mm"
+    range: [0, 1500]
+
+# ─── Alarms (Read-Only) ─────────────────────────────────────────────────────
+alarms:
+  RW_Tank_LL:
+    modbus_type: coil
+    address: 64             # %QX8.0
+    label: "RW Tank Low-Low"
+    description: "Raw water tank critically low"
+    severity: critical
+    color: red
+
+  RW_Tank_L:
+    modbus_type: coil
+    address: 65             # %QX8.1
+    label: "RW Tank Low"
+    description: "Raw water tank low"
+    severity: warning
+    color: yellow
+
+  RW_Tank_H:
+    modbus_type: coil
+    address: 66             # %QX8.2
+    label: "RW Tank High"
+    description: "Raw water tank high"
+    severity: warning
+    color: yellow
+
+  RW_Tank_HH:
+    modbus_type: coil
+    address: 67             # %QX8.3
+    label: "RW Tank High-High"
+    description: "Raw water tank critically high"
+    severity: critical
+    color: red
+
+# ─── Valve Status (Read-Only) ───────────────────────────────────────────────
+valve_status:
+  PR_Valve:
+    modbus_type: holding_register
+    address: 320            # Bridge HR
+    label: "PR Valve"
+    description: "Pressure relief valve status"
+
+  P6B_Valve:
+    modbus_type: holding_register
+    address: 321
+    label: "P6B Valve"
+    description: "P6B valve status"
+
+  P_Valve:
+    modbus_type: holding_register
+    address: 322
+    label: "Process Valve"
+    description: "Process valve status"
+
+  Pump_Running:
+    modbus_type: holding_register
+    address: 323
+    label: "Pump Running"
+    description: "Raw water pump running status"
+
+  Pump_Fault:
+    modbus_type: holding_register
+    address: 324
+    label: "Pump Fault"
+    description: "Raw water pump fault"

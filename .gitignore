@@ -88,3 +88,9 @@ site/
 *.bak
 *.backup
 *.old
+old/
+
+# Generated evidence bundles (source-only policy - regenerate on demand)
+*/runs/*-harvey-*/
+*/runs/*-attack-*/
+*/runs/validate-*-live/
