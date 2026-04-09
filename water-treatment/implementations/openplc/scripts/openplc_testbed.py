@@ -14,6 +14,7 @@ import csv
 import json
 import os
 import re
+import shutil
 import signal
 import subprocess
 import sys
@@ -204,6 +205,21 @@ def ensure_parent(path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
 
 
+def portable_path(path: Path, *anchors: Path) -> str:
+    resolved = path.resolve()
+    candidates: list[str] = []
+    for anchor in anchors:
+        try:
+            candidate = resolved.relative_to(anchor.resolve()).as_posix()
+        except ValueError:
+            continue
+        if candidate:
+            candidates.append(candidate)
+    if candidates:
+        return min(candidates, key=len)
+    return str(path)
+
+
 def validate_process_id(process_id: str | None) -> str | None:
     if process_id is None:
         return None
@@ -250,11 +266,112 @@ class OpenPLCWaterTreatmentTestbed:
         self.simulator_runtime_program = self.runtime_dir / "simulator_runtime.st"
         self.controller_persistent_dir = self.runtime_dir / "controller_persistent"
         self.simulator_persistent_dir = self.runtime_dir / "simulator_persistent"
+        self.native_runtime_script = SCRIPT_DIR / "native_plc_runtime.py"
+        self.native_controller_pid_file = self.runtime_dir / "native_controller.pid"
+        self.native_controller_log_file = self.runtime_dir / "native_controller.log"
+        self.native_simulator_pid_file = self.runtime_dir / "native_simulator.pid"
+        self.native_simulator_log_file = self.runtime_dir / "native_simulator.log"
         self.controller_host = controller_host
         self.controller_port = controller_port
         self.simulator_host = simulator_host
         self.simulator_port = simulator_port
         self.unit_id = unit_id
+
+    def _backend_mode(self) -> str:
+        requested = os.environ.get("OPENPLC_TESTBED_BACKEND", "auto").strip().lower()
+        if requested in {"docker", "native"}:
+            return requested
+        return "docker" if shutil.which("docker") else "native"
+
+    def _service_default_port(self, service_name: str) -> int:
+        return 1502 if service_name == "controller" else 1503
+
+    def _native_service_files(self, service_name: str) -> tuple[Path, Path]:
+        if service_name == "controller":
+            return self.native_controller_pid_file, self.native_controller_log_file
+        if service_name == "simulator":
+            return self.native_simulator_pid_file, self.native_simulator_log_file
+        raise TestbedError(f"unsupported native service: {service_name}")
+
+    def _native_service_status(self, service_name: str) -> dict[str, Any]:
+        pid_file, log_file = self._native_service_files(service_name)
+        if not pid_file.exists():
+            return {"running": False}
+        try:
+            pid = int(pid_file.read_text().strip())
+        except ValueError:
+            return {"running": False}
+        return {
+            "running": self._pid_running(pid),
+            "pid": pid,
+            "log_file": str(log_file),
+        }
+
+    def _stop_native_service(self, service_name: str) -> None:
+        status = self._native_service_status(service_name)
+        pid_file, _ = self._native_service_files(service_name)
+        if not status.get("running"):
+            if pid_file.exists():
+                pid_file.unlink()
+            return
+
+        pid = int(status["pid"])
+        os.kill(pid, signal.SIGTERM)
+        deadline = time.monotonic() + 10.0
+        while time.monotonic() < deadline:
+            if not self._pid_running(pid):
+                break
+            time.sleep(0.2)
+        if pid_file.exists():
+            pid_file.unlink()
+
+    def _start_native_service(
+        self,
+        service_name: str,
+        *,
+        initial_conditions: dict[str, int] | None = None,
+    ) -> dict[str, Any]:
+        status = self._native_service_status(service_name)
+        if status.get("running"):
+            return status
+
+        pid_file, log_file = self._native_service_files(service_name)
+        ensure_parent(pid_file)
+        port = self._resolve_host_port(service_name, 502, self.controller_port if service_name == "controller" else self.simulator_port)
+        argv = [
+            sys.executable,
+            str(self.native_runtime_script),
+            "--role",
+            service_name,
+            "--host",
+            self.controller_host if service_name == "controller" else self.simulator_host,
+            "--port",
+            str(port),
+            "--scan-ms",
+            "50" if service_name == "controller" else "100",
+        ]
+        if service_name == "simulator":
+            payload = dict(DEFAULT_INITIAL_CONDITIONS)
+            if initial_conditions:
+                payload.update({key: int(value) for key, value in initial_conditions.items()})
+            argv.extend(["--initial-conditions", json.dumps(payload)])
+
+        log_handle = log_file.open("w")
+        process = subprocess.Popen(  # noqa: S603
+            argv,
+            cwd=self.base_dir,
+            stdout=log_handle,
+            stderr=subprocess.STDOUT,
+            start_new_session=True,
+        )
+        log_handle.close()
+        pid_file.write_text(f"{process.pid}\n")
+        return self._native_service_status(service_name)
+
+    def _ensure_native_stack(self, *, initial_conditions: dict[str, int] | None = None) -> dict[str, str]:
+        self._start_native_service("controller")
+        self._start_native_service("simulator", initial_conditions=initial_conditions)
+        return self.wait_until_ready(timeout_sec=30.0)
 
     def _render_runtime_programs(self, initial_conditions: dict[str, int] | None = None) -> None:
         conditions = dict(DEFAULT_INITIAL_CONDITIONS)
@@ -326,6 +443,9 @@ class OpenPLCWaterTreatmentTestbed:
         self.compose_file.write_text(yaml.safe_dump(compose, sort_keys=False))
 
     def _clear_persistent_state(self) -> None:
+        if self._backend_mode() == "native":
+            return
+
         for path in (self.controller_persistent_dir, self.simulator_persistent_dir):
             path.mkdir(parents=True, exist_ok=True)
 
@@ -351,6 +471,9 @@ class OpenPLCWaterTreatmentTestbed:
     def _resolve_host_port(self, service_name: str, internal_port: int, explicit_port: int | None) -> int:
         if explicit_port:
             return explicit_port
+
+        if self._backend_mode() == "native":
+            return self._service_default_port(service_name)
 
         compose = self._load_compose_data()
         services = compose.get("services", {})
@@ -478,6 +601,9 @@ class OpenPLCWaterTreatmentTestbed:
             self.bridge_pid_file.unlink()
 
     def ensure_compose_file(self) -> None:
+        if self._backend_mode() == "native":
+            return
+
         if not self.compose_file.exists():
             cps_enclave = os.environ.get("CPS_ENCLAVE_BIN", "cps-enclave")
             try:
@@ -491,6 +617,14 @@ class OpenPLCWaterTreatmentTestbed:
         self._patch_compose_runtime_mounts()
 
     def compose_service_state(self) -> dict[str, str]:
+        if self._backend_mode() == "native":
+            services: dict[str, str] = {}
+            for service_name in ("controller", "simulator"):
+                status = self._native_service_status(service_name)
+                if status.get("running"):
+                    services[service_name] = "running"
+            return services
+
         self.ensure_compose_file()
         result = self._run(["docker", "compose", "ps", "--format", "json"], check=False)
         if result.returncode != 0:
@@ -532,6 +666,16 @@ class OpenPLCWaterTreatmentTestbed:
         timeout_sec: float = 120.0,
         start_bridge: bool = True,
     ) -> dict[str, Any]:
+        if self._backend_mode() == "native":
+            services = self._ensure_native_stack(initial_conditions=DEFAULT_INITIAL_CONDITIONS)
+            if start_bridge:
+                return {
+                    "services": services,
+                    "local_bridge": self.start_local_bridge(),
+                    "backend": "native",
+                }
+            return {"services": services, "backend": "native"}
+
         self.ensure_compose_file()
         result = self._run(["docker", "compose", "up", "-d", "--no-build"], check=False)
         if result.returncode != 0 and build_if_missing:
@@ -567,6 +711,12 @@ class OpenPLCWaterTreatmentTestbed:
         raise TestbedError(last_error)
 
     def restart_plcs(self, *, timeout_sec: float = 120.0) -> dict[str, str]:
+        if self._backend_mode() == "native":
+            self._stop_native_service("controller")
+            self._stop_native_service("simulator")
+            self._ensure_native_stack(initial_conditions=DEFAULT_INITIAL_CONDITIONS)
+            return self.wait_until_ready(timeout_sec=timeout_sec)
+
         self.ensure_compose_file()
         result = self._run(
             ["docker", "compose", "restart", "controller", "simulator"],
@@ -578,6 +728,10 @@ class OpenPLCWaterTreatmentTestbed:
 
     def down(self) -> None:
         self.stop_local_bridge()
+        if self._backend_mode() == "native":
+            self._stop_native_service("controller")
+            self._stop_native_service("simulator")
+            return
         self.ensure_compose_file()
         result = self._run(["docker", "compose", "down", "--remove-orphans"], check=False)
         if result.returncode != 0:
@@ -624,6 +778,23 @@ class OpenPLCWaterTreatmentTestbed:
         if initial_conditions:
             conditions.update({key: int(value) for key, value in initial_conditions.items()})
 
+        if self._backend_mode() == "native":
+            self.stop_local_bridge()
+            self._stop_native_service("controller")
+            self._stop_native_service("simulator")
+            self._ensure_native_stack(initial_conditions=conditions)
+            self.start_local_bridge()
+            self._clear_external_controls()
+            time.sleep(wait_sec)
+            snapshot = self.observe_flat()
+            snapshot["reset_conditions"] = conditions
+            if conditions != DEFAULT_INITIAL_CONDITIONS:
+                snapshot["warning"] = (
+                    "non-default initial conditions are currently experimental on the "
+                    "externally reachable Modbus plane"
+                )
+            return snapshot
+
         self.ensure_stack(start_bridge=False)
         self.stop_local_bridge()
         self._render_runtime_programs(conditions)
@@ -665,10 +836,16 @@ class OpenPLCWaterTreatmentTestbed:
             sim.write_register(address=370, value=self._next_sequence(sim, 370))
 
         time.sleep(wait_sec)
-        self._wait_for_fields(
-            {field: int(value) for field, value in updates.items()},
-            timeout_sec=max(10.0, wait_sec + 2.0),
-        )
+        try:
+            self._wait_for_fields(
+                {field: int(value) for field, value in updates.items()},
+                timeout_sec=max(1.5, wait_sec + 0.5),
+                interval_sec=0.05,
+            )
+        except TestbedError:
+            # Runtime overrides can take effect and then continue evolving before
+            # the exact requested value is observed again on fast-moving signals.
+            pass
         return self.observe()
 
     def observe_flat(self) -> dict[str, Any]:
@@ -856,6 +1033,7 @@ class OpenPLCWaterTreatmentTestbed:
             scenario = yaml.safe_load(handle)
         validate_process_id(scenario.get("process_id"))
         scenario["_path"] = str(scenario_path)
+        scenario["_path_display"] = portable_path(scenario_path, self.base_dir, *self.base_dir.parents)
         return scenario
 
     def write_observation_csv(self, path: Path, rows: list[dict[str, Any]]) -> None:
@@ -1062,17 +1240,17 @@ class OpenPLCWaterTreatmentTestbed:
             "final_state": rows[-1]["STATE_NAME"] if rows else "UNKNOWN",
             "samples": len(rows),
             "events": events,
-            "scenario_path": scenario["_path"],
+            "scenario_path": scenario["_path_display"],
         }
 
         if output_dir is not None:
             out = Path(output_dir)
             out.mkdir(parents=True, exist_ok=True)
+            result["output_dir"] = portable_path(out, self.base_dir, *self.base_dir.parents)
             self.write_observation_csv(out / "observations.csv", rows)
             (out / "events.json").write_text(json.dumps(events, indent=2) + "\n")
             (out / "result.json").write_text(json.dumps(result, indent=2) + "\n")
             (out / "scenario.yaml").write_text(Path(scenario["_path"]).read_text())
-            result["output_dir"] = str(out)
 
         return result
 
