@@ -25,6 +25,10 @@ export PATH="/Applications/Docker.app/Contents/Resources/bin:$PATH"
 ### Option 1: Ansible Deployment (Recommended)
 
 ```bash
+#Build docker container (first time only)
+./docker/openplc/build.sh
+
+
 # Activate the virtual environment (contains Ansible and pymodbus)
 source .venv/bin/activate
 
