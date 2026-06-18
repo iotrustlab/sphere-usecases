@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="24.553333mm"
+   height="20.32mm"
+   viewBox="0 0 24.553333 20.32"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.4.4 (dcaf3e7d9e, 2026-05-05)"
+   sodipodi:docname="analyzer.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="0.70555556"
+     inkscape:cx="-19.84252"
+     inkscape:cy="255.11811"
+     inkscape:window-width="1920"
+     inkscape:window-height="1003"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-110.22542,-80.856667)">
+    <g
+       id="use18"
+       transform="matrix(0.42333333,0,0,0.42333333,109.80209,80.433334)">
+      <rect
+         x="2"
+         y="2"
+         width="56"
+         height="46"
+         rx="3"
+         fill="#fff3e0"
+         stroke="#e65100"
+         stroke-width="2"
+         id="rect1" />
+      <text
+         x="30"
+         y="20"
+         text-anchor="middle"
+         font-size="9px"
+         fill="#e65100"
+         font-weight="bold"
+         id="text1">ANALYZER</text>
+      <line
+         x1="10"
+         y1="28"
+         x2="50"
+         y2="28"
+         stroke="#e65100"
+         stroke-width="1"
+         id="line1" />
+      <text
+         x="15"
+         y="40"
+         font-size="7px"
+         fill="#e65100"
+         id="text2">A B C</text>
+    </g>
+  </g>
+</svg>
