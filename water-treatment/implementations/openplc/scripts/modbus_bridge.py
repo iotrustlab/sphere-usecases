@@ -81,7 +81,7 @@ class ModbusBridge:
     def _read_coils(client, address, count):
         """Read coils, return list of int (0/1) or None on error."""
         try:
-            rr = client.read_coils(address, count)
+            rr = client.read_coils(address, count=count)
             if rr is None or isinstance(rr, ExceptionResponse) or rr.isError():
                 return None
             return [1 if b else 0 for b in rr.bits[:count]]
@@ -93,7 +93,7 @@ class ModbusBridge:
     def _read_hr(client, address, count):
         """Read holding registers, return list of int or None."""
         try:
-            rr = client.read_holding_registers(address, count)
+            rr = client.read_holding_registers(address, count=count)
             if rr is None or isinstance(rr, ExceptionResponse) or rr.isError():
                 return None
             return list(rr.registers[:count])
