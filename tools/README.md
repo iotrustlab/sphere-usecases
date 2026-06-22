@@ -26,5 +26,5 @@ Use-case-agnostic analysis tools (network capture parsing, timestamp alignment, 
 
 Implementation-specific scripts (validation, deployment, local execution) live inside each use case directory:
 
-- `water/rovisys-treatment/usecases/p1-onboarding/implementations/openplc/scripts/` - OpenPLC local run scripts
-- `water/rovisys-treatment/usecases/p1-onboarding/implementations/rockwell/scripts/` - Rockwell validation and deployment
+- `sector-water/rovisys-treatment/usecases/p1-onboarding/implementations/openplc/scripts/` - OpenPLC local run scripts
+- `sector-water/rovisys-treatment/usecases/p1-onboarding/implementations/rockwell/scripts/` - Rockwell validation and deployment

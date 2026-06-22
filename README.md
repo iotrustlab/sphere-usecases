@@ -18,9 +18,9 @@ Use cases are organized by CISA critical infrastructure sector:
 
 | Sector | CISA # | Contents |
 |--------|--------|----------|
-| [**Water**](water/) | 16 | Water treatment, distribution, and wastewater systems |
-| [**Chemical**](chemical/) | 1 | Chemical manufacturing and processing |
-| [**Energy**](energy/) | 8 | Power generation, transmission, oil/gas distribution |
+| [**Water**](sector-water/) | 16 | Water treatment, distribution, and wastewater systems |
+| [**Chemical**](sector-chemical/) | 1 | Chemical manufacturing and processing |
+| [**Energy**](sector-energy/) | 8 | Power generation, transmission, oil/gas distribution |
 
 ## Available Use Cases
 
@@ -28,21 +28,21 @@ Use cases are organized by CISA critical infrastructure sector:
 
 | Use Case | Status | Rockwell | OpenPLC | Description |
 |----------|--------|----------|---------|-------------|
-| [rovisys-treatment](water/rovisys-treatment/) | Active | Testbed | Virtual | Multi-stage water purification with chemical dosing (P1-P6) |
-| [rovisys-distribution](water/rovisys-distribution/) | Active slice | Planned | Assets | Municipal distribution with controller/simulator |
+| [rovisys-treatment](sector-water/rovisys-treatment/) | Active | Testbed | Virtual | Multi-stage water purification with chemical dosing (P1-P6) |
+| [rovisys-distribution](sector-water/rovisys-distribution/) | Active slice | Planned | Assets | Municipal distribution with controller/simulator |
 
 ### Chemical (Sector 1)
 
 | Use Case | Status | Rockwell | OpenPLC | Description |
 |----------|--------|----------|---------|-------------|
-| [grfics](chemical/grfics/) | Integrated | N/A | SPHERE-native | Tennessee Eastman chemical process |
+| [grfics](sector-chemical/grfics/) | Integrated | N/A | SPHERE-native | Tennessee Eastman chemical process |
 
 ### Energy (Sector 8)
 
 | Use Case | Status | Rockwell | OpenPLC | Description |
 |----------|--------|----------|---------|-------------|
-| [olmsted-hydro](energy/olmsted-hydro/) | Active | Planned | Virtual | Hydroelectric power station (Olmsted Dam) |
-| [oil-and-gas](energy/oil-and-gas/) | Incubation | Planned | Planned | Pipeline distribution with pressure control |
+| [olmsted-hydro](sector-energy/olmsted-hydro/) | Active | Planned | Virtual | Hydroelectric power station (Olmsted Dam) |
+| [oil-and-gas](sector-energy/oil-and-gas/) | Incubation | Planned | Planned | Pipeline distribution with pressure control |
 
 ## Getting Started
 
@@ -55,7 +55,7 @@ Use cases are organized by CISA critical infrastructure sector:
 ### Quick Start: P1 Onboarding Demo
 
 ```bash
-cd water/rovisys-treatment/usecases/p1-onboarding
+cd sector-water/rovisys-treatment/usecases/p1-onboarding
 cat README.md  # Follow setup instructions
 ```
 
@@ -63,7 +63,7 @@ cat README.md  # Follow setup instructions
 
 ```
 sphere-usecases/
-├── water/                             # CISA Sector 16: Water and Wastewater
+├── sector-water/                      # CISA Sector 16: Water and Wastewater
 │   ├── rovisys-treatment/             # Rovisys water treatment (P1-P6)
 │   │   ├── usecases/
 │   │   │   ├── p1-onboarding/         # P1 demo for beta users
@@ -72,10 +72,10 @@ sphere-usecases/
 │   │   └── docs/
 │   └── rovisys-distribution/          # Rovisys water distribution
 │
-├── chemical/                          # CISA Sector 1: Chemical
+├── sector-chemical/                   # CISA Sector 1: Chemical
 │   └── grfics/                        # Tennessee Eastman / GRFICS
 │
-├── energy/                            # CISA Sector 8: Energy
+├── sector-energy/                     # CISA Sector 8: Energy
 │   ├── olmsted-hydro/                 # Hydroelectric power
 │   └── oil-and-gas/                   # Pipeline distribution
 │
@@ -95,7 +95,7 @@ sphere-usecases/
 Each vendor use case follows this hierarchy:
 
 ```
-<sector>/<vendor>-<domain>/
+sector-<name>/<vendor>-<domain>/
 ├── usecases/
 │   └── <instance>/                    # e.g., p1-onboarding
 │       ├── implementations/
@@ -119,7 +119,7 @@ Each vendor use case follows this hierarchy:
 ### Creating New Use Cases
 
 1. **Identify the CISA sector** for your use case
-2. **Copy the template**: `cp -r templates/single-process/ <sector>/<vendor>-<domain>/`
+2. **Copy the template**: `cp -r templates/usecase/ sector-<name>/<vendor>-<domain>/`
 3. **Follow the structure**: Each use case should be self-contained
 4. **Add implementations**: Rockwell (testbed) and/or OpenPLC (virtual)
 5. **Include experiments**: Security research scenarios

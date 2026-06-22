@@ -68,7 +68,7 @@ analyzer: 192.168.95.15:502 (slave 247)
 VBoxManage list hostonlyifs | rg vboxnet0
 
 # Python env for GRFICS bridge
-cd /Users/lag/Development/sphere-usecases/chemical/grfics
+cd /Users/lag/Development/sphere-usecases/sector-chemical/grfics
 python3 -m venv .venv
 source .venv/bin/activate
 pip install pymodbus pyyaml
@@ -97,7 +97,7 @@ curl -s http://192.168.95.5:8080/ScadaBR/ | head -1
 ### Capture Run Bundle
 
 ```bash
-cd /Users/lag/Development/sphere-usecases/chemical/grfics
+cd /Users/lag/Development/sphere-usecases/sector-chemical/grfics
 source .venv/bin/activate
 
 python scripts/grfics_bridge.py \
@@ -123,23 +123,23 @@ cd /Users/lag/Development/cps-enclave-model
 
 ./bin/usecase-runner \
   --backend=openplc \
-  --contract ../sphere-usecases/chemical/grfics/tag_contract.yaml \
-  --mapping ../sphere-usecases/chemical/grfics/openplc_backend_map.yaml \
+  --contract ../sphere-usecases/sector-chemical/grfics/tag_contract.yaml \
+  --mapping ../sphere-usecases/sector-chemical/grfics/openplc_backend_map.yaml \
   --controller-endpoint localhost:1502 \
   --simulator-endpoint localhost:1503 \
-  --run-dir ../sphere-usecases/chemical/grfics/runs/run-local-01 \
+  --run-dir ../sphere-usecases/sector-chemical/grfics/runs/run-local-01 \
   --duration 10s \
   --poll-ms 500 \
   --emit-tags all_contract
 
-./bin/validate-bundle ../sphere-usecases/chemical/grfics/runs/run-local-01
+./bin/validate-bundle ../sphere-usecases/sector-chemical/grfics/runs/run-local-01
 ```
 
 ### Validate Bundle
 
 ```bash
 cd /Users/lag/Development/cps-enclave-model
-./bin/validate-bundle ../sphere-usecases/chemical/grfics/runs/run-demo-01
+./bin/validate-bundle ../sphere-usecases/sector-chemical/grfics/runs/run-demo-01
 ```
 
 ### Run Attack + Defense
@@ -147,7 +147,7 @@ cd /Users/lag/Development/cps-enclave-model
 ```bash
 cd /Users/lag/Development/cps-enclave-model
 
-./scripts/toolbox-run.sh ../sphere-usecases/chemical/grfics/runs/run-demo-01 \
+./scripts/toolbox-run.sh ../sphere-usecases/sector-chemical/grfics/runs/run-demo-01 \
   --tag TE_Tank_Pressure \
   --offset 100 \
   --start 20 \
@@ -165,9 +165,9 @@ Expected artifacts:
 cd /Users/lag/Development/cps-enclave-model
 
 go run ./cps-enclave-viewer/cmd/viewer \
-  -data ../sphere-usecases/chemical/grfics/runs \
-  -assets-dir ../sphere-usecases/chemical/grfics/assets \
-  -slice ../sphere-usecases/chemical/grfics/slices/grfics-te-full-slice.yaml \
+  -data ../sphere-usecases/sector-chemical/grfics/runs \
+  -assets-dir ../sphere-usecases/sector-chemical/grfics/assets \
+  -slice ../sphere-usecases/sector-chemical/grfics/slices/grfics-te-full-slice.yaml \
   -addr :8085
 ```
 

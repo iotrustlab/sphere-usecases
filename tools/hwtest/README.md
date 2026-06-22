@@ -38,7 +38,7 @@ python -m hwtest validate-wiring \
 Each use case that supports hardware testing includes its own config:
 
 ```bash
-cd water/rovisys-treatment/usecases/p1-onboarding/implementations/rockwell
+cd sector-water/rovisys-treatment/usecases/p1-onboarding/implementations/rockwell
 pytest tests/test_digital_io.py tests/test_analog_scaling.py -v
 ```
 
@@ -136,5 +136,5 @@ result = validate_analog_scaling(
 
 ## See Also
 
-- Use case configs: `water/rovisys-treatment/usecases/p1-onboarding/implementations/rockwell/hw_test_config.yaml`
+- Use case configs: `sector-water/rovisys-treatment/usecases/p1-onboarding/implementations/rockwell/hw_test_config.yaml`
 - Physical connections: `docs/wiring/physical_connections.yaml`

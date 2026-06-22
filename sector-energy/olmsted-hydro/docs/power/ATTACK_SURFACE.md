@@ -6,8 +6,8 @@ hydro power use case. It is intended to guide toolbox integrations
 
 ## Scope and Assumptions
 
-- Scope: PS‑1 generic hydro station in `energy/olmsted-hydro/`
-- Tags: must align with `energy/olmsted-hydro/tag_contract.yaml`
+- Scope: PS‑1 generic hydro station in `sector-energy/olmsted-hydro/`
+- Tags: must align with `sector-energy/olmsted-hydro/tag_contract.yaml`
 - Attacker model: can modify PLC outputs, spoof sensor measurements, or
   manipulate command/status channels
 - Out of scope: firmware rootkits, network lateral movement, or HMI‑only

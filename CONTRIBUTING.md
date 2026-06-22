@@ -26,16 +26,16 @@ cd sphere-usecases
 cp -r templates/usecase/ <sector>/<vendor>-<domain>/usecases/<instance>/
 
 # Example: Create a new water treatment use case
-cp -r templates/usecase/ water/acme-treatment/usecases/basic-demo/
+cp -r templates/usecase/ sector-water/acme-treatment/usecases/basic-demo/
 
 # Update the README with your process details
-vim water/acme-treatment/usecases/basic-demo/README.md
+vim sector-water/acme-treatment/usecases/basic-demo/README.md
 ```
 
 #### Improving an Existing Use Case
 ```bash
 # Navigate to the use case
-cd water/rovisys-treatment/usecases/p1-onboarding/
+cd sector-water/rovisys-treatment/usecases/p1-onboarding/
 
 # Make your changes
 vim implementations/rockwell/controller/Controller_PLC.L5X

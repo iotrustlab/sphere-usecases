@@ -88,32 +88,32 @@ ansible-playbook -i inventory.yml site.yml
 cd /path/to/cps-enclave-model
 
 ./bin/usecase-runner \
-  --contract ../sphere-usecases/chemical/grfics/tag_contract.yaml \
-  --mapping ../sphere-usecases/chemical/grfics/openplc_backend_map.yaml \
+  --contract ../sphere-usecases/sector-chemical/grfics/tag_contract.yaml \
+  --mapping ../sphere-usecases/sector-chemical/grfics/openplc_backend_map.yaml \
   --controller-endpoint localhost:1502 \
   --simulator-endpoint localhost:1503 \
-  --run-dir ../sphere-usecases/chemical/grfics/runs/run-local-01 \
+  --run-dir ../sphere-usecases/sector-chemical/grfics/runs/run-local-01 \
   --duration 120s \
   --poll-ms 500 \
   --emit-tags all_contract
 
 # Validate bundle
-./bin/validate-bundle ../sphere-usecases/chemical/grfics/runs/run-local-01
+./bin/validate-bundle ../sphere-usecases/sector-chemical/grfics/runs/run-local-01
 ```
 
 ### Run Toolbox
 
 ```bash
 # Attack: perturb tank pressure reading
-./scripts/toolbox-run.sh ../sphere-usecases/chemical/grfics/runs/run-local-01 \
+./scripts/toolbox-run.sh ../sphere-usecases/sector-chemical/grfics/runs/run-local-01 \
   --tag TE_Tank_Pressure --offset 100 \
   --rules tools/defense/rules/grfics-te.yaml
 
 # View in SPHERE viewer
 go run ./cps-enclave-viewer/cmd/viewer/ \
-  -data ../sphere-usecases/chemical/grfics/runs \
-  -assets-dir ../sphere-usecases/chemical/grfics/assets \
-  -slice ../sphere-usecases/chemical/grfics/slices/grfics-te-full-slice.yaml \
+  -data ../sphere-usecases/sector-chemical/grfics/runs \
+  -assets-dir ../sphere-usecases/sector-chemical/grfics/assets \
+  -slice ../sphere-usecases/sector-chemical/grfics/slices/grfics-te-full-slice.yaml \
   -addr :8085
 ```
 

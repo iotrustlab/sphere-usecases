@@ -88,6 +88,6 @@ The following checks are expected to expose partial or failed spoofing:
 
 For each Harvey scenario run bundle:
 
-- scenario definition (`energy/olmsted-hydro/scenarios/*.yaml`)
+- scenario definition (`sector-energy/olmsted-hydro/scenarios/*.yaml`)
 - attack artifact (perturbed `tags.csv` + manifest)
 - invariant-check output describing detected violations or evasion behavior
