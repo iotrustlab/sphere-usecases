@@ -13,14 +13,18 @@ active_groups:
   - system
 
 diagram:
-  asset: "water-treatment.png"
+  asset: "generated/water-treatment.svg"
 
 overlay_tags:
   # P2 tank levels
   - ChemTreat_NaCl_Level
   - ChemTreat_NaOCl_Level
   - ChemTreat_HCl_Level
-  # P2 valve status
+  # P2 valve commands
+  - ChemTreat_NaCl_Valve
+  - ChemTreat_NaOCl_Valve
+  - ChemTreat_HCl_Valve
+  # P2 valve status feedback
   - ChemTreat_NaCl_Valve_Sts
   - ChemTreat_NaOCl_Valve_Sts
   - ChemTreat_HCl_Valve_Sts

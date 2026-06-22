@@ -79,7 +79,7 @@ CONTROLLER_HR_TAGS = [
 def read_hr(client, address, count):
     """Read holding registers, return list or None."""
     try:
-        rr = client.read_holding_registers(address, count)
+        rr = client.read_holding_registers(address, count=count)
         if rr is None or isinstance(rr, ExceptionResponse) or rr.isError():
             return None
         return list(rr.registers[:count])
@@ -90,7 +90,7 @@ def read_hr(client, address, count):
 def read_coils(client, address, count):
     """Read coils, return list of 0/1 or None."""
     try:
-        rr = client.read_coils(address, count)
+        rr = client.read_coils(address, count=count)
         if rr is None or isinstance(rr, ExceptionResponse) or rr.isError():
             return None
         return [1 if b else 0 for b in rr.bits[:count]]
@@ -112,14 +112,14 @@ TAG_HEADER = [
     "UF_UFFT_Tank_Valve_Sts", "UF_Drain_Valve_Sts",
     "UF_ROFT_Valve_Sts", "UF_BWP_Valve_Sts",
     # Controller commands (coils 40-51)
-    "RW_Tank_PR_Valve_Cmd", "RW_Tank_P6B_Valve_Cmd", "RW_Tank_P_Valve_Cmd",
-    "RW_Pump_Start_Cmd", "RW_Pump_Stop_Cmd",
-    "ChemTreat_NaCl_Valve_Cmd", "ChemTreat_NaOCl_Valve_Cmd",
-    "ChemTreat_HCl_Valve_Cmd",
-    "UF_UFFT_Tank_Valve_Cmd", "UF_Drain_Valve_Cmd",
-    "UF_ROFT_Valve_Cmd", "UF_BWP_Valve_Cmd",
+    "RW_Tank_PR_Valve", "RW_Tank_P6B_Valve", "RW_Tank_P_Valve",
+    "RW_Pump_Start", "RW_Pump_Stop",
+    "ChemTreat_NaCl_Valve", "ChemTreat_NaOCl_Valve",
+    "ChemTreat_HCl_Valve",
+    "UF_UFFT_Tank_Valve", "UF_Drain_Valve",
+    "UF_ROFT_Valve", "UF_BWP_Valve",
     # Controller HR 100 (pump speed)
-    "RW_Pump_Speed_Cmd",
+    "RW_Pump_Speed",
     # System state (controller coils 56-60  i.e. %QX7.0-7.4)
     "SYS_IDLE", "SYS_START", "SYS_RUNNING", "SYS_SHUTDOWN",
     "SYS_Permissives_Ready",
@@ -127,6 +127,39 @@ TAG_HEADER = [
     "Alarm_RW_Tank_LL", "Alarm_RW_Tank_L",
     "Alarm_RW_Tank_H", "Alarm_RW_Tank_HH",
     # HMI (controller coils 0-3)
+    "HMI_Start_PB", "HMI_Stop_PB", "HMI_Start_Active", "HMI_Stop_Active",
+]
+
+LEVEL_TAGS = [
+    "RW_Tank_Level", "RW_Pump_Flow",
+    "ChemTreat_NaCl_Level", "ChemTreat_NaOCl_Level", "ChemTreat_HCl_Level",
+    "UF_UFFT_Tank_Level",
+]
+STATUS_TAGS = [
+    "RW_Tank_PR_Valve_Sts", "RW_Tank_P6B_Valve_Sts", "RW_Tank_P_Valve_Sts",
+    "RW_Pump_Sts", "RW_Pump_Fault",
+    "ChemTreat_NaCl_Valve_Sts", "ChemTreat_NaOCl_Valve_Sts",
+    "ChemTreat_HCl_Valve_Sts",
+    "UF_UFFT_Tank_Valve_Sts", "UF_Drain_Valve_Sts",
+    "UF_ROFT_Valve_Sts", "UF_BWP_Valve_Sts",
+]
+COMMAND_TAGS = [
+    "RW_Tank_PR_Valve", "RW_Tank_P6B_Valve", "RW_Tank_P_Valve",
+    "RW_Pump_Start", "RW_Pump_Stop",
+    "ChemTreat_NaCl_Valve", "ChemTreat_NaOCl_Valve",
+    "ChemTreat_HCl_Valve",
+    "UF_UFFT_Tank_Valve", "UF_Drain_Valve",
+    "UF_ROFT_Valve", "UF_BWP_Valve",
+]
+SYSTEM_TAGS = [
+    "SYS_IDLE", "SYS_START", "SYS_RUNNING", "SYS_SHUTDOWN",
+    "SYS_Permissives_Ready",
+]
+ALARM_TAGS = [
+    "Alarm_RW_Tank_LL", "Alarm_RW_Tank_L",
+    "Alarm_RW_Tank_H", "Alarm_RW_Tank_HH",
+]
+HMI_TAGS = [
     "HMI_Start_PB", "HMI_Stop_PB", "HMI_Start_Active", "HMI_Stop_Active",
 ]
 
@@ -138,72 +171,138 @@ def poll_tags(ctrl_client, sim_client):
 
     # Simulator levels (HR 300-305)
     levels = read_hr(sim_client, 300, 6)
-    level_names = TAG_HEADER[1:7]
     if levels:
-        for name, val in zip(level_names, levels):
+        for name, val in zip(LEVEL_TAGS, levels):
             row[name] = val
     else:
-        for name in level_names:
+        for name in LEVEL_TAGS:
             row[name] = ""
 
     # Simulator valve/pump status (HR 320-331)
     status = read_hr(sim_client, 320, 12)
-    status_names = TAG_HEADER[7:19]
     if status:
-        for name, val in zip(status_names, status):
+        for name, val in zip(STATUS_TAGS, status):
             row[name] = val
     else:
-        for name in status_names:
+        for name in STATUS_TAGS:
             row[name] = ""
 
     # Controller command coils 40-51
     cmds = read_coils(ctrl_client, 40, 12)
-    cmd_names = TAG_HEADER[19:31]
     if cmds:
-        for name, val in zip(cmd_names, cmds):
+        for name, val in zip(COMMAND_TAGS, cmds):
             row[name] = val
     else:
-        for name in cmd_names:
+        for name in COMMAND_TAGS:
             row[name] = ""
 
     # Controller pump speed HR 100
     speed = read_hr(ctrl_client, 100, 1)
-    row["RW_Pump_Speed_Cmd"] = speed[0] if speed else ""
+    row["RW_Pump_Speed"] = speed[0] if speed else ""
 
     # System state coils (QX7.0-7.4 → Modbus coil 56-60)
     sys_coils = read_coils(ctrl_client, 56, 5)
-    sys_names = TAG_HEADER[32:37]
     if sys_coils:
-        for name, val in zip(sys_names, sys_coils):
+        for name, val in zip(SYSTEM_TAGS, sys_coils):
             row[name] = val
     else:
-        for name in sys_names:
+        for name in SYSTEM_TAGS:
             row[name] = ""
 
     # Alarm coils (QX8.0-8.3 → Modbus coil 64-67)
     alm_coils = read_coils(ctrl_client, 64, 4)
-    alm_names = TAG_HEADER[37:41]
     if alm_coils:
-        for name, val in zip(alm_names, alm_coils):
+        for name, val in zip(ALARM_TAGS, alm_coils):
             row[name] = val
     else:
-        for name in alm_names:
+        for name in ALARM_TAGS:
             row[name] = ""
 
     # HMI coils (QX0.0-0.3 → Modbus coil 0-3)
     hmi_coils = read_coils(ctrl_client, 0, 4)
-    hmi_names = TAG_HEADER[41:45]
     if hmi_coils:
-        for name, val in zip(hmi_names, hmi_coils):
+        for name, val in zip(HMI_TAGS, hmi_coils):
             row[name] = val
     else:
-        for name in hmi_names:
+        for name in HMI_TAGS:
             row[name] = ""
 
     return row
 
 
 # ── Timeline actions ─────────────────────────────────────────────────
+
+CHEMICAL_VALVES = {
+    "nacl": {
+        "label": "NaCl",
+        "command_coil": 45,
+        "bridge_command_register": 205,
+        "status_register": 325,
+        "level_register": 302,
+    },
+    "naocl": {
+        "label": "NaOCl",
+        "command_coil": 46,
+        "bridge_command_register": 206,
+        "status_register": 326,
+        "level_register": 303,
+    },
+    "hcl": {
+        "label": "HCl",
+        "command_coil": 47,
+        "bridge_command_register": 207,
+        "status_register": 327,
+        "level_register": 304,
+    },
+}
+
+UF_VALVES = {
+    "ufft": {
+        "label": "UF feed",
+        "command_coil": 48,
+        "bridge_command_register": 208,
+        "status_register": 328,
+    },
+    "drain": {
+        "label": "UF drain",
+        "command_coil": 49,
+        "bridge_command_register": 209,
+        "status_register": 329,
+    },
+    "roft": {
+        "label": "RO feed",
+        "command_coil": 50,
+        "bridge_command_register": 210,
+        "status_register": 330,
+    },
+    "bwp": {
+        "label": "backwash permeate",
+        "command_coil": 51,
+        "bridge_command_register": 211,
+        "status_register": 331,
+    },
+}
+
+
+def _chemical_config(name):
+    key = name.strip().lower()
+    if key not in CHEMICAL_VALVES:
+        raise ValueError(f"Unknown chemical valve '{name}'")
+    return key, CHEMICAL_VALVES[key]
+
+
+def _uf_config(name):
+    key = name.strip().lower()
+    if key not in UF_VALVES:
+        raise ValueError(f"Unknown UF valve '{name}'")
+    return key, UF_VALVES[key]
+
+
+def _write_evidence_register(client_a, client_b, register, value):
+    """Write an evidence-path holding register on both PLCs."""
+    client_a.write_register(register, value)
+    client_b.write_register(register, value)
+
 
 def execute_action(action, ctrl_client, sim_client):
     """Execute a scenario timeline action."""
@@ -228,6 +327,107 @@ def execute_action(action, ctrl_client, sim_client):
         val = int(parts[2])
         sim_client.write_register(reg, val)
         return f"Set simulator HR {reg} = {val}"
+    elif action.startswith("set_bridge_register:"):
+        # Format: set_bridge_register:register:value
+        # Write both PLCs for immediate evidence consistency. The bridge will
+        # continue forwarding simulator HR values to controller HR values.
+        parts = action.split(":")
+        reg = int(parts[1])
+        val = int(parts[2])
+        sim_client.write_register(reg, val)
+        ctrl_client.write_register(reg, val)
+        return f"Set bridge HR {reg} = {val} on simulator and controller"
+    elif action.startswith("spoof_rw_level:"):
+        # Format: spoof_rw_level:value
+        val = int(float(action.split(":", 1)[1]))
+        sim_client.write_register(300, val)
+        ctrl_client.write_register(300, val)
+        return f"Spoofed RW_Tank_Level via bridge HR 300 = {val}"
+    elif action.startswith("restore_rw_level:"):
+        # Format: restore_rw_level:value
+        val = int(float(action.split(":", 1)[1]))
+        sim_client.write_register(300, val)
+        ctrl_client.write_register(300, val)
+        return f"Restored RW_Tank_Level bridge HR 300 = {val}"
+    elif action.startswith("record_intended_chemical_action:"):
+        # Format: record_intended_chemical_action:chemical
+        _, chem = action.split(":", 1)
+        _, cfg = _chemical_config(chem)
+        return f"Recorded intended chemical action: {cfg['label']} dosing expected"
+    elif action.startswith("set_chemical_level:"):
+        # Format: set_chemical_level:chemical:value
+        parts = action.split(":")
+        _, cfg = _chemical_config(parts[1])
+        val = int(float(parts[2]))
+        _write_evidence_register(sim_client, ctrl_client, cfg["level_register"], val)
+        return f"Set {cfg['label']} level bridge HR {cfg['level_register']} = {val}"
+    elif action.startswith("force_wrong_chemical_valve:"):
+        # Format: force_wrong_chemical_valve:intended:actual
+        #
+        # This models a command-to-actuation mismatch: the controller evidence
+        # path shows the intended chemical command, while the process/status
+        # evidence path shows the wrong chemical valve opening.
+        parts = action.split(":")
+        intended_name, intended = _chemical_config(parts[1])
+        actual_name, actual = _chemical_config(parts[2])
+
+        for chem_name, cfg in CHEMICAL_VALVES.items():
+            is_intended = chem_name == intended_name
+            is_actual = chem_name == actual_name
+            ctrl_client.write_coil(cfg["command_coil"], is_intended)
+            sim_client.write_register(cfg["bridge_command_register"], 1 if is_actual else 0)
+            _write_evidence_register(
+                sim_client, ctrl_client, cfg["status_register"], 1 if is_actual else 0
+            )
+
+        return (
+            f"Forced wrong chemical valve: intended {intended['label']} command, "
+            f"actual {actual['label']} status"
+        )
+    elif action.startswith("restore_wrong_chemical_valve:"):
+        # Format: restore_wrong_chemical_valve:intended:actual
+        parts = action.split(":")
+        _, intended = _chemical_config(parts[1])
+        _, actual = _chemical_config(parts[2])
+
+        for cfg in CHEMICAL_VALVES.values():
+            ctrl_client.write_coil(cfg["command_coil"], False)
+            sim_client.write_register(cfg["bridge_command_register"], 0)
+            _write_evidence_register(sim_client, ctrl_client, cfg["status_register"], 0)
+
+        return (
+            f"Restored chemical valve state after wrong-valve test "
+            f"({intended['label']} intent / {actual['label']} actual)"
+        )
+    elif action.startswith("record_intended_uf_action:"):
+        # Format: record_intended_uf_action:message
+        message = action.split(":", 1)[1].replace("_", " ")
+        return f"Recorded intended UF action: {message}"
+    elif action.startswith("set_uf_level:"):
+        # Format: set_uf_level:value
+        val = int(float(action.split(":", 1)[1]))
+        _write_evidence_register(sim_client, ctrl_client, 305, val)
+        return f"Set UF_UFFT_Tank_Level bridge HR 305 = {val}"
+    elif action.startswith("force_uf_drain_open"):
+        # Model drain sabotage: process/status evidence shows drain open while
+        # the controller drain command remains off.
+        _, drain = _uf_config("drain")
+        for cfg in UF_VALVES.values():
+            ctrl_client.write_coil(cfg["command_coil"], False)
+            sim_client.write_register(cfg["bridge_command_register"], 0)
+            _write_evidence_register(sim_client, ctrl_client, cfg["status_register"], 0)
+
+        sim_client.write_register(drain["bridge_command_register"], 1)
+        _write_evidence_register(sim_client, ctrl_client, drain["status_register"], 1)
+        return "Forced UF drain valve status open with no matching controller command"
+    elif action.startswith("restore_uf_drain_open"):
+        _, drain = _uf_config("drain")
+        sim_client.write_register(drain["bridge_command_register"], 0)
+        for cfg in UF_VALVES.values():
+            ctrl_client.write_coil(cfg["command_coil"], False)
+            sim_client.write_register(cfg["bridge_command_register"], 0)
+            _write_evidence_register(sim_client, ctrl_client, cfg["status_register"], 0)
+        return "Restored UF valve state after drain-forced-open test"
     else:
         log.warning("Unknown action: %s", action)
         return f"Unknown action: {action}"
@@ -244,40 +444,45 @@ INITIAL_LEVEL_MAP = {
 }
 
 
-def apply_initial_conditions(sim_client, conditions):
-    """Write initial tank levels to simulator output registers.
-
-    The simulator physics uses internal REAL state, but on first scan it
-    will overwrite these.  For proper initialization the simulator should
-    read its own QW outputs as initial state — which it does since the
-    globals are initialized in the ST VAR section.  Instead, we trust
-    the ST defaults.  This function is a no-op placeholder for future
-    use when we add a sim-reset Modbus command.
-    """
+def apply_initial_conditions(ctrl_client, sim_client, conditions):
+    """Write initial tank levels to bridge evidence registers before capture."""
     if not conditions:
         return
-    log.info("Initial conditions specified (using ST defaults): %s", conditions)
+    applied = {}
+    for tag, value in conditions.items():
+        register = INITIAL_LEVEL_MAP.get(tag)
+        if register is None:
+            continue
+        val = int(float(value))
+        _write_evidence_register(sim_client, ctrl_client, register, val)
+        applied[tag] = val
+    log.info("Initial conditions applied to evidence registers: %s", applied)
 
 
 # ── Bundle writer ────────────────────────────────────────────────────
 
-def write_bundle(output_dir, scenario, events, tags_file, invariant_report=None,
-                 profile=None):
+def write_bundle(output_dir, scenario, events, tags_file, profile=None,
+                 start_utc=None, end_utc=None):
     """Write a run bundle to output_dir."""
     out = Path(output_dir)
     out.mkdir(parents=True, exist_ok=True)
 
     # meta.json
     meta = {
-        "usecase_id": scenario.get("scenario_id", "unknown"),
+        "usecase_id": scenario.get("usecase_id", "water-treatment-uc1"),
+        "scenario_id": scenario.get("scenario_id", "unknown"),
         "description": scenario.get("description", ""),
         "backend_type": "openplc",
         "created_utc": datetime.now(timezone.utc).isoformat(),
+        "start_utc": start_utc,
+        "end_utc": end_utc,
         "duration_sec": scenario.get("duration_sec", 0),
         "poll_interval_ms": scenario.get("poll_interval_ms", 500),
         "tags_file": "tags.csv",
         "events_file": "events.json",
         "bundle_schema_version": "1.1.0",
+        "tag_selection": "ctf1-p1-evidence",
+        "tags": TAG_HEADER[1:],
     }
 
     # Add profile metadata if available
@@ -293,23 +498,19 @@ def write_bundle(output_dir, scenario, events, tags_file, invariant_report=None,
     # tags.csv — copy from temp location
     shutil.copy2(tags_file, out / "tags.csv")
 
-    # Copy scenario for traceability
-    artifacts = out / "artifacts" / "model-validate"
+    # Copy scenario metadata for traceability
+    artifacts = out / "artifacts" / "scenario"
     artifacts.mkdir(parents=True, exist_ok=True)
-    if invariant_report:
-        for fname in ("report.json", "report.md"):
-            src = Path(invariant_report) / fname
-            if src.exists():
-                shutil.copy2(src, artifacts / fname)
+    (artifacts / "scenario.json").write_text(json.dumps(scenario, indent=2) + "\n")
 
     log.info("Bundle written to %s", out)
 
 
 # ── Invariant check ─────────────────────────────────────────────────
 
-def run_invariant_check(tags_csv, rules_path, checker_path, output_dir):
+def run_invariant_check(bundle_dir, rules_path, checker_path):
     """Run invariant_check.py and return the output directory."""
-    report_dir = os.path.join(output_dir, "artifacts", "model-validate")
+    report_dir = os.path.join(bundle_dir, "artifacts", "invariant-check")
     os.makedirs(report_dir, exist_ok=True)
 
     if not os.path.exists(checker_path):
@@ -318,9 +519,9 @@ def run_invariant_check(tags_csv, rules_path, checker_path, output_dir):
 
     cmd = [
         sys.executable, checker_path,
-        "--tags-csv", tags_csv,
+        "--bundle", bundle_dir,
         "--rules", rules_path,
-        "--output", report_dir,
+        "--output-dir", report_dir,
     ]
     log.info("Running invariant check: %s", " ".join(cmd))
     try:
@@ -428,7 +629,7 @@ def main():
         sys.exit(1)
 
     # Apply initial conditions
-    apply_initial_conditions(sim_client, scenario.get("initial_conditions"))
+    apply_initial_conditions(ctrl_client, sim_client, scenario.get("initial_conditions"))
 
     # Prepare data collection
     duration = scenario.get("duration_sec", 60)
@@ -443,6 +644,7 @@ def main():
     os.makedirs(args.output, exist_ok=True)
 
     log.info("Starting data collection for %ds...", duration)
+    run_start_utc = datetime.now(timezone.utc).isoformat()
     start_time = time.monotonic()
     next_event_idx = 0
 
@@ -462,11 +664,16 @@ def main():
                     if elapsed >= evt.get("time_sec", 0):
                         desc = execute_action(evt["action"], ctrl_client, sim_client)
                         event_record = {
+                            "type": evt.get("type", "action"),
                             "time_sec": round(elapsed, 2),
                             "action": evt["action"],
+                            "message": evt.get("message", desc),
                             "description": desc,
                             "timestamp_utc": datetime.now(timezone.utc).isoformat(),
                         }
+                        for key, value in evt.items():
+                            if key not in ("time_sec", "action", "type", "message"):
+                                event_record[key] = value
                         events.append(event_record)
                         log.info("t=%.1fs  %s", elapsed, desc)
                         next_event_idx += 1
@@ -492,14 +699,17 @@ def main():
             bridge.stop()
             bridge.disconnect()
 
+    run_end_utc = datetime.now(timezone.utc).isoformat()
     log.info("Collection done: %.1fs, %d events", time.monotonic() - start_time, len(events))
 
-    # Run invariant check
-    report_dir = run_invariant_check(
-        tags_tmp, args.invariant_rules, args.invariant_checker, args.output)
-
     # Write bundle
-    write_bundle(args.output, scenario, events, tags_tmp, report_dir, profile)
+    write_bundle(
+        args.output, scenario, events, tags_tmp,
+        profile=profile, start_utc=run_start_utc, end_utc=run_end_utc,
+    )
+
+    # Run invariant check after tags.csv is in the bundle.
+    run_invariant_check(args.output, args.invariant_rules, args.invariant_checker)
 
     # Clean up temp CSV
     if os.path.exists(tags_tmp):

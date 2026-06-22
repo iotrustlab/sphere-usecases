@@ -14,7 +14,7 @@ active_groups:
   - alarms
 
 diagram:
-  asset: "water-treatment.png"
+  asset: "generated/water-treatment.svg"
 
 overlay_tags:
   # P1 sensors

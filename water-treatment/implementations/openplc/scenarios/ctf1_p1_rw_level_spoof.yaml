@@ -1,0 +1,70 @@
+usecase_id: "water-treatment-uc1"
+scenario_id: "WT-P1-S01"
+description: "CTF1 P1 raw-water level spoofing evidence run"
+duration_sec: 40
+poll_interval_ms: 500
+
+initial_conditions:
+  RW_Tank_Level: 600
+  UF_UFFT_Tank_Level: 400
+  ChemTreat_NaCl_Level: 800
+  ChemTreat_NaOCl_Level: 800
+  ChemTreat_HCl_Level: 800
+
+timeline:
+  - time_sec: 2
+    type: baseline
+    action: "set_bridge_register:300:600"
+    target_tag: RW_Tank_Level
+    message: "Baseline raw-water level set to 600mm on bridge evidence path"
+
+  - time_sec: 5
+    type: start
+    action: hmi_start
+    message: "Operator starts UC1 process"
+
+  - time_sec: 12
+    type: attack_start
+    action: "spoof_rw_level:1300"
+    attack_id: WT-P1-S01
+    target_tag: RW_Tank_Level
+    expected_effect: "RW_Tank_Level exceeds physical max and HH threshold"
+    message: "Begin raw-water level spoof: force RW_Tank_Level to 1300mm"
+
+  - time_sec: 24
+    type: attack_stop
+    action: "restore_rw_level:600"
+    attack_id: WT-P1-S01
+    target_tag: RW_Tank_Level
+    expected_effect: "RW_Tank_Level returns to baseline, causing another rate jump"
+    message: "Stop raw-water level spoof and restore RW_Tank_Level to 600mm"
+
+  - time_sec: 35
+    type: stop
+    action: hmi_stop
+    message: "Operator stops UC1 process"
+
+evidence_requirements:
+  required_artifacts:
+    - meta.json
+    - events.json
+    - tags.csv
+    - artifacts/invariant-check/report.json
+    - artifacts/invariant-check/summary.txt
+  primary_tags:
+    - RW_Tank_Level
+    - RW_Pump_Speed
+    - RW_Pump_Flow
+    - RW_Pump_Sts
+    - RW_Tank_PR_Valve
+    - RW_Tank_PR_Valve_Sts
+    - RW_Tank_P_Valve
+    - RW_Tank_P_Valve_Sts
+    - SYS_RUNNING
+    - Alarm_RW_Tank_HH
+  expected_detector_findings:
+    - "range violation for RW_Tank_Level > 1200"
+    - "rate_of_change violation at attack start"
+    - "rate_of_change violation at attack stop"
+
+reference_bundle: null

@@ -1,0 +1,115 @@
+usecase_id: "water-treatment-uc1"
+scenario_id: "WT-P2-S01"
+description: "CTF1 P2 wrong chemical valve evidence run"
+duration_sec: 40
+poll_interval_ms: 500
+
+initial_conditions:
+  RW_Tank_Level: 600
+  UF_UFFT_Tank_Level: 400
+  ChemTreat_NaCl_Level: 800
+  ChemTreat_NaOCl_Level: 800
+  ChemTreat_HCl_Level: 800
+
+timeline:
+  - time_sec: 2
+    type: baseline
+    action: "set_chemical_level:nacl:800"
+    target_tag: ChemTreat_NaCl_Level
+    message: "Baseline NaCl tank level set to 800mm on bridge evidence path"
+
+  - time_sec: 2.5
+    type: baseline
+    action: "set_chemical_level:naocl:800"
+    target_tag: ChemTreat_NaOCl_Level
+    message: "Baseline NaOCl tank level set to 800mm on bridge evidence path"
+
+  - time_sec: 3
+    type: baseline
+    action: "set_chemical_level:hcl:800"
+    target_tag: ChemTreat_HCl_Level
+    message: "Baseline HCl tank level set to 800mm on bridge evidence path"
+
+  - time_sec: 5
+    type: start
+    action: hmi_start
+    message: "Operator starts UC1 process"
+
+  - time_sec: 10
+    type: intended_action
+    action: "record_intended_chemical_action:naocl"
+    target_tag: ChemTreat_NaOCl_Valve
+    expected_effect: "NaOCl dosing command/status should be the chemical path used"
+    message: "Expected chemical action recorded: NaOCl dosing"
+
+  - time_sec: 12
+    type: attack_start
+    action: "force_wrong_chemical_valve:naocl:hcl"
+    attack_id: WT-P2-S01
+    target_tag: ChemTreat_HCl_Valve_Sts
+    expected_effect: "HCl valve status becomes active while NaOCl dosing is expected"
+    message: "Begin wrong chemical valve attack: HCl valve opens instead of NaOCl path"
+
+  - time_sec: 16
+    type: physical_effect
+    action: "set_chemical_level:hcl:790"
+    attack_id: WT-P2-S01
+    target_tag: ChemTreat_HCl_Level
+    expected_effect: "HCl level begins decreasing during wrong-valve window"
+    message: "HCl tank level drops while wrong HCl valve is active"
+
+  - time_sec: 20
+    type: physical_effect
+    action: "set_chemical_level:hcl:780"
+    attack_id: WT-P2-S01
+    target_tag: ChemTreat_HCl_Level
+    expected_effect: "HCl level continues decreasing during wrong-valve window"
+    message: "HCl tank level continues to drop during wrong-valve actuation"
+
+  - time_sec: 24
+    type: attack_stop
+    action: "restore_wrong_chemical_valve:naocl:hcl"
+    attack_id: WT-P2-S01
+    target_tag: ChemTreat_HCl_Valve_Sts
+    expected_effect: "HCl valve status returns inactive and chemical path recovers"
+    message: "Stop wrong chemical valve attack and restore chemical valve states"
+
+  - time_sec: 28
+    type: recovery
+    action: "set_chemical_level:hcl:780"
+    target_tag: ChemTreat_HCl_Level
+    expected_effect: "HCl level stabilizes after wrong-valve actuation ends"
+    message: "HCl tank level remains stable after recovery"
+
+  - time_sec: 35
+    type: stop
+    action: hmi_stop
+    message: "Operator stops UC1 process"
+
+evidence_requirements:
+  required_artifacts:
+    - meta.json
+    - events.json
+    - tags.csv
+    - artifacts/invariant-check/report.json
+    - artifacts/invariant-check/summary.txt
+  primary_tags:
+    - ChemTreat_NaCl_Level
+    - ChemTreat_NaOCl_Level
+    - ChemTreat_HCl_Level
+    - ChemTreat_NaCl_Valve
+    - ChemTreat_NaOCl_Valve
+    - ChemTreat_HCl_Valve
+    - ChemTreat_NaCl_Valve_Sts
+    - ChemTreat_NaOCl_Valve_Sts
+    - ChemTreat_HCl_Valve_Sts
+    - SYS_RUNNING
+  expected_detector_findings:
+    - "NaOCl command/status causality violation during attack window"
+    - "HCl status-without-command correlation violation during attack window"
+  expected_physical_effects:
+    - "HCl valve status active while NaOCl dosing is expected"
+    - "HCl tank level decreases from 800mm to 780mm during attack window"
+    - "NaOCl tank level remains at baseline during attack window"
+
+reference_bundle: null

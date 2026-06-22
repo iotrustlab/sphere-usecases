@@ -13,12 +13,17 @@ active_groups:
   - system
 
 diagram:
-  asset: "water-treatment.png"
+  asset: "generated/water-treatment.svg"
 
 overlay_tags:
   # P3 tank level
   - UF_UFFT_Tank_Level
-  # P3 valve status
+  # P3 valve commands
+  - UF_UFFT_Tank_Valve
+  - UF_Drain_Valve
+  - UF_ROFT_Valve
+  - UF_BWP_Valve
+  # P3 valve status feedback
   - UF_UFFT_Tank_Valve_Sts
   - UF_Drain_Valve_Sts
   - UF_ROFT_Valve_Sts

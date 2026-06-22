@@ -1,0 +1,102 @@
+usecase_id: "water-treatment-uc1"
+scenario_id: "WT-P3-S01"
+description: "CTF1 P3 UF drain forced-open evidence run"
+duration_sec: 40
+poll_interval_ms: 500
+
+initial_conditions:
+  RW_Tank_Level: 600
+  UF_UFFT_Tank_Level: 900
+  ChemTreat_NaCl_Level: 800
+  ChemTreat_NaOCl_Level: 800
+  ChemTreat_HCl_Level: 800
+
+timeline:
+  - time_sec: 2
+    type: baseline
+    action: "set_uf_level:900"
+    target_tag: UF_UFFT_Tank_Level
+    message: "Baseline UF feed tank level set to 900mm on bridge evidence path"
+
+  - time_sec: 5
+    type: start
+    action: hmi_start
+    message: "Operator starts UC1 process"
+
+  - time_sec: 10
+    type: intended_action
+    action: "record_intended_uf_action:normal_forward_filtration_expected"
+    target_tag: UF_ROFT_Valve_Sts
+    expected_effect: "UF feed tank should not drain unexpectedly during normal filtration context"
+    message: "Expected UF action recorded: normal forward filtration"
+
+  - time_sec: 12
+    type: attack_start
+    action: "force_uf_drain_open"
+    attack_id: WT-P3-S01
+    target_tag: UF_Drain_Valve_Sts
+    expected_effect: "UF drain valve status becomes active without matching drain command"
+    message: "Begin UF drain forced-open attack"
+
+  - time_sec: 16
+    type: physical_effect
+    action: "set_uf_level:860"
+    attack_id: WT-P3-S01
+    target_tag: UF_UFFT_Tank_Level
+    expected_effect: "UF feed tank level begins decreasing during drain-active window"
+    message: "UF feed tank level drops while drain valve status is active"
+
+  - time_sec: 20
+    type: physical_effect
+    action: "set_uf_level:820"
+    attack_id: WT-P3-S01
+    target_tag: UF_UFFT_Tank_Level
+    expected_effect: "UF feed tank level continues decreasing during drain-active window"
+    message: "UF feed tank level continues to drop during drain actuation"
+
+  - time_sec: 24
+    type: attack_stop
+    action: "restore_uf_drain_open"
+    attack_id: WT-P3-S01
+    target_tag: UF_Drain_Valve_Sts
+    expected_effect: "UF drain valve status returns inactive and filtration path recovers"
+    message: "Stop UF drain forced-open attack and restore UF valve states"
+
+  - time_sec: 28
+    type: recovery
+    action: "set_uf_level:820"
+    target_tag: UF_UFFT_Tank_Level
+    expected_effect: "UF feed tank level stabilizes after drain actuation ends"
+    message: "UF feed tank level remains stable after recovery"
+
+  - time_sec: 35
+    type: stop
+    action: hmi_stop
+    message: "Operator stops UC1 process"
+
+evidence_requirements:
+  required_artifacts:
+    - meta.json
+    - events.json
+    - tags.csv
+    - artifacts/invariant-check/report.json
+    - artifacts/invariant-check/summary.txt
+  primary_tags:
+    - UF_UFFT_Tank_Level
+    - UF_UFFT_Tank_Valve
+    - UF_Drain_Valve
+    - UF_ROFT_Valve
+    - UF_BWP_Valve
+    - UF_UFFT_Tank_Valve_Sts
+    - UF_Drain_Valve_Sts
+    - UF_ROFT_Valve_Sts
+    - UF_BWP_Valve_Sts
+  expected_detector_findings:
+    - "UF drain status-without-command correlation violation during attack window"
+  expected_physical_effects:
+    - "events.json records intended normal filtration context before the attack"
+    - "UF drain valve status active without matching drain command"
+    - "UF feed tank level decreases from 900mm to 820mm during attack window"
+    - "ROFT and backwash status do not explain the drain event"
+
+reference_bundle: "sphere-usecases/water-treatment/runs/ctf1-p3-s01-openplc"
