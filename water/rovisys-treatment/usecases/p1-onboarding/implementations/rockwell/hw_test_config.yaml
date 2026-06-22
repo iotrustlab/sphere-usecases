@@ -1,0 +1,79 @@
+# Hardware Signal Test Configuration for Water Treatment
+#
+# This file defines PLC endpoints, timing parameters, and test tolerances
+# for hardware signal roundtrip testing.
+
+api_version: sphere.mergetb.io/v1
+kind: HWTestConfig
+
+metadata:
+  use_case: water-treatment
+  description: Test configuration for Process 1 (Raw Water) hardware I/O
+
+# PLC endpoints
+plcs:
+  controller:
+    # Process PLC (runs control logic)
+    ip: "10.100.0.10"
+    slot: 0
+    description: "ControlLogix Process PLC"
+
+  simulator:
+    # Simulation PLC (runs process model)
+    ip: "10.100.0.11"
+    slot: 0
+    description: "ControlLogix Simulation PLC"
+
+# Timing parameters (milliseconds)
+timing:
+  # Time for digital signal to propagate through I/O
+  digital_propagation_ms: 100
+
+  # Time for analog signal to settle (ADC/DAC)
+  analog_settling_ms: 500
+
+  # Connection timeout
+  connection_timeout_ms: 5000
+
+# Analog signal test configuration
+analog_test_points:
+  # Percentage points across signal span to test
+  - 0      # Low limit
+  - 25     # Quarter scale
+  - 50     # Mid scale
+  - 75     # Three-quarter scale
+  - 100    # High limit
+
+# Default tolerance as percentage of span
+# Accounts for ADC/DAC quantization, noise, and calibration
+default_tolerance_percent: 1.0
+
+# Per-signal tolerance overrides (optional)
+signal_tolerances:
+  RW_Tank_Level: 0.5   # Tighter tolerance for critical measurement
+  RW_Pump_Flow: 2.0    # Looser tolerance for flow measurement
+
+# Test filtering
+test_filters:
+  # Only test signals matching these groups
+  groups: ["p1", "p2", "p3"]
+
+  # Skip these specific signals
+  skip_signals: []
+
+  # Only test these signal types (digital, analog, or both)
+  signal_types: ["digital", "analog"]
+
+# Hardware I/O module configuration (informational)
+modules:
+  analog_input:
+    model: "1756-IF16"
+    mode: "single-ended"   # NOT differential (causes channel interference)
+    range: "0-20mA"
+
+  analog_output:
+    model: "1756-OF8"
+    range: "0-20mA"
+
+  digital_io:
+    voltage: "24VDC"

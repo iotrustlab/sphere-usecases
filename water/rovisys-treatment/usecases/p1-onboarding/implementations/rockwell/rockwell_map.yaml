@@ -16,57 +16,130 @@ metadata:
 
 mappings:
   # ─── Process 1: Raw Water System ─────────────────────────────────────
+  # Analog sensors with hw_io metadata for hardware testing
   RW_Tank_Level:
     cip_path: "P1.RW_Tank_tnk_lvl"
     data_type: REAL
+    hw_io:
+      signal_type: analog
+      direction: input      # Simulator -> Controller
+      module: "1756-IF16"
+      channel: 0
+      scaling:
+        low_eng: 0.0        # mm
+        high_eng: 1200.0    # mm
+        low_mA: 0.0
+        high_mA: 20.0
 
   RW_Pump_Flow:
     cip_path: "P1.RW_Pump_flow"
     data_type: REAL
+    hw_io:
+      signal_type: analog
+      direction: input      # Simulator -> Controller
+      module: "1756-IF16"
+      channel: 1
+      scaling:
+        low_eng: 0.0        # L/min
+        high_eng: 500.0     # L/min
+        low_mA: 0.0
+        high_mA: 20.0
 
   RW_Pump_Speed:
     cip_path: "P1.RW_Pump"
     data_type: REAL
+    hw_io:
+      signal_type: analog
+      direction: output     # Controller -> Simulator
+      module: "1756-OF8"
+      channel: 0
+      scaling:
+        low_eng: 0.0        # %
+        high_eng: 100.0     # %
+        low_mA: 0.0
+        high_mA: 20.0
 
+  # Digital status signals (Simulator -> Controller)
   RW_Tank_PR_Valve_Sts:
     cip_path: "P1.RW_Tank_PR_Valve_sts"
     data_type: BOOL
+    hw_io:
+      signal_type: digital
+      direction: input
+      voltage: "24VDC"
 
   RW_Tank_P6B_Valve_Sts:
     cip_path: "P1.RW_Tank_P6B_Valve_sts"
     data_type: BOOL
+    hw_io:
+      signal_type: digital
+      direction: input
+      voltage: "24VDC"
 
   RW_Tank_P_Valve_Sts:
     cip_path: "P1.RW_Tank_P_Valve_sts"
     data_type: BOOL
+    hw_io:
+      signal_type: digital
+      direction: input
+      voltage: "24VDC"
 
   RW_Pump_Sts:
     cip_path: "P1.RW_Pump_sts"
     data_type: BOOL
+    hw_io:
+      signal_type: digital
+      direction: input
+      voltage: "24VDC"
 
   RW_Pump_Fault:
     cip_path: "P1.RW_Pump_fault"
     data_type: BOOL
+    hw_io:
+      signal_type: digital
+      direction: input
+      voltage: "24VDC"
 
+  # Digital command signals (Controller -> Simulator)
   RW_Tank_PR_Valve:
     cip_path: "P1.RW_Tank_PR_Valve"
     data_type: BOOL
+    hw_io:
+      signal_type: digital
+      direction: output
+      voltage: "24VDC"
 
   RW_Tank_P6B_Valve:
     cip_path: "P1.RW_Tank_P6B_Valve"
     data_type: BOOL
+    hw_io:
+      signal_type: digital
+      direction: output
+      voltage: "24VDC"
 
   RW_Tank_P_Valve:
     cip_path: "P1.RW_Tank_P_Valve"
     data_type: BOOL
+    hw_io:
+      signal_type: digital
+      direction: output
+      voltage: "24VDC"
 
   RW_Pump_Start:
     cip_path: "P1.RW_Pump_start"
     data_type: BOOL
+    hw_io:
+      signal_type: digital
+      direction: output
+      voltage: "24VDC"
 
   RW_Pump_Stop:
     cip_path: "P1.RW_Pump_stop"
     data_type: BOOL
+    hw_io:
+      signal_type: digital
+      direction: output
+      voltage: "24VDC"
 
   # ─── Process 2: Chemical Treatment ───────────────────────────────────
   ChemTreat_NaCl_Level:
@@ -109,6 +182,16 @@ mappings:
   UF_UFFT_Tank_Level:
     cip_path: "P3.Ultrafiltration_UFFT_Tank_tnk_lvl"
     data_type: REAL
+    hw_io:
+      signal_type: analog
+      direction: input
+      module: "1756-IF16"
+      channel: 5
+      scaling:
+        low_eng: 0.0        # mm
+        high_eng: 1200.0    # mm
+        low_mA: 0.0
+        high_mA: 20.0
 
   UF_UFFT_Tank_Valve_Sts:
     cip_path: "P3.Ultrafiltration_UFFT_Tank_Valve_sts"
