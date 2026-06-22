@@ -2,6 +2,8 @@
 
 This runbook is the operational path to stand up GRFICSv3 and produce a replayable SPHERE run bundle in under 15 minutes once VMs are available.
 
+> Operational guide only. Canonical milestone status and ranked backlog live in [`../../../sphere-docs/ROADMAP.md`](../../../sphere-docs/ROADMAP.md) and [`../../../sphere-docs/BACKLOG.md`](../../../sphere-docs/BACKLOG.md).
+
 ## 1) VM Topology and Network Assumptions
 
 GRFICSv3 uses a 4-VM VirtualBox deployment on host-only network `192.168.95.0/24`.
@@ -40,7 +42,8 @@ Engineering units (from `tag_contract.yaml`):
 
 Core files:
 - `grfics/tag_contract.yaml` — canonical 17 tags
-- `grfics/source_map.yaml` — Modbus endpoint/register mapping
+- `grfics/source_map.yaml` — richer source-map/reference surface for the bridge/original-VM lane
+- `grfics/openplc_backend_map.yaml` — flattened `BackendMapping` used by `usecase-runner` on the SPHERE dual-PLC stack
 - `grfics/scripts/grfics_bridge.py` — live Modbus polling to run bundle
 - `grfics/slices/grfics-te-full-slice.yaml` — viewer slice
 - `cps-enclave-model/tools/defense/rules/grfics-te.yaml` — invariants
@@ -65,7 +68,7 @@ analyzer: 192.168.95.15:502 (slave 247)
 VBoxManage list hostonlyifs | rg vboxnet0
 
 # Python env for GRFICS bridge
-cd /Users/lag/Development/sphere-usecases/grfics
+cd /Users/lag/Development/sphere-usecases/chemical/grfics
 python3 -m venv .venv
 source .venv/bin/activate
 pip install pymodbus pyyaml
@@ -94,7 +97,7 @@ curl -s http://192.168.95.5:8080/ScadaBR/ | head -1
 ### Capture Run Bundle
 
 ```bash
-cd /Users/lag/Development/sphere-usecases/grfics
+cd /Users/lag/Development/sphere-usecases/chemical/grfics
 source .venv/bin/activate
 
 python scripts/grfics_bridge.py \
@@ -111,11 +114,32 @@ ls -la runs/run-demo-01
 head -5 runs/run-demo-01/tags.csv
 ```
 
+### SPHERE-Native Runner Path
+
+Use this path for the current dual-PLC SPHERE deployment instead of the original-VM bridge script:
+
+```bash
+cd /Users/lag/Development/cps-enclave-model
+
+./bin/usecase-runner \
+  --backend=openplc \
+  --contract ../sphere-usecases/chemical/grfics/tag_contract.yaml \
+  --mapping ../sphere-usecases/chemical/grfics/openplc_backend_map.yaml \
+  --controller-endpoint localhost:1502 \
+  --simulator-endpoint localhost:1503 \
+  --run-dir ../sphere-usecases/chemical/grfics/runs/run-local-01 \
+  --duration 10s \
+  --poll-ms 500 \
+  --emit-tags all_contract
+
+./bin/validate-bundle ../sphere-usecases/chemical/grfics/runs/run-local-01
+```
+
 ### Validate Bundle
 
 ```bash
 cd /Users/lag/Development/cps-enclave-model
-./bin/validate-bundle ../sphere-usecases/grfics/runs/run-demo-01
+./bin/validate-bundle ../sphere-usecases/chemical/grfics/runs/run-demo-01
 ```
 
 ### Run Attack + Defense
@@ -123,7 +147,7 @@ cd /Users/lag/Development/cps-enclave-model
 ```bash
 cd /Users/lag/Development/cps-enclave-model
 
-./scripts/toolbox-run.sh ../sphere-usecases/grfics/runs/run-demo-01 \
+./scripts/toolbox-run.sh ../sphere-usecases/chemical/grfics/runs/run-demo-01 \
   --tag TE_Tank_Pressure \
   --offset 100 \
   --start 20 \
@@ -141,9 +165,9 @@ Expected artifacts:
 cd /Users/lag/Development/cps-enclave-model
 
 go run ./cps-enclave-viewer/cmd/viewer \
-  -data ../sphere-usecases/grfics/runs \
-  -assets-dir ../sphere-usecases/grfics/assets \
-  -slice ../sphere-usecases/grfics/slices/grfics-te-full-slice.yaml \
+  -data ../sphere-usecases/chemical/grfics/runs \
+  -assets-dir ../sphere-usecases/chemical/grfics/assets \
+  -slice ../sphere-usecases/chemical/grfics/slices/grfics-te-full-slice.yaml \
   -addr :8085
 ```
 
@@ -157,23 +181,19 @@ Credentials:
 - user: `admin`
 - password: `admin`
 
-## 5) Done vs Pending Checklist
+## 5) Integration Snapshot (local facts only)
 
-Done:
+Ready in-repo:
 - [x] Tag contract (`grfics/tag_contract.yaml`)
 - [x] Source map (`grfics/source_map.yaml`)
+- [x] Runner backend map (`grfics/openplc_backend_map.yaml`)
 - [x] Bridge script (`grfics/scripts/grfics_bridge.py`)
 - [x] Invariant rules (`tools/defense/rules/grfics-te.yaml`)
 - [x] Slice definition (`grfics/slices/grfics-te-full-slice.yaml`)
 - [x] Demo profile (`grfics/profiles/demo.yaml`)
 - [x] Demo guide (`cps-enclave-model/docs/demo/GRFICS_DEMO.md`)
 
-Pending:
-- [ ] P&ID SVG upgrade (replace placeholder `grfics/assets/grfics-te.svg`)
-- [ ] Stable golden run generation path for GRFICS
-- [ ] Full viewer overlay positioning validation
-- [ ] Expanded attack scenario library
-- [ ] Live VM validation cycle completion when endpoints are reachable
+For readiness gaps and current next steps, check the canonical backlog before attempting a live VM validation cycle. The open items currently center on the P&ID SVG, stable golden-run generation, overlay-position validation, expanded attack scenarios, and reachable VM endpoints.
 
 ## Troubleshooting
 
@@ -192,5 +212,6 @@ Pending:
 - `grfics/README.md`
 - `grfics/tag_contract.yaml`
 - `grfics/source_map.yaml`
+- `grfics/openplc_backend_map.yaml`
 - `grfics/scripts/grfics_bridge.py`
 - `cps-enclave-model/tools/defense/rules/grfics-te.yaml`

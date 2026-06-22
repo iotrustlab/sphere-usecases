@@ -32,10 +32,10 @@ vim your-new-use-case/README.md
 #### Improving an Existing Use Case
 ```bash
 # Navigate to the use case
-cd water-treatment/  # or oil-and-gas-distribution/
+cd water/rovisys-treatment/usecases/p1-onboarding/
 
 # Make your changes
-vim implementations/rockwell/plc/Controller_PLC.L5X
+vim implementations/rockwell/controller/Controller_PLC.L5X
 ```
 
 ## 📁 Use Case Structure Requirements

@@ -155,7 +155,7 @@ python bridge.py --usecase wt --controller localhost:502 --simulator localhost:5
 
 ## Related Documentation
 
-- [WT Modbus Map](../water-treatment/implementations/openplc/configs/modbus_map.yaml)
-- [WD Modbus Map](../water-distribution/implementations/openplc/configs/openplc_map.yaml)
-- [PS Modbus Map](../power-hydro/implementations/openplc/configs/openplc_map.yaml)
+- [WT Modbus Map](../water/rovisys-treatment/usecases/p1-onboarding/implementations/openplc/configs/modbus_map.yaml)
+- [WD Modbus Map](../water/rovisys-distribution/implementations/openplc/configs/openplc_map.yaml)
+- [PS Modbus Map](../energy/olmsted-hydro/implementations/openplc/configs/openplc_map.yaml)
 - [OpenPLC Dockerfile](../../cps-enclave-model/docker/openplc/Dockerfile)

@@ -1,6 +1,6 @@
 # Oil & Gas Distribution Use Case
 
-> **Status**: 🔄 Planned - This use case is currently under development
+> Repo-local planning note: this use case is still in incubation. Canonical prioritization lives in [`../../sphere-docs/BACKLOG.md`](../../sphere-docs/BACKLOG.md).
 
 A pipeline distribution system with pressure control, demonstrating realistic oil and gas industry control scenarios with safety interlocks and security considerations.
 
@@ -26,7 +26,7 @@ Oil and gas pipeline distribution with pressure control:
 ## 📁 Structure
 
 ```
-oil-and-gas-distribution/
+oil-and-gas/
 ├── README.md                          # This file
 ├── docs/                              # Process documentation (planned)
 │   ├── process_overview.md            # Detailed process description
