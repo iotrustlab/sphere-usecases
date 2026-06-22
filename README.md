@@ -80,13 +80,14 @@ sphere-usecases/
 │   └── oil-and-gas/                   # Pipeline distribution
 │
 ├── tools/                             # Repo-level tools
-│   └── hwtest/                        # Hardware signal testing
+│   ├── hwtest/                        # Hardware signal testing
+│   └── fuxa-demo/                     # FUXA HMI demo stack
 │
 ├── templates/                         # Golden skeletons
-├── hmi/                               # Shared HMI stack
-├── diagrams/                          # Global diagram references
-├── tag-layouts/                       # Tag naming conventions
-└── controller-mappings/               # Controller I/O configs
+│   └── usecase/                       # Use case template
+│
+└── docs/                              # Global documentation
+    └── conventions/                   # Tag naming, diagram standards
 ```
 
 ## Use Case Structure Pattern
