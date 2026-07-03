@@ -108,6 +108,8 @@ Current limitations include:
 - The P3 tank drains directly instead of feeding downstream treatment stages (P4–P6).
 
 ---
+##HMI Storage
+Hmi is stored as an xml file, for the two displays that were created
 
 ## Process Flow
 
