@@ -108,7 +108,7 @@ Current limitations include:
 - The P3 tank drains directly instead of feeding downstream treatment stages (P4–P6).
 
 ---
-##HMI Storage
+## HMI Storage
 Hmi is stored as an xml file, for the two displays that were created
 
 ## Process Flow
@@ -138,5 +138,5 @@ Drain P3 Tank
         ▼
 Repeat
 ```
-##Video Demonstartion of HMI and Simulator and Controller Process working together
+## Video Demonstartion of HMI and Simulator and Controller Process working together
 https://youtu.be/Wm_Pji_4yi4
