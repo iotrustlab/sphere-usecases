@@ -11,7 +11,7 @@ The simulator and controller PLCs are connected together, with the outputs of on
 
 The process begins by filling the **P1 Raw Water Tank (`P1.RW_Tank`)** from a simulated raw water source. Once the tank reaches approximately **800 mm**, a transfer valve and pump are activated to move water into the **P3 Ultrafiltration Tank (`P3.Ultrafiltration_Tank`)**.
 
-When the P3 tank reaches its maximum capacity of **1000 mm**, the tank is held full for a randomly selected time between **5 and 8 seconds** before draining. Once the tank is emptied, the process repeats by filling the P1 tank again.
+When the P3 tank reaches its maximum capacity of **1000 mm**, the tank is then drained for a randomly selected time between **5 and 8 seconds**. Once the tank is emptied of a certain amount, the process repeats by filling the P1 tank again.
 
 ---
 
