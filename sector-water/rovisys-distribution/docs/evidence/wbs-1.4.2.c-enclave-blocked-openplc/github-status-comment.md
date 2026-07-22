@@ -1,10 +1,10 @@
 WBS 1.4.2.c test plan and attempted results are documented in:
 
-`sphere-usecases/water-distribution/docs/wbs-1.4.2.c-enclave-test-plan-results.md`
+`sphere-usecases/sector-water/rovisys-distribution/docs/wbs-1.4.2.c-enclave-test-plan-results.md`
 
 Failure evidence bundle:
 
-`sphere-usecases/water-distribution/docs/evidence/wbs-1.4.2.c-enclave-blocked-openplc/`
+`sphere-usecases/sector-water/rovisys-distribution/docs/evidence/wbs-1.4.2.c-enclave-blocked-openplc/`
 
 Summary:
 
