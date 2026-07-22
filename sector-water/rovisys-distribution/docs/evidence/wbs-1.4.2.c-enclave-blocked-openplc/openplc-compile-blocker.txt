@@ -1,0 +1,45 @@
+Controller compile output observed:
+
+=== SPHERE OpenPLC Runtime ===
+Program: /programs/wd_controller.st
+Modbus Port: 502
+WebUI Port: 8080
+Scan Cycle: 50ms
+
+Copying program to OpenPLC...
+Compiling program...
+Generating C files...
+POUS.c
+POUS.h
+LOCATED_VARIABLES.h
+VARIABLES.csv
+Including Siemens S7 Protocol via snap7
+Moving Files...
+mv: cannot stat 'Config0.c': No such file or directory
+mv: cannot stat 'Config0.h': No such file or directory
+mv: cannot stat 'Res0.c': No such file or directory
+Error moving files
+Compilation finished with errors!
+
+Simulator compile output observed:
+
+=== SPHERE OpenPLC Runtime ===
+Program: /programs/wd_simulator.st
+Modbus Port: 502
+WebUI Port: 8080
+Scan Cycle: 50ms
+
+Copying program to OpenPLC...
+Compiling program...
+Generating C files...
+POUS.c
+POUS.h
+LOCATED_VARIABLES.h
+VARIABLES.csv
+Including Siemens S7 Protocol via snap7
+Moving Files...
+mv: cannot stat 'Config0.c': No such file or directory
+mv: cannot stat 'Config0.h': No such file or directory
+mv: cannot stat 'Res0.c': No such file or directory
+Error moving files
+Compilation finished with errors!

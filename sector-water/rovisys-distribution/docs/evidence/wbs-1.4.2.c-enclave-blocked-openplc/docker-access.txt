@@ -1,0 +1,9 @@
+Docker access from evidence-capture session
+
+`docker ps -a --filter name=wd-openplc` output:
+permission denied while trying to connect to the docker API at unix:///var/run/docker.sock
+
+`sudo -n docker ps -a --filter name=wd-openplc` output:
+sudo: interactive authentication is required
+
+Note: this Codex session could not capture live container logs because Docker access requires interactive sudo authentication. The compile failure is recorded from the user's terminal output during the validation attempt.
