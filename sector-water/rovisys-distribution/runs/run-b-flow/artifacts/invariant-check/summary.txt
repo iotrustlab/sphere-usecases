@@ -1,0 +1,7 @@
+Invariant Check Report
+Bundle: run-b-flow
+Rules: water-distribution.yaml
+Samples: 60
+Violations: 0
+
+  No violations detected.

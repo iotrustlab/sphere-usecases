@@ -1,0 +1,38 @@
+api_version: sphere.mergetb.io/v1
+kind: SliceDefinition
+metadata:
+  slice_id: wt-uc1-p2-only
+  usecase_id: water-treatment-uc1
+  version: "1.0.0"
+  description: >
+    P2 only - Chemical Treatment. Focused slice for Process 2 analysis
+    covering NaCl, NaOCl, and HCl dosing tanks and valves.
+
+active_groups:
+  - p2
+  - system
+
+diagram:
+  asset: "water-treatment.png"
+
+overlay_tags:
+  # P2 tank levels
+  - ChemTreat_NaCl_Level
+  - ChemTreat_NaOCl_Level
+  - ChemTreat_HCl_Level
+  # P2 valve status
+  - ChemTreat_NaCl_Valve_Sts
+  - ChemTreat_NaOCl_Valve_Sts
+  - ChemTreat_HCl_Valve_Sts
+  # System state
+  - SYS_RUNNING
+
+trend_tags:
+  - ChemTreat_NaCl_Level
+  - ChemTreat_NaOCl_Level
+  - ChemTreat_HCl_Level
+
+notes: >
+  Single-process slice for P2 (Chemical Treatment). Use this slice for
+  focused analysis of chemical dosing behavior without raw water or
+  ultrafiltration clutter.

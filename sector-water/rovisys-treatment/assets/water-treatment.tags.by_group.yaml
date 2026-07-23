@@ -1,0 +1,41 @@
+# Tags grouped by slice active_groups (p1, p2, p3, sys, alm).
+# Derived from water-treatment.tags.normalized.yaml + slice.yaml.
+
+groups:
+  p1:
+    label: "P1 — Raw Water Intake"
+    tags:
+      - RW_Tank_Level
+      - RW_Tank_PR_Valve
+      - RW_Tank_PR_Valve_Sts
+      - RW_Tank_P_Valve
+      - RW_Tank_P_Valve_Sts
+      - RW_Pump_Speed
+      - RW_Pump_Flow
+      - RW_Pump_Sts
+      - RW_Pump_Fault
+      - RW_Pump_Start
+      - RW_Pump_Stop
+
+  p2:
+    label: "P2 — Chemical Treatment"
+    tags:
+      - ChemTreat_NaCl_Level
+      - ChemTreat_NaOCl_Level
+      - ChemTreat_HCl_Level
+
+  p3:
+    label: "P3 — Ultrafiltration"
+    tags:
+      - UF_UFFT_Tank_Level
+
+  sys:
+    label: "System State"
+    tags:
+      - SYS_IDLE
+      - SYS_RUNNING
+
+  alm:
+    label: "Alarms"
+    tags:
+      - Alarm_RW_Tank_HH

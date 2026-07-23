@@ -1,0 +1,7 @@
+Invariant Check Report
+Bundle: run-a-idle
+Rules: power-hydro.yaml
+Samples: 60
+Violations: 0
+
+  No violations detected.

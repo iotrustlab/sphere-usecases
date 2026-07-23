@@ -1,0 +1,7 @@
+Invariant Check Report
+Bundle: run-d-trip
+Rules: power-hydro.yaml
+Samples: 120
+Violations: 0
+
+  No violations detected.

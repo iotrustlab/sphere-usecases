@@ -1,0 +1,8 @@
+# Ansible Galaxy requirements for OpenPLC deployment
+#
+# Install with:
+#   ansible-galaxy collection install -r requirements.yml
+
+collections:
+  - name: community.docker
+    version: ">=3.0.0"

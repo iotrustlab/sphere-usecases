@@ -1,0 +1,285 @@
+# OpenPLC Backend Mapping: Power Systems - Generic Hydro Station (PS-1)
+#
+# Maps each canonical tag name from tag_contract.yaml to its Modbus
+# register type and address for the OpenPLC backend.
+#
+# Architecture:
+#   Controller PLC (10.100.0.10:502) <-> Modbus Bridge <-> Simulator PLC (10.100.0.20:502)
+#
+# The Modbus bridge shuttles data between controller and simulator:
+#   - Controller outputs (coils, holding regs) -> Simulator inputs
+#   - Simulator outputs (sensor values, status) -> Controller inputs
+#
+# Modbus register types:
+#   coil              - Digital output (function codes 1/5/15)
+#   discrete_input    - Digital input (function code 2)
+#   holding_register  - Analog output (function codes 3/6/16)
+#   input_register    - Analog input (function code 4)
+#
+# OpenPLC IEC address convention:
+#   %QX<byte>.<bit> -> coil address = byte*8 + bit
+#   %IX<byte>.<bit> -> discrete_input address = byte*8 + bit
+#   %QW<n>          -> holding_register address = n
+#   %IW<n>          -> input_register address = n
+
+api_version: sphere.mergetb.io/v1
+kind: BackendMapping
+metadata:
+  backend: openplc
+  protocol: modbus_tcp
+  status: active
+  controller_address: "10.100.0.10:502"
+  simulator_address: "10.100.0.20:502"
+
+# Bridge register allocation:
+#
+# Controller -> Simulator (via bridge):
+#   Coils 40-42      (%QX5.0-5.2)     Breaker/Spill commands
+#   HR 100           (%QW100)         Gate position command (scaled 0-1000 = 0-100%)
+#   HR 101           (%QW101)         Power setpoint (scaled 0-1000 = 0-100 MW)
+#
+# Simulator -> Controller (via bridge):
+#   IR 70-79         (%IW70-79)       Analog sensor values
+#   DI 16-23         (%IX2.0-2.7)     Status bits
+#
+# Internal to Controller:
+#   Coils 56-60      (%QX7.0-7.4)     System state (IDLE, STARTUP, RUNNING, SHUTDOWN, TRIPPED)
+#   Coils 64-67      (%QX8.0-8.3)     Trip outputs
+#   Coils 72-74      (%QX9.0-9.2)     Alarm outputs
+#   DI 0-5           (%IX0.0-0.5)     HMI inputs
+
+mappings:
+  # ─── HMI Inputs (Discrete Inputs) ─────────────────────────────────────────
+  HY_Start_Cmd:
+    register_type: discrete_input
+    address: 0              # %IX0.0
+    iec_address: "%IX0.0"
+    description: "Start pushbutton input"
+
+  HY_Stop_Cmd:
+    register_type: discrete_input
+    address: 1              # %IX0.1
+    iec_address: "%IX0.1"
+    description: "Stop pushbutton input"
+
+  HY_Reset_Cmd:
+    register_type: discrete_input
+    address: 2              # %IX0.2
+    iec_address: "%IX0.2"
+    description: "Trip reset pushbutton input"
+
+  HY_Mode_Auto:
+    register_type: discrete_input
+    address: 3              # %IX0.3
+    iec_address: "%IX0.3"
+    description: "Auto mode selector switch"
+
+  HY_Run_Enable:
+    register_type: discrete_input
+    address: 4              # %IX0.4
+    iec_address: "%IX0.4"
+    description: "Run enable permissive"
+
+  # ─── Actuator Commands ────────────────────────────────────────────────────
+  # Analog command (holding register) - controller -> simulator
+  HY_Gate_Cmd:
+    register_type: holding_register
+    address: 100            # %QW100
+    iec_address: "%QW100"
+    scale: 10.0             # 0-1000 maps to 0-100%
+    description: "Wicket gate position command [%], range [0, 100]"
+
+  HY_Power_Setpoint_MW:
+    register_type: holding_register
+    address: 101            # %QW101
+    iec_address: "%QW101"
+    scale: 10.0             # 0-1000 maps to 0-100 MW
+    description: "Power output setpoint [MW], range [0, 100]"
+
+  # Digital commands (coils) - controller -> simulator
+  HY_Breaker_Cmd:
+    register_type: coil
+    address: 40             # %QX5.0
+    iec_address: "%QX5.0"
+    description: "Generator breaker close command"
+
+  HY_Spill_Cmd:
+    register_type: coil
+    address: 41             # %QX5.1
+    iec_address: "%QX5.1"
+    description: "Spillway gate open command"
+
+  # ─── Actuator Status (Simulator -> Controller) ───────────────────────────
+  # Analog status (input registers)
+  HY_Gate_Pos:
+    register_type: input_register
+    address: 70             # %IW70
+    iec_address: "%IW70"
+    scale: 10.0             # 0-1000 maps to 0-100%
+    description: "Wicket gate actual position [%], range [0, 100]"
+
+  # Digital status (discrete inputs)
+  HY_Breaker_Sts:
+    register_type: discrete_input
+    address: 16             # %IX2.0
+    iec_address: "%IX2.0"
+    description: "Generator breaker closed status"
+
+  HY_Spill_Sts:
+    register_type: discrete_input
+    address: 17             # %IX2.1
+    iec_address: "%IX2.1"
+    description: "Spillway gate open status"
+
+  # ─── Process Sensors (Simulator -> Controller) ───────────────────────────
+  HY_Res_Level:
+    register_type: input_register
+    address: 71             # %IW71
+    iec_address: "%IW71"
+    scale: 100.0            # 0-3000 maps to 0-30.00 m
+    description: "Reservoir level [m], range [0, 30]"
+
+  HY_Head:
+    register_type: input_register
+    address: 72             # %IW72
+    iec_address: "%IW72"
+    scale: 10.0             # 0-1500 maps to 0-150.0 m
+    description: "Net hydraulic head [m], range [0, 150]"
+
+  HY_Flow:
+    register_type: input_register
+    address: 73             # %IW73
+    iec_address: "%IW73"
+    scale: 10.0             # 0-1500 maps to 0-150.0 m3/s
+    description: "Turbine flow rate [m3/s], range [0, 150]"
+
+  HY_Pressure:
+    register_type: input_register
+    address: 74             # %IW74
+    iec_address: "%IW74"
+    scale: 1.0              # 0-2000 maps to 0-2000 kPa
+    description: "Penstock pressure [kPa], range [0, 2000]"
+
+  HY_Speed_Pct:
+    register_type: input_register
+    address: 75             # %IW75
+    iec_address: "%IW75"
+    scale: 10.0             # 0-1500 maps to 0-150.0%
+    description: "Speed as % of synchronous [%], range [0, 150]"
+
+  HY_Freq_Hz:
+    register_type: input_register
+    address: 76             # %IW76
+    iec_address: "%IW76"
+    scale: 100.0            # 5500-6500 maps to 55.00-65.00 Hz
+    description: "Generator frequency [Hz], range [55, 65]"
+
+  HY_Power_MW:
+    register_type: input_register
+    address: 77             # %IW77
+    iec_address: "%IW77"
+    scale: 10.0             # 0-1000 maps to 0-100.0 MW
+    description: "Electrical power output [MW], range [0, 100]"
+
+  # ─── System State (Controller Outputs) ───────────────────────────────────
+  HY_State_Idle:
+    register_type: coil
+    address: 56             # %QX7.0
+    iec_address: "%QX7.0"
+    description: "Unit in IDLE state"
+
+  HY_State_Startup:
+    register_type: coil
+    address: 57             # %QX7.1
+    iec_address: "%QX7.1"
+    description: "Unit in STARTUP state"
+
+  HY_State_Running:
+    register_type: coil
+    address: 58             # %QX7.2
+    iec_address: "%QX7.2"
+    description: "Unit in RUNNING state"
+
+  HY_State_Shutdown:
+    register_type: coil
+    address: 59             # %QX7.3
+    iec_address: "%QX7.3"
+    description: "Unit in SHUTDOWN state"
+
+  HY_State_Tripped:
+    register_type: coil
+    address: 60             # %QX7.4
+    iec_address: "%QX7.4"
+    description: "Unit in TRIPPED state"
+
+  HY_Permissives_Ready:
+    register_type: coil
+    address: 61             # %QX7.5
+    iec_address: "%QX7.5"
+    description: "All start permissives satisfied"
+
+  # ─── Trip Outputs ─────────────────────────────────────────────────────────
+  HY_Trip_Overspeed:
+    register_type: coil
+    address: 64             # %QX8.0
+    iec_address: "%QX8.0"
+    description: "Overspeed trip active"
+
+  HY_Trip_Overpressure:
+    register_type: coil
+    address: 65             # %QX8.1
+    iec_address: "%QX8.1"
+    description: "Overpressure trip active"
+
+  HY_Trip_LowHead:
+    register_type: coil
+    address: 66             # %QX8.2
+    iec_address: "%QX8.2"
+    description: "Low head trip active"
+
+  HY_Trip_Manual:
+    register_type: coil
+    address: 67             # %QX8.3
+    iec_address: "%QX8.3"
+    description: "Manual emergency trip active"
+
+  # ─── Alarm Outputs ────────────────────────────────────────────────────────
+  HY_Alarm_GateMismatch:
+    register_type: coil
+    address: 72             # %QX9.0
+    iec_address: "%QX9.0"
+    description: "Gate command/position mismatch alarm"
+
+  HY_Alarm_BreakerMismatch:
+    register_type: coil
+    address: 73             # %QX9.1
+    iec_address: "%QX9.1"
+    description: "Breaker command/status mismatch alarm"
+
+  HY_Alarm_LowLevel:
+    register_type: coil
+    address: 74             # %QX9.2
+    iec_address: "%QX9.2"
+    description: "Low reservoir level alarm"
+
+# ─── Bridge Configuration Reference ────────────────────────────────────────
+#
+# The modbus_bridge.py script should be configured to shuttle:
+#
+# Controller -> Simulator:
+#   Coil 40     (%QX5.0) -> Discrete Input 24 (%IX3.0)  HY_Breaker_Cmd
+#   Coil 41     (%QX5.1) -> Discrete Input 25 (%IX3.1)  HY_Spill_Cmd
+#   HR 100      (%QW100) -> IR 200 (%IW200)             HY_Gate_Cmd
+#   HR 101      (%QW101) -> IR 201 (%IW201)             HY_Power_Setpoint_MW
+#
+# Simulator -> Controller:
+#   HR 300      (%QW300) -> IR 70 (%IW70)               HY_Gate_Pos
+#   HR 301      (%QW301) -> IR 71 (%IW71)               HY_Res_Level
+#   HR 302      (%QW302) -> IR 72 (%IW72)               HY_Head
+#   HR 303      (%QW303) -> IR 73 (%IW73)               HY_Flow
+#   HR 304      (%QW304) -> IR 74 (%IW74)               HY_Pressure
+#   HR 305      (%QW305) -> IR 75 (%IW75)               HY_Speed_Pct
+#   HR 306      (%QW306) -> IR 76 (%IW76)               HY_Freq_Hz
+#   HR 307      (%QW307) -> IR 77 (%IW77)               HY_Power_MW
+#   Coil 320    (%QX40.0) -> DI 16 (%IX2.0)             HY_Breaker_Sts
+#   Coil 321    (%QX40.1) -> DI 17 (%IX2.1)             HY_Spill_Sts

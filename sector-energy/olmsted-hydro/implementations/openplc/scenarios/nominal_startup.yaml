@@ -1,0 +1,56 @@
+# Nominal startup scenario - clean start, run at 50% load, clean shutdown
+# Tests the full state machine: IDLE -> STARTUP -> RUNNING -> SHUTDOWN -> IDLE
+
+scenario_id: "ps-hydro-nominal-startup"
+description: "Clean startup, run at 50% load, clean shutdown"
+duration_sec: 120
+poll_interval_ms: 500
+
+initial_conditions:
+  HY_Res_Level: 20.0          # m - normal reservoir level
+  HY_Head: 120.0              # m - normal head
+  HY_Gate_Pos: 0.0            # Gate closed
+  HY_Breaker_Sts: false       # Breaker open
+  HY_Power_MW: 0.0            # No power output
+  HY_Speed_Pct: 0.0           # Unit stopped
+  HY_Run_Enable: true         # Permissive enabled
+
+timeline:
+  # Set power setpoint before starting
+  - time_sec: 3
+    action: set_tag
+    tag: HY_Power_Setpoint_MW
+    value: 40.0               # 50% of 80 MW rated
+
+  # Issue start command at t=5s
+  - time_sec: 5
+    action: start_cmd
+    comment: "Initiate startup sequence"
+
+  # System should transition through STARTUP to RUNNING
+  # Expected: gate ramps to no-load (~5%), speed rises, breaker closes at sync
+
+  # Run at setpoint until t=90s
+  - time_sec: 90
+    action: stop_cmd
+    comment: "Initiate normal shutdown"
+
+  # System should transition through SHUTDOWN to IDLE
+  # Expected: power ramps down, breaker opens, gate closes
+
+expected_state:
+  at_time_30:
+    HY_State_Running: true
+    HY_Breaker_Sts: true
+    HY_Power_MW: {min: 30, max: 50}  # Approaching setpoint
+
+  at_time_60:
+    HY_State_Running: true
+    HY_Power_MW: {min: 38, max: 42}  # At setpoint +/- 5%
+
+  at_end:
+    HY_State_Idle: true
+    HY_Gate_Pos: {max: 1.0}
+    HY_Breaker_Sts: false
+
+reference_bundle: null

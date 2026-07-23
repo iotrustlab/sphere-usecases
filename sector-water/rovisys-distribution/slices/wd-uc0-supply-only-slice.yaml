@@ -1,0 +1,36 @@
+api_version: sphere.mergetb.io/v1
+kind: SliceDefinition
+
+metadata:
+  slice_id: wd-uc0-supply-only-slice
+  usecase_id: water-distribution-uc0
+  version: "1.0.0"
+  description: Water Distribution UC0 Supply Line only slice. Isolates supply tank, pump, chemical dosing, and valve for focused validation.
+
+active_groups:
+  - supply
+
+diagram:
+  asset: "water-distribution.svg"
+
+overlay_tags:
+  - Supply_Tank_Level
+  - Supply_Pump_Flow
+  - Supply_Pump_Speed
+  - Supply_Pump_Sts
+  - Supply_Mixer_Sts
+  - Supply_Tank_Valve
+  - Supply_Tank_Valve_Sts
+  - Supply_NaOCl_Level
+  - Supply_NH4Cl_Level
+  - SYS_IDLE
+  - SYS_RUNNING
+  - Alarm_Supply_Tank_HH
+
+trend_tags:
+  - Supply_Tank_Level
+  - Supply_Pump_Flow
+  - Supply_NaOCl_Level
+  - Supply_NH4Cl_Level
+
+notes: Supply-only slice for isolated validation of the supply line process (clearwell, booster pump, chemical dosing).

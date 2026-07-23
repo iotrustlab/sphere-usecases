@@ -1,0 +1,123 @@
+# SPHERE HMI Demo Stack
+#
+# Self-contained docker-compose with 4 services:
+#   1. controller - OpenPLC running control logic (port 502, WebUI 8080)
+#   2. simulator  - OpenPLC running physics simulation (port 503, WebUI 8081)
+#   3. bridge     - Python Modbus bridge shuttling data between PLCs
+#   4. fuxa       - HMI web UI (port 1881) connecting to controller
+#
+# Use case selection via USECASE environment variable:
+#   USECASE=wt ./scripts/start_demo.sh   # Water Treatment
+#   USECASE=wd ./scripts/start_demo.sh   # Water Distribution
+#   USECASE=ps ./scripts/start_demo.sh   # Power Systems Hydro
+#
+# Network: 10.100.0.0/24 bridge
+#   controller: 10.100.0.10
+#   simulator:  10.100.0.20
+#   bridge:     10.100.0.30
+#   fuxa:       10.100.0.40
+
+networks:
+  sphere-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.100.0.0/24
+          gateway: 10.100.0.1
+
+services:
+  # Controller PLC - runs control logic
+  controller:
+    build:
+      context: ../../cps-enclave-model/docker/openplc
+      dockerfile: Dockerfile
+    container_name: sphere-controller
+    hostname: controller
+    networks:
+      sphere-net:
+        ipv4_address: 10.100.0.10
+    ports:
+      - "8080:8080"   # WebUI
+      - "502:502"     # Modbus TCP (exposed for debugging)
+    volumes:
+      - ${CONTROLLER_ST_FILE:-./programs/controller.st}:/programs/program.st:ro
+    environment:
+      OPENPLC_PROGRAM: /programs/program.st
+      OPENPLC_MODBUS_PORT: 502
+      OPENPLC_WEBUI_PORT: 8080
+      OPENPLC_SCAN_CYCLE_MS: 50
+      OPENPLC_AUTOSTART: "true"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+
+  # Simulator PLC - runs physics simulation
+  simulator:
+    build:
+      context: ../../cps-enclave-model/docker/openplc
+      dockerfile: Dockerfile
+    container_name: sphere-simulator
+    hostname: simulator
+    networks:
+      sphere-net:
+        ipv4_address: 10.100.0.20
+    ports:
+      - "8081:8080"   # WebUI
+      - "503:502"     # Modbus TCP (exposed for debugging)
+    volumes:
+      - ${SIMULATOR_ST_FILE:-./programs/simulator.st}:/programs/program.st:ro
+    environment:
+      OPENPLC_PROGRAM: /programs/program.st
+      OPENPLC_MODBUS_PORT: 502
+      OPENPLC_WEBUI_PORT: 8080
+      OPENPLC_SCAN_CYCLE_MS: 50
+      OPENPLC_AUTOSTART: "true"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+
+  # Modbus Bridge - shuttles data between controller and simulator
+  bridge:
+    build:
+      context: ./bridge
+      dockerfile: Dockerfile
+    container_name: sphere-bridge
+    hostname: bridge
+    networks:
+      sphere-net:
+        ipv4_address: 10.100.0.30
+    depends_on:
+      controller:
+        condition: service_healthy
+      simulator:
+        condition: service_healthy
+    environment:
+      CONTROLLER_ADDR: "10.100.0.10:502"
+      SIMULATOR_ADDR: "10.100.0.20:502"
+      USECASE: ${USECASE:-wt}
+      CYCLE_MS: ${CYCLE_MS:-100}
+    restart: unless-stopped
+
+  # FUXA HMI - web-based HMI
+  fuxa:
+    image: frangoteam/fuxa:latest
+    container_name: sphere-fuxa
+    hostname: fuxa
+    networks:
+      sphere-net:
+        ipv4_address: 10.100.0.40
+    ports:
+      - "1881:1881"
+    volumes:
+      - ./fuxa:/usr/src/app/FUXA/server/_appdata
+    environment:
+      - FUXA_securityEnabled=false
+    depends_on:
+      - controller
+    restart: unless-stopped

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="13.758333mm"
+   height="16.404167mm"
+   viewBox="0 0 13.758333 16.404167"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.4.4 (dcaf3e7d9e, 2026-05-05)"
+   sodipodi:docname="wicketgate.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="0.70555556"
+     inkscape:cx="96.377953"
+     inkscape:cy="283.46457"
+     inkscape:window-width="1920"
+     inkscape:window-height="1003"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-79.375,-73.554167)">
+    <g
+       id="use23"
+       transform="matrix(0.26458333,0,0,0.26458333,79.639583,73.81875)">
+      <rect
+         x="15"
+         y="0"
+         width="20"
+         height="60"
+         fill="#e8e8e8"
+         stroke="#2a5a8c"
+         stroke-width="2"
+         id="rect1" />
+      <rect
+         x="0"
+         y="20"
+         width="50"
+         height="20"
+         fill="#d4e6f1"
+         stroke="#2a5a8c"
+         stroke-width="2"
+         id="rect2" />
+      <!-- Gate position indicator -->
+      <line
+         x1="25"
+         y1="5"
+         x2="25"
+         y2="55"
+         stroke="#c0392b"
+         stroke-width="3"
+         id="line2" />
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,22 @@
+scenario_id: "wd-uc0-high-demand"
+description: "Start system, apply high demand (2x base), verify control responds"
+duration_sec: 120
+poll_interval_ms: 500
+
+initial_conditions:
+  Supply_Tank_Level: 1200
+  Supply_NaOCl_Level: 800
+  Supply_NH4Cl_Level: 800
+  Grid_Elev_Tank_Level: 5000
+  Grid_Consum_Tank_Level: 3500
+  RWS_Tank_Level: 300
+
+timeline:
+  - { time_sec: 5, action: hmi_start }
+  # Apply high demand multiplier at 30s
+  - { time_sec: 30, action: "set_demand_mult:2.0" }
+  # Return to normal demand at 80s
+  - { time_sec: 80, action: "set_demand_mult:1.0" }
+  - { time_sec: 100, action: hmi_stop }
+
+reference_bundle: null

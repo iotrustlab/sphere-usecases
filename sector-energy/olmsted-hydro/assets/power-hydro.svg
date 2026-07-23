@@ -1,0 +1,313 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 500" font-family="Arial, Helvetica, sans-serif" font-size="11">
+  <defs>
+    <!-- Reservoir / Dam symbol -->
+    <symbol id="sym-reservoir" viewBox="0 0 100 80">
+      <path d="M0,80 L0,20 L20,0 L80,0 L100,20 L100,80 Z" fill="#b3d9ff" stroke="#2a5a8c" stroke-width="2"/>
+      <path d="M0,20 L20,0 L80,0 L100,20" fill="none" stroke="#2a5a8c" stroke-width="2"/>
+      <!-- Water level lines -->
+      <line x1="10" y1="35" x2="90" y2="35" stroke="#2a5a8c" stroke-width="1" stroke-dasharray="4,2"/>
+      <line x1="10" y1="50" x2="90" y2="50" stroke="#2a5a8c" stroke-width="1" stroke-dasharray="4,2"/>
+    </symbol>
+
+    <!-- Penstock / Pipe symbol -->
+    <symbol id="sym-penstock" viewBox="0 0 120 40">
+      <rect x="0" y="10" width="120" height="20" fill="#d4e6f1" stroke="#2a5a8c" stroke-width="2"/>
+      <line x1="30" y1="10" x2="30" y2="30" stroke="#2a5a8c" stroke-width="1"/>
+      <line x1="60" y1="10" x2="60" y2="30" stroke="#2a5a8c" stroke-width="1"/>
+      <line x1="90" y1="10" x2="90" y2="30" stroke="#2a5a8c" stroke-width="1"/>
+    </symbol>
+
+    <!-- Gate valve symbol -->
+    <symbol id="sym-gate" viewBox="0 0 50 60">
+      <rect x="15" y="0" width="20" height="60" fill="#e8e8e8" stroke="#2a5a8c" stroke-width="2"/>
+      <rect x="0" y="20" width="50" height="20" fill="#d4e6f1" stroke="#2a5a8c" stroke-width="2"/>
+      <!-- Gate position indicator -->
+      <line x1="25" y1="5" x2="25" y2="55" stroke="#c0392b" stroke-width="3"/>
+    </symbol>
+
+    <!-- Turbine symbol -->
+    <symbol id="sym-turbine" viewBox="0 0 80 80">
+      <circle cx="40" cy="40" r="35" fill="#e8f0f6" stroke="#2a5a8c" stroke-width="2"/>
+      <!-- Turbine blades -->
+      <path d="M40,10 Q55,40 40,70" fill="none" stroke="#2a5a8c" stroke-width="2"/>
+      <path d="M40,10 Q25,40 40,70" fill="none" stroke="#2a5a8c" stroke-width="2"/>
+      <path d="M10,40 Q40,55 70,40" fill="none" stroke="#2a5a8c" stroke-width="2"/>
+      <path d="M10,40 Q40,25 70,40" fill="none" stroke="#2a5a8c" stroke-width="2"/>
+      <circle cx="40" cy="40" r="8" fill="#2a5a8c"/>
+    </symbol>
+
+    <!-- Generator symbol -->
+    <symbol id="sym-generator" viewBox="0 0 80 60">
+      <rect x="0" y="0" width="80" height="60" rx="5" fill="#f9e79f" stroke="#2a5a8c" stroke-width="2"/>
+      <text x="40" y="35" text-anchor="middle" font-size="16" font-weight="bold" fill="#2a5a8c">G</text>
+      <!-- Coil indicators -->
+      <circle cx="15" cy="15" r="6" fill="none" stroke="#2a5a8c" stroke-width="1.5"/>
+      <circle cx="65" cy="15" r="6" fill="none" stroke="#2a5a8c" stroke-width="1.5"/>
+      <circle cx="15" cy="45" r="6" fill="none" stroke="#2a5a8c" stroke-width="1.5"/>
+      <circle cx="65" cy="45" r="6" fill="none" stroke="#2a5a8c" stroke-width="1.5"/>
+    </symbol>
+
+    <!-- Breaker symbol -->
+    <symbol id="sym-breaker" viewBox="0 0 50 50">
+      <rect x="0" y="0" width="50" height="50" rx="3" fill="#fadbd8" stroke="#2a5a8c" stroke-width="2"/>
+      <line x1="10" y1="25" x2="25" y2="25" stroke="#2a5a8c" stroke-width="3"/>
+      <line x1="25" y1="25" x2="40" y2="15" stroke="#c0392b" stroke-width="3"/>
+      <circle cx="40" cy="25" r="4" fill="none" stroke="#2a5a8c" stroke-width="2"/>
+    </symbol>
+
+    <!-- Grid symbol -->
+    <symbol id="sym-grid" viewBox="0 0 60 60">
+      <rect x="5" y="5" width="50" height="50" fill="#d5f5e3" stroke="#2a5a8c" stroke-width="2"/>
+      <line x1="5" y1="20" x2="55" y2="20" stroke="#2a5a8c" stroke-width="1"/>
+      <line x1="5" y1="40" x2="55" y2="40" stroke="#2a5a8c" stroke-width="1"/>
+      <line x1="22" y1="5" x2="22" y2="55" stroke="#2a5a8c" stroke-width="1"/>
+      <line x1="38" y1="5" x2="38" y2="55" stroke="#2a5a8c" stroke-width="1"/>
+      <text x="30" y="33" text-anchor="middle" font-size="10" fill="#2a5a8c">GRID</text>
+    </symbol>
+
+    <!-- Sensor symbol -->
+    <symbol id="sym-sensor" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="10" fill="#fff" stroke="#2a5a8c" stroke-width="2"/>
+      <text x="12" y="16" text-anchor="middle" font-size="10" fill="#2a5a8c" font-weight="bold">S</text>
+    </symbol>
+
+    <!-- Flow arrow marker -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2a5a8c"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="500" fill="#ffffff"/>
+
+  <!-- Title -->
+  <text x="600" y="28" text-anchor="middle" font-size="18" font-weight="bold" fill="#2a5a8c">Power Systems - Hydro Station PS-1 (P&amp;ID)</text>
+
+  <!-- ================================================================== -->
+  <!-- MAIN PROCESS FLOW (left to right)                                  -->
+  <!-- ================================================================== -->
+
+  <!-- Reservoir -->
+  <g id="comp-Reservoir" transform="translate(50, 100)">
+    <use href="#sym-reservoir" width="100" height="80"/>
+    <text x="50" y="95" text-anchor="middle" font-size="10" fill="#555">Reservoir</text>
+    <!-- Level anchor -->
+    <rect id="anchor_HY_Res_Level" x="25" y="40" width="50" height="14" fill="transparent"/>
+  </g>
+
+  <!-- Flow line: Reservoir to Penstock -->
+  <line x1="150" y1="150" x2="180" y2="150" stroke="#2a5a8c" stroke-width="3" marker-end="url(#arrow)"/>
+
+  <!-- Penstock section -->
+  <g id="comp-Penstock" transform="translate(190, 130)">
+    <use href="#sym-penstock" width="120" height="40"/>
+    <text x="60" y="55" text-anchor="middle" font-size="10" fill="#555">Penstock</text>
+    <!-- Head sensor anchor -->
+    <rect id="anchor_HY_Head" x="10" y="-20" width="50" height="14" fill="transparent"/>
+    <!-- Pressure sensor anchor -->
+    <rect id="anchor_HY_Pressure" x="60" y="-20" width="60" height="14" fill="transparent"/>
+  </g>
+
+  <!-- Flow line: Penstock to Gate -->
+  <line x1="310" y1="150" x2="360" y2="150" stroke="#2a5a8c" stroke-width="3" marker-end="url(#arrow)"/>
+
+  <!-- Wicket Gate -->
+  <g id="comp-Gate" transform="translate(370, 120)">
+    <use href="#sym-gate" width="50" height="60"/>
+    <text x="25" y="75" text-anchor="middle" font-size="10" fill="#555">Wicket Gate</text>
+    <!-- Gate position anchor -->
+    <rect id="anchor_HY_Gate_Pos" x="5" y="-18" width="40" height="14" fill="transparent"/>
+    <!-- Gate command anchor (below component) -->
+    <rect id="anchor_HY_Gate_Cmd" x="5" y="78" width="40" height="14" fill="transparent"/>
+  </g>
+
+  <!-- Flow line: Gate to Turbine -->
+  <line x1="420" y1="150" x2="470" y2="150" stroke="#2a5a8c" stroke-width="3" marker-end="url(#arrow)"/>
+
+  <!-- Flow sensor between gate and turbine -->
+  <g id="comp-FlowSensor" transform="translate(440, 125)">
+    <use href="#sym-sensor" width="24" height="24"/>
+    <rect id="anchor_HY_Flow" x="-10" y="28" width="44" height="14" fill="transparent"/>
+  </g>
+
+  <!-- Turbine -->
+  <g id="comp-Turbine" transform="translate(480, 110)">
+    <use href="#sym-turbine" width="80" height="80"/>
+    <text x="40" y="95" text-anchor="middle" font-size="10" fill="#555">Turbine</text>
+    <!-- Speed anchor -->
+    <rect id="anchor_HY_Speed_Pct" x="10" y="-18" width="60" height="14" fill="transparent"/>
+  </g>
+
+  <!-- Mechanical coupling line: Turbine to Generator -->
+  <line x1="560" y1="150" x2="590" y2="150" stroke="#2a5a8c" stroke-width="4" stroke-dasharray="8,4"/>
+  <text x="575" y="165" text-anchor="middle" font-size="8" fill="#888">shaft</text>
+
+  <!-- Generator -->
+  <g id="comp-Generator" transform="translate(600, 120)">
+    <use href="#sym-generator" width="80" height="60"/>
+    <text x="40" y="75" text-anchor="middle" font-size="10" fill="#555">Generator</text>
+    <!-- Power output anchor -->
+    <rect id="anchor_HY_Power_MW" x="10" y="-18" width="60" height="14" fill="transparent"/>
+    <!-- Frequency anchor -->
+    <rect id="anchor_HY_Freq_Hz" x="10" y="78" width="60" height="14" fill="transparent"/>
+  </g>
+
+  <!-- Electrical line: Generator to Breaker -->
+  <line x1="680" y1="150" x2="720" y2="150" stroke="#c0392b" stroke-width="3"/>
+
+  <!-- Breaker -->
+  <g id="comp-Breaker" transform="translate(730, 125)">
+    <use href="#sym-breaker" width="50" height="50"/>
+    <text x="25" y="65" text-anchor="middle" font-size="10" fill="#555">Breaker</text>
+    <!-- Breaker status anchor -->
+    <rect id="anchor_HY_Breaker_Sts" x="5" y="-18" width="40" height="14" fill="transparent"/>
+    <!-- Breaker command anchor -->
+    <rect id="anchor_HY_Breaker_Cmd" x="5" y="68" width="40" height="14" fill="transparent"/>
+  </g>
+
+  <!-- Electrical line: Breaker to Grid -->
+  <line x1="780" y1="150" x2="830" y2="150" stroke="#c0392b" stroke-width="3" marker-end="url(#arrow)"/>
+
+  <!-- Grid -->
+  <g id="comp-Grid" transform="translate(840, 120)">
+    <use href="#sym-grid" width="60" height="60"/>
+  </g>
+
+  <!-- ================================================================== -->
+  <!-- SPILLWAY (below main flow)                                         -->
+  <!-- ================================================================== -->
+  <g id="group-spillway" transform="translate(100, 220)">
+    <text x="0" y="0" font-size="10" font-weight="bold" fill="#2a5a8c">Spillway</text>
+    <rect x="0" y="10" width="40" height="30" fill="#e8e8e8" stroke="#2a5a8c" stroke-width="2"/>
+    <text x="20" y="30" text-anchor="middle" font-size="8" fill="#555">Spill</text>
+    <rect id="anchor_HY_Spill_Sts" x="45" y="15" width="30" height="14" fill="transparent"/>
+  </g>
+
+  <!-- ================================================================== -->
+  <!-- SETPOINT DISPLAY (top right)                                       -->
+  <!-- ================================================================== -->
+  <g id="group-setpoint" transform="translate(940, 100)">
+    <rect x="0" y="0" width="120" height="50" rx="5" fill="#eaf2f8" stroke="#2a5a8c" stroke-width="1"/>
+    <text x="60" y="18" text-anchor="middle" font-size="10" font-weight="bold" fill="#2a5a8c">Power Setpoint</text>
+    <rect id="anchor_HY_Power_Setpoint_MW" x="10" y="25" width="100" height="18" fill="transparent"/>
+  </g>
+
+  <!-- ================================================================== -->
+  <!-- STATE INDICATORS (bottom row)                                      -->
+  <!-- ================================================================== -->
+  <g id="group-states" transform="translate(50, 320)">
+    <text x="0" y="0" font-size="12" font-weight="bold" fill="#2a5a8c">System State</text>
+
+    <!-- IDLE -->
+    <g transform="translate(0, 20)">
+      <rect x="0" y="0" width="80" height="35" rx="5" fill="#f0f0f0" stroke="#2a5a8c" stroke-width="1"/>
+      <text x="40" y="22" text-anchor="middle" font-size="10" fill="#555">IDLE</text>
+      <rect id="anchor_HY_State_Idle" x="65" y="5" width="12" height="12" fill="transparent"/>
+    </g>
+
+    <!-- STARTUP -->
+    <g transform="translate(100, 20)">
+      <rect x="0" y="0" width="80" height="35" rx="5" fill="#f0f0f0" stroke="#2a5a8c" stroke-width="1"/>
+      <text x="40" y="22" text-anchor="middle" font-size="10" fill="#555">STARTUP</text>
+      <rect id="anchor_HY_State_Startup" x="65" y="5" width="12" height="12" fill="transparent"/>
+    </g>
+
+    <!-- RUNNING -->
+    <g transform="translate(200, 20)">
+      <rect x="0" y="0" width="80" height="35" rx="5" fill="#f0f0f0" stroke="#2a5a8c" stroke-width="1"/>
+      <text x="40" y="22" text-anchor="middle" font-size="10" fill="#555">RUNNING</text>
+      <rect id="anchor_HY_State_Running" x="65" y="5" width="12" height="12" fill="transparent"/>
+    </g>
+
+    <!-- SHUTDOWN -->
+    <g transform="translate(300, 20)">
+      <rect x="0" y="0" width="80" height="35" rx="5" fill="#f0f0f0" stroke="#2a5a8c" stroke-width="1"/>
+      <text x="40" y="22" text-anchor="middle" font-size="10" fill="#555">SHUTDOWN</text>
+      <rect id="anchor_HY_State_Shutdown" x="65" y="5" width="12" height="12" fill="transparent"/>
+    </g>
+
+    <!-- TRIPPED -->
+    <g transform="translate(400, 20)">
+      <rect x="0" y="0" width="80" height="35" rx="5" fill="#fadbd8" stroke="#c0392b" stroke-width="1"/>
+      <text x="40" y="22" text-anchor="middle" font-size="10" fill="#c0392b">TRIPPED</text>
+      <rect id="anchor_HY_State_Tripped" x="65" y="5" width="12" height="12" fill="transparent"/>
+    </g>
+
+    <!-- Permissives -->
+    <g transform="translate(500, 20)">
+      <rect x="0" y="0" width="100" height="35" rx="5" fill="#d5f5e3" stroke="#2a5a8c" stroke-width="1"/>
+      <text x="50" y="22" text-anchor="middle" font-size="10" fill="#555">PERMISSIVE</text>
+      <rect id="anchor_HY_Permissives_Ready" x="85" y="5" width="12" height="12" fill="transparent"/>
+    </g>
+  </g>
+
+  <!-- ================================================================== -->
+  <!-- TRIP/ALARM INDICATORS (bottom right)                               -->
+  <!-- ================================================================== -->
+  <g id="group-trips" transform="translate(700, 320)">
+    <text x="0" y="0" font-size="12" font-weight="bold" fill="#c0392b">Trips / Alarms</text>
+
+    <!-- Overspeed Trip -->
+    <g transform="translate(0, 20)">
+      <rect x="0" y="0" width="100" height="30" rx="3" fill="#fadbd8" stroke="#c0392b" stroke-width="1"/>
+      <text x="50" y="19" text-anchor="middle" font-size="9" fill="#c0392b">OVERSPEED</text>
+      <rect id="anchor_HY_Trip_Overspeed" x="85" y="5" width="12" height="12" fill="transparent"/>
+    </g>
+
+    <!-- Overpressure Trip -->
+    <g transform="translate(110, 20)">
+      <rect x="0" y="0" width="110" height="30" rx="3" fill="#fadbd8" stroke="#c0392b" stroke-width="1"/>
+      <text x="55" y="19" text-anchor="middle" font-size="9" fill="#c0392b">OVERPRESSURE</text>
+      <rect id="anchor_HY_Trip_Overpressure" x="95" y="5" width="12" height="12" fill="transparent"/>
+    </g>
+
+    <!-- Low Head Trip -->
+    <g transform="translate(230, 20)">
+      <rect x="0" y="0" width="90" height="30" rx="3" fill="#fadbd8" stroke="#c0392b" stroke-width="1"/>
+      <text x="45" y="19" text-anchor="middle" font-size="9" fill="#c0392b">LOW HEAD</text>
+      <rect id="anchor_HY_Trip_LowHead" x="75" y="5" width="12" height="12" fill="transparent"/>
+    </g>
+
+    <!-- Manual Trip -->
+    <g transform="translate(330, 20)">
+      <rect x="0" y="0" width="80" height="30" rx="3" fill="#fadbd8" stroke="#c0392b" stroke-width="1"/>
+      <text x="40" y="19" text-anchor="middle" font-size="9" fill="#c0392b">MANUAL</text>
+      <rect id="anchor_HY_Trip_Manual" x="65" y="5" width="12" height="12" fill="transparent"/>
+    </g>
+
+    <!-- Alarms row -->
+    <g transform="translate(0, 60)">
+      <!-- Gate Mismatch -->
+      <rect x="0" y="0" width="100" height="30" rx="3" fill="#fef9e7" stroke="#f39c12" stroke-width="1"/>
+      <text x="50" y="19" text-anchor="middle" font-size="9" fill="#9a7b0a">GATE MISMATCH</text>
+      <rect id="anchor_HY_Alarm_GateMismatch" x="85" y="5" width="12" height="12" fill="transparent"/>
+    </g>
+
+    <g transform="translate(110, 60)">
+      <!-- Breaker Mismatch -->
+      <rect x="0" y="0" width="120" height="30" rx="3" fill="#fef9e7" stroke="#f39c12" stroke-width="1"/>
+      <text x="60" y="19" text-anchor="middle" font-size="9" fill="#9a7b0a">BREAKER MISMATCH</text>
+      <rect id="anchor_HY_Alarm_BreakerMismatch" x="105" y="5" width="12" height="12" fill="transparent"/>
+    </g>
+
+    <g transform="translate(240, 60)">
+      <!-- Low Level Alarm -->
+      <rect x="0" y="0" width="90" height="30" rx="3" fill="#fef9e7" stroke="#f39c12" stroke-width="1"/>
+      <text x="45" y="19" text-anchor="middle" font-size="9" fill="#9a7b0a">LOW LEVEL</text>
+      <rect id="anchor_HY_Alarm_LowLevel" x="75" y="5" width="12" height="12" fill="transparent"/>
+    </g>
+  </g>
+
+  <!-- ================================================================== -->
+  <!-- LEGEND                                                             -->
+  <!-- ================================================================== -->
+  <g id="legend" transform="translate(50, 450)">
+    <text x="0" y="0" font-size="9" fill="#888">Legend:</text>
+    <line x1="50" y1="-4" x2="80" y2="-4" stroke="#2a5a8c" stroke-width="3"/>
+    <text x="85" y="0" font-size="9" fill="#888">Water flow</text>
+    <line x1="150" y1="-4" x2="180" y2="-4" stroke="#c0392b" stroke-width="3"/>
+    <text x="185" y="0" font-size="9" fill="#888">Electrical</text>
+    <line x1="250" y1="-4" x2="280" y2="-4" stroke="#2a5a8c" stroke-width="4" stroke-dasharray="8,4"/>
+    <text x="285" y="0" font-size="9" fill="#888">Mechanical coupling</text>
+  </g>
+</svg>

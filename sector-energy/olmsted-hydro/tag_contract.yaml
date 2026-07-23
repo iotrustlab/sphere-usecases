@@ -1,0 +1,307 @@
+# Canonical Tag Contract for Power Systems - Generic Hydro Station (PS-1)
+#
+# This file is the backend-agnostic source of truth for all tags in the
+# hydro power generation scenario. Tag names here must be used identically
+# across OpenPLC and any future backend implementations.
+#
+# Backend-specific protocol bindings (Modbus addresses) are in separate
+# mapping files under implementations/<backend>/.
+
+api_version: sphere.mergetb.io/v1
+kind: TagContract
+
+metadata:
+  name: power-hydro-ps1
+  use_case: power-hydro
+  version: "1.0.0"
+  description: |
+    Generic hydro station model covering the core power generation chain:
+    reservoir -> penstock -> wicket gate -> turbine -> generator -> breaker -> grid.
+
+    Designed to be parameterized via profile overlays for different sites
+    (Olmsted, generic small hydro, run-of-river, etc.).
+
+    Physics model includes:
+    - Reservoir mass balance with head calculation
+    - Penstock flow dynamics (1st-order lag)
+    - Wicket gate actuator with slew limits
+    - Turbine/generator power conversion
+    - Grid breaker with fast open/close
+    - Trip conditions (overspeed, overpressure, low head)
+  references:
+    - "DOE Hydropower Handbook"
+    - "IEEE C37.013 (AC HV Generator Circuit Breakers)"
+    - "PNNL Governor Studies"
+    - "Olmsted Hydroelectric Poster (Public Data)"
+  process_models:
+    - "docs/process-models/ps-hydro-station.md"
+
+# Tags grouped by function and role
+tags:
+  # ─── Operator/HMI Inputs ────────────────────────────────────────────────
+  - name: HY_Start_Cmd
+    type: bool
+    direction: actuator
+    role: controller
+    group: hmi
+    description: "Operator start command (momentary)"
+
+  - name: HY_Stop_Cmd
+    type: bool
+    direction: actuator
+    role: controller
+    group: hmi
+    description: "Operator stop command (momentary)"
+
+  - name: HY_Reset_Cmd
+    type: bool
+    direction: actuator
+    role: controller
+    group: hmi
+    description: "Trip reset command (momentary)"
+
+  - name: HY_Mode_Auto
+    type: bool
+    direction: actuator
+    role: controller
+    group: hmi
+    description: "Auto mode enable (vs manual)"
+
+  - name: HY_Run_Enable
+    type: bool
+    direction: actuator
+    role: controller
+    group: hmi
+    description: "Run permissive from operator"
+
+  - name: HY_Power_Setpoint_MW
+    type: real
+    direction: actuator
+    role: controller
+    group: hmi
+    units: "MW"
+    range: [0, 100]
+    description: "Power output setpoint"
+
+  # ─── Actuator Commands (Controller -> Simulator) ────────────────────────
+  - name: HY_Gate_Cmd
+    type: real
+    direction: actuator
+    role: controller
+    group: actuators
+    units: "%"
+    range: [0, 100]
+    description: "Wicket gate position command (0=closed, 100=full open)"
+
+  - name: HY_Breaker_Cmd
+    type: bool
+    direction: actuator
+    role: controller
+    group: actuators
+    description: "Generator breaker close command"
+
+  - name: HY_Spill_Cmd
+    type: bool
+    direction: actuator
+    role: controller
+    group: actuators
+    description: "Spillway gate open command (emergency)"
+
+  # ─── Actuator Status (Simulator -> Controller) ──────────────────────────
+  - name: HY_Gate_Pos
+    type: real
+    direction: sensor
+    role: simulator
+    group: status
+    units: "%"
+    range: [0, 100]
+    description: "Wicket gate actual position"
+
+  - name: HY_Breaker_Sts
+    type: bool
+    direction: sensor
+    role: simulator
+    group: status
+    description: "Generator breaker closed status"
+
+  - name: HY_Spill_Sts
+    type: bool
+    direction: sensor
+    role: simulator
+    group: status
+    description: "Spillway gate open status"
+
+  # ─── Process Sensors (Simulator -> Controller) ──────────────────────────
+  - name: HY_Res_Level
+    type: real
+    direction: sensor
+    role: simulator
+    group: sensors
+    units: "m"
+    range: [0, 30]
+    description: "Reservoir level (forebay)"
+
+  - name: HY_Head
+    type: real
+    direction: sensor
+    role: simulator
+    group: sensors
+    units: "m"
+    range: [0, 150]
+    description: "Net hydraulic head"
+
+  - name: HY_Flow
+    type: real
+    direction: sensor
+    role: simulator
+    group: sensors
+    units: "m3/s"
+    range: [0, 150]
+    description: "Turbine water flow rate"
+
+  - name: HY_Pressure
+    type: real
+    direction: sensor
+    role: simulator
+    group: sensors
+    units: "kPa"
+    range: [0, 2000]
+    description: "Penstock pressure"
+
+  - name: HY_Speed_Pct
+    type: real
+    direction: sensor
+    role: simulator
+    group: sensors
+    units: "%"
+    range: [0, 150]
+    description: "Turbine/generator speed (% of synchronous)"
+
+  - name: HY_Freq_Hz
+    type: real
+    direction: sensor
+    role: simulator
+    group: sensors
+    units: "Hz"
+    range: [55, 65]
+    description: "Generator electrical frequency"
+
+  - name: HY_Power_MW
+    type: real
+    direction: sensor
+    role: simulator
+    group: sensors
+    units: "MW"
+    range: [0, 100]
+    description: "Electrical power output"
+
+  # ─── Trip Conditions ────────────────────────────────────────────────────
+  - name: HY_Trip_Overspeed
+    type: bool
+    direction: sensor
+    role: controller
+    group: trips
+    description: "Overspeed trip active (speed > 110%)"
+
+  - name: HY_Trip_Overpressure
+    type: bool
+    direction: sensor
+    role: controller
+    group: trips
+    description: "Overpressure trip active (water hammer)"
+
+  - name: HY_Trip_LowHead
+    type: bool
+    direction: sensor
+    role: controller
+    group: trips
+    description: "Low head trip active (head < min)"
+
+  - name: HY_Trip_Manual
+    type: bool
+    direction: sensor
+    role: controller
+    group: trips
+    description: "Manual emergency trip active"
+
+  # ─── Alarms ─────────────────────────────────────────────────────────────
+  - name: HY_Alarm_GateMismatch
+    type: bool
+    direction: sensor
+    role: controller
+    group: alarms
+    description: "Gate command/position mismatch alarm"
+
+  - name: HY_Alarm_BreakerMismatch
+    type: bool
+    direction: sensor
+    role: controller
+    group: alarms
+    description: "Breaker command/status mismatch alarm"
+
+  - name: HY_Alarm_LowLevel
+    type: bool
+    direction: sensor
+    role: controller
+    group: alarms
+    description: "Low reservoir level warning"
+
+  # ─── System State ───────────────────────────────────────────────────────
+  - name: HY_State_Idle
+    type: bool
+    direction: sensor
+    role: controller
+    group: system
+    description: "Unit in IDLE state"
+
+  - name: HY_State_Startup
+    type: bool
+    direction: sensor
+    role: controller
+    group: system
+    description: "Unit in STARTUP state"
+
+  - name: HY_State_Running
+    type: bool
+    direction: sensor
+    role: controller
+    group: system
+    description: "Unit in RUNNING state (on grid)"
+
+  - name: HY_State_Shutdown
+    type: bool
+    direction: sensor
+    role: controller
+    group: system
+    description: "Unit in SHUTDOWN state"
+
+  - name: HY_State_Tripped
+    type: bool
+    direction: sensor
+    role: controller
+    group: system
+    description: "Unit in TRIPPED state (latched)"
+
+  - name: HY_Permissives_Ready
+    type: bool
+    direction: sensor
+    role: controller
+    group: system
+    description: "All start permissives satisfied"
+
+# Trip thresholds (reference - actual logic is in PLC program)
+trip_thresholds:
+  overspeed_pct: 110      # % of synchronous speed
+  overpressure_pct: 150   # % of static head pressure
+  min_head_m: 10          # Minimum operating head
+  min_flow_pct: 10        # % of rated flow (stall limit)
+
+# Headline tags for UI overlays and trend displays
+headline_tags:
+  - HY_Res_Level
+  - HY_Gate_Pos
+  - HY_Flow
+  - HY_Power_MW
+  - HY_Speed_Pct
+  - HY_State_Running
+  - HY_Trip_Overspeed

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="32.279167mm"
+   height="5.8208332mm"
+   viewBox="0 0 32.279167 5.8208332"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.4.4 (dcaf3e7d9e, 2026-05-05)"
+   sodipodi:docname="penstock.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="0.70555556"
+     inkscape:cx="47.480315"
+     inkscape:cy="359.29134"
+     inkscape:window-width="1125"
+     inkscape:window-height="1080"
+     inkscape:window-x="26"
+     inkscape:window-y="23"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-92.604167,-53.710416)">
+    <g
+       id="use22"
+       transform="matrix(0.26458333,0,0,0.26458333,92.86875,51.329166)">
+      <rect
+         x="0"
+         y="10"
+         width="120"
+         height="20"
+         fill="#d4e6f1"
+         stroke="#2a5a8c"
+         stroke-width="2"
+         id="rect1" />
+      <line
+         x1="30"
+         y1="10"
+         x2="30"
+         y2="30"
+         stroke="#2a5a8c"
+         stroke-width="1"
+         id="line1" />
+      <line
+         x1="60"
+         y1="10"
+         x2="60"
+         y2="30"
+         stroke="#2a5a8c"
+         stroke-width="1"
+         id="line2" />
+      <line
+         x1="90"
+         y1="10"
+         x2="90"
+         y2="30"
+         stroke="#2a5a8c"
+         stroke-width="1"
+         id="line3" />
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,520 @@
+#!/usr/bin/env python3
+"""
+SPHERE Validation Harness — WD UC0 Scenario-driven dual-PLC validation
+
+Orchestrates: bridge start -> initialize sim state -> execute scenario
+timeline -> collect historian data -> stop -> write bundle -> run invariant
+check -> report.
+
+Usage:
+    python validation_harness.py \\
+        --scenario scenarios/nominal_startup.yaml \\
+        --output runs/validate-nominal \\
+        [--profile profiles/realistic.yaml] \\
+        [--controller HOST:PORT] [--simulator HOST:PORT] \\
+        [--invariant-rules PATH]
+"""
+
+import argparse
+import csv
+import json
+import logging
+import os
+import shutil
+import subprocess
+import sys
+import time
+from datetime import datetime, timezone
+from pathlib import Path
+
+try:
+    import yaml
+except ImportError:
+    print("Error: PyYAML required.  pip install pyyaml")
+    sys.exit(1)
+
+try:
+    from pymodbus.client import ModbusTcpClient
+    from pymodbus.exceptions import ConnectionException
+    from pymodbus.pdu import ExceptionResponse
+except ImportError:
+    print("Error: pymodbus required.  pip install pymodbus")
+    sys.exit(1)
+
+# Import bridge from sibling module
+SCRIPT_DIR = Path(__file__).resolve().parent
+sys.path.insert(0, str(SCRIPT_DIR))
+from modbus_bridge import ModbusBridge, parse_host_port
+
+log = logging.getLogger("validation_harness_wd")
+
+# Default paths (in cps-enclave-model repo)
+_ENCLAVE_MODEL_ROOT = SCRIPT_DIR.parent.parent.parent.parent.parent / "cps-enclave-model"
+DEFAULT_RULES = str(_ENCLAVE_MODEL_ROOT / "tools" / "defense" / "rules" / "water-distribution.yaml")
+DEFAULT_CHECKER = str(_ENCLAVE_MODEL_ROOT / "tools" / "defense" / "invariant_check.py")
+DEFAULT_PROFILE = str(SCRIPT_DIR.parent.parent.parent / "profiles" / "realistic.yaml")
+
+# Try to import sim primitives for profile loading
+try:
+    sys.path.insert(0, str(_ENCLAVE_MODEL_ROOT))
+    from sim.primitives import load_profile, SimProfile
+    HAS_PRIMITIVES = True
+except ImportError:
+    HAS_PRIMITIVES = False
+    SimProfile = None
+
+
+# -- Tag polling ---------------------------------------------------------------
+
+# Tags to collect - (name, plc, register_type, address, count)
+# WD UC0 Register Layout:
+#   Simulator HR 300-306: sensor values (7 regs)
+#   Simulator coils 320-325: status bits (6 coils)
+#   Controller coils 40-42: valve commands (3 coils)
+#   Controller HR 100-101: pump speed setpoints (2 regs)
+#   Controller coils 56-57: system state (2 coils)
+#   Controller coil 64: alarm output (1 coil)
+#   Controller coils 0-1: HMI inputs (2 coils)
+
+def read_hr(client, address, count):
+    """Read holding registers, return list or None."""
+    try:
+        rr = client.read_holding_registers(address, count)
+        if rr is None or isinstance(rr, ExceptionResponse) or rr.isError():
+            return None
+        return list(rr.registers[:count])
+    except Exception:
+        return None
+
+
+def read_coils(client, address, count):
+    """Read coils, return list of 0/1 or None."""
+    try:
+        rr = client.read_coils(address, count)
+        if rr is None or isinstance(rr, ExceptionResponse) or rr.isError():
+            return None
+        return [1 if b else 0 for b in rr.bits[:count]]
+    except Exception:
+        return None
+
+
+TAG_HEADER = [
+    "timestamp_utc",
+    # Levels/sensors (from simulator HR 300-306)
+    "Supply_Tank_Level", "Supply_Pump_Flow",
+    "Supply_NaOCl_Level", "Supply_NH4Cl_Level",
+    "Grid_Elev_Tank_Level", "Grid_Consum_Tank_Level",
+    "RWS_Tank_Level",
+    # Status bits (from simulator coils 320-325)
+    "Supply_Pump_Sts", "Supply_Mixer_Sts", "Supply_Tank_Valve_Sts",
+    "Grid_Elev_Valve_Sts",
+    "RWS_Pump_Sts", "RWS_Tank_Valve_Sts",
+    # Controller commands (coils 40-42)
+    "Supply_Tank_Valve_Cmd", "Grid_Elev_Valve_Cmd", "RWS_Tank_Valve_Cmd",
+    # Controller pump speed setpoints (HR 100-101)
+    "Supply_Pump_Speed_Cmd", "RWS_Pump_Speed_Cmd",
+    # System state (controller coils 56-57)
+    "SYS_IDLE", "SYS_RUNNING",
+    # Alarms (controller coil 64)
+    "Alarm_Supply_Tank_HH",
+    # HMI (controller coils 0-1)
+    "HMI_Start_PB", "HMI_Stop_PB",
+]
+
+
+def poll_tags(ctrl_client, sim_client):
+    """Poll all tags and return a dict keyed by TAG_HEADER names."""
+    ts = datetime.now(timezone.utc).isoformat()
+    row = {"timestamp_utc": ts}
+
+    # Simulator levels/sensors (HR 300-306)
+    levels = read_hr(sim_client, 300, 7)
+    level_names = TAG_HEADER[1:8]
+    if levels:
+        for name, val in zip(level_names, levels):
+            row[name] = val
+    else:
+        for name in level_names:
+            row[name] = ""
+
+    # Simulator status bits (coils 320-325)
+    status = read_coils(sim_client, 320, 6)
+    status_names = TAG_HEADER[8:14]
+    if status:
+        for name, val in zip(status_names, status):
+            row[name] = val
+    else:
+        for name in status_names:
+            row[name] = ""
+
+    # Controller valve command coils 40-42
+    cmds = read_coils(ctrl_client, 40, 3)
+    cmd_names = TAG_HEADER[14:17]
+    if cmds:
+        for name, val in zip(cmd_names, cmds):
+            row[name] = val
+    else:
+        for name in cmd_names:
+            row[name] = ""
+
+    # Controller pump speed setpoints HR 100-101
+    speeds = read_hr(ctrl_client, 100, 2)
+    speed_names = TAG_HEADER[17:19]
+    if speeds:
+        for name, val in zip(speed_names, speeds):
+            row[name] = val
+    else:
+        for name in speed_names:
+            row[name] = ""
+
+    # System state coils (56-57)
+    sys_coils = read_coils(ctrl_client, 56, 2)
+    sys_names = TAG_HEADER[19:21]
+    if sys_coils:
+        for name, val in zip(sys_names, sys_coils):
+            row[name] = val
+    else:
+        for name in sys_names:
+            row[name] = ""
+
+    # Alarm coil (64)
+    alm_coils = read_coils(ctrl_client, 64, 1)
+    if alm_coils:
+        row["Alarm_Supply_Tank_HH"] = alm_coils[0]
+    else:
+        row["Alarm_Supply_Tank_HH"] = ""
+
+    # HMI coils (0-1)
+    hmi_coils = read_coils(ctrl_client, 0, 2)
+    hmi_names = TAG_HEADER[22:24]
+    if hmi_coils:
+        for name, val in zip(hmi_names, hmi_coils):
+            row[name] = val
+    else:
+        for name in hmi_names:
+            row[name] = ""
+
+    return row
+
+
+# -- Timeline actions ----------------------------------------------------------
+
+def execute_action(action, ctrl_client, sim_client):
+    """Execute a scenario timeline action."""
+    if action == "hmi_start":
+        # Write coil 0 = True (HMI Start PB)
+        ctrl_client.write_coil(0, True)
+        ctrl_client.write_coil(1, False)
+        return "HMI Start pressed"
+    elif action == "hmi_stop":
+        ctrl_client.write_coil(0, False)
+        ctrl_client.write_coil(1, True)
+        return "HMI Stop pressed"
+    elif action == "hmi_estop":
+        # Same as stop but immediate
+        ctrl_client.write_coil(0, False)
+        ctrl_client.write_coil(1, True)
+        return "Emergency stop pressed"
+    elif action.startswith("set_sim_level:"):
+        # Format: set_sim_level:register:value
+        parts = action.split(":")
+        reg = int(parts[1])
+        val = int(parts[2])
+        sim_client.write_register(reg, val)
+        return f"Set simulator HR {reg} = {val}"
+    elif action.startswith("set_supply_tank_level:"):
+        # Convenience: set_supply_tank_level:value
+        val = int(action.split(":")[1])
+        sim_client.write_register(300, val)
+        return f"Set Supply_Tank_Level = {val}"
+    elif action.startswith("set_grid_elev_level:"):
+        val = int(action.split(":")[1])
+        sim_client.write_register(304, val)
+        return f"Set Grid_Elev_Tank_Level = {val}"
+    elif action.startswith("set_rws_level:"):
+        val = int(action.split(":")[1])
+        sim_client.write_register(306, val)
+        return f"Set RWS_Tank_Level = {val}"
+    else:
+        log.warning("Unknown action: %s", action)
+        return f"Unknown action: {action}"
+
+
+# -- Initial conditions --------------------------------------------------------
+
+INITIAL_LEVEL_MAP = {
+    "Supply_Tank_Level": 300,
+    "Supply_NaOCl_Level": 302,
+    "Supply_NH4Cl_Level": 303,
+    "Grid_Elev_Tank_Level": 304,
+    "Grid_Consum_Tank_Level": 305,
+    "RWS_Tank_Level": 306,
+}
+
+
+def apply_initial_conditions(sim_client, conditions):
+    """Write initial tank levels to simulator output registers.
+
+    The simulator physics uses internal REAL state, but on first scan it
+    will overwrite these.  For proper initialization the simulator should
+    read its own QW outputs as initial state -- which it does since the
+    globals are initialized in the ST VAR section.  Instead, we trust
+    the ST defaults.  This function is a no-op placeholder for future
+    use when we add a sim-reset Modbus command.
+    """
+    if not conditions:
+        return
+    log.info("Initial conditions specified (using ST defaults): %s", conditions)
+
+
+# -- Bundle writer -------------------------------------------------------------
+
+def write_bundle(output_dir, scenario, events, tags_file, invariant_report=None,
+                 profile=None):
+    """Write a run bundle to output_dir."""
+    out = Path(output_dir)
+    out.mkdir(parents=True, exist_ok=True)
+
+    # meta.json
+    meta = {
+        "usecase_id": scenario.get("scenario_id", "unknown"),
+        "description": scenario.get("description", ""),
+        "backend_type": "openplc",
+        "created_utc": datetime.now(timezone.utc).isoformat(),
+        "duration_sec": scenario.get("duration_sec", 0),
+        "poll_interval_ms": scenario.get("poll_interval_ms", 500),
+        "tags_file": "tags.csv",
+        "events_file": "events.json",
+        "bundle_schema_version": "1.1.0",
+    }
+
+    # Add profile metadata if available
+    if profile is not None:
+        meta["profile_name"] = profile.metadata.name
+        meta["params_snapshot"] = profile.to_snapshot()
+
+    (out / "meta.json").write_text(json.dumps(meta, indent=2) + "\n")
+
+    # events.json
+    (out / "events.json").write_text(json.dumps(events, indent=2) + "\n")
+
+    # tags.csv - copy from temp location
+    shutil.copy2(tags_file, out / "tags.csv")
+
+    # Copy scenario for traceability
+    artifacts = out / "artifacts" / "model-validate"
+    artifacts.mkdir(parents=True, exist_ok=True)
+    if invariant_report:
+        for fname in ("report.json", "report.md"):
+            src = Path(invariant_report) / fname
+            if src.exists():
+                shutil.copy2(src, artifacts / fname)
+
+    log.info("Bundle written to %s", out)
+
+
+# -- Invariant check -----------------------------------------------------------
+
+def run_invariant_check(tags_csv, rules_path, checker_path, output_dir):
+    """Run invariant_check.py and return the output directory."""
+    report_dir = os.path.join(output_dir, "artifacts", "model-validate")
+    os.makedirs(report_dir, exist_ok=True)
+
+    if not os.path.exists(checker_path):
+        log.warning("Invariant checker not found at %s, skipping", checker_path)
+        return None
+
+    cmd = [
+        sys.executable, checker_path,
+        "--tags-csv", tags_csv,
+        "--rules", rules_path,
+        "--output", report_dir,
+    ]
+    log.info("Running invariant check: %s", " ".join(cmd))
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+        if result.returncode != 0:
+            log.warning("Invariant check returned %d:\n%s", result.returncode, result.stderr)
+        else:
+            log.info("Invariant check passed")
+        return report_dir
+    except FileNotFoundError:
+        log.warning("Could not run invariant checker")
+        return None
+    except subprocess.TimeoutExpired:
+        log.warning("Invariant check timed out")
+        return None
+
+
+# -- Main ----------------------------------------------------------------------
+
+def main():
+    parser = argparse.ArgumentParser(description="SPHERE Validation Harness (WD UC0)")
+    parser.add_argument("--scenario", required=True, help="Scenario YAML file")
+    parser.add_argument("--output", required=True, help="Output run bundle directory")
+    parser.add_argument("--profile", default=os.environ.get("SIM_PROFILE", DEFAULT_PROFILE),
+                        help="Simulation profile YAML (default: realistic)")
+    parser.add_argument("--controller", default=os.environ.get("CONTROLLER_ADDR", "controller:502"))
+    parser.add_argument("--simulator", default=os.environ.get("SIMULATOR_ADDR", "simulator:503"))
+    parser.add_argument("--cycle-ms", type=int, default=100, help="Bridge cycle time")
+    parser.add_argument("--invariant-rules", default=os.environ.get("INVARIANT_RULES", DEFAULT_RULES))
+    parser.add_argument("--invariant-checker", default=os.environ.get("INVARIANT_CHECKER", DEFAULT_CHECKER))
+    parser.add_argument("--no-bridge", action="store_true", help="Assume bridge is running externally")
+    parser.add_argument("-v", "--verbose", action="store_true")
+    args = parser.parse_args()
+
+    logging.basicConfig(
+        level=logging.DEBUG if args.verbose else logging.INFO,
+        format="%(asctime)s %(name)s %(levelname)s %(message)s",
+    )
+
+    # Load simulation profile
+    profile = None
+    if HAS_PRIMITIVES and args.profile and os.path.exists(args.profile):
+        try:
+            profile = load_profile(args.profile)
+            log.info("Loaded profile: %s (v%s)", profile.metadata.name, profile.metadata.version)
+        except Exception as e:
+            log.warning("Failed to load profile %s: %s", args.profile, e)
+    elif args.profile and os.path.exists(args.profile):
+        log.warning("sim.primitives not available, profile metadata will be limited")
+        # Still record profile path even without full parsing
+        with open(args.profile) as f:
+            profile_data = yaml.safe_load(f)
+        # Create minimal profile-like object for metadata
+        class MinimalProfile:
+            class Metadata:
+                def __init__(self, data):
+                    self.name = data.get("metadata", {}).get("name", "unknown")
+                    self.version = data.get("metadata", {}).get("version", "1.0.0")
+            def __init__(self, data):
+                self.metadata = self.Metadata(data)
+                self._data = data
+            def to_snapshot(self):
+                return self._data
+        profile = MinimalProfile(profile_data)
+        log.info("Loaded profile (limited): %s", profile.metadata.name)
+
+    # Load scenario
+    with open(args.scenario) as f:
+        scenario = yaml.safe_load(f)
+
+    log.info("Scenario: %s", scenario.get("scenario_id", "?"))
+    log.info("Duration: %ds, poll: %dms",
+             scenario.get("duration_sec", 0),
+             scenario.get("poll_interval_ms", 500))
+
+    ctrl_host, ctrl_port = parse_host_port(args.controller, 502)
+    sim_host, sim_port = parse_host_port(args.simulator, 503)
+
+    # Connect Modbus clients for polling
+    ctrl_client = ModbusTcpClient(ctrl_host, port=ctrl_port, timeout=3)
+    sim_client = ModbusTcpClient(sim_host, port=sim_port, timeout=3)
+
+    # Start bridge (unless external)
+    bridge = None
+    if not args.no_bridge:
+        bridge = ModbusBridge(ctrl_host, ctrl_port, sim_host, sim_port, args.cycle_ms)
+        if not bridge.connect(retries=30):
+            log.error("Bridge failed to connect")
+            sys.exit(1)
+        bridge.start()
+        log.info("Bridge started")
+
+    # Connect polling clients
+    for attempt in range(30):
+        c_ok = ctrl_client.connect()
+        s_ok = sim_client.connect()
+        if c_ok and s_ok:
+            break
+        time.sleep(1)
+    else:
+        log.error("Polling clients failed to connect")
+        if bridge:
+            bridge.stop()
+            bridge.disconnect()
+        sys.exit(1)
+
+    # Apply initial conditions
+    apply_initial_conditions(sim_client, scenario.get("initial_conditions"))
+
+    # Prepare data collection
+    duration = scenario.get("duration_sec", 60)
+    poll_ms = scenario.get("poll_interval_ms", 500)
+    poll_sec = poll_ms / 1000.0
+    timeline = scenario.get("timeline", [])
+    # Sort timeline by time
+    timeline.sort(key=lambda e: e.get("time_sec", 0))
+
+    events = []
+    tags_tmp = os.path.join(args.output, "_tags_tmp.csv")
+    os.makedirs(args.output, exist_ok=True)
+
+    log.info("Starting data collection for %ds...", duration)
+    start_time = time.monotonic()
+    next_event_idx = 0
+
+    try:
+        with open(tags_tmp, "w", newline="") as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=TAG_HEADER)
+            writer.writeheader()
+
+            while True:
+                elapsed = time.monotonic() - start_time
+                if elapsed >= duration:
+                    break
+
+                # Check timeline events
+                while next_event_idx < len(timeline):
+                    evt = timeline[next_event_idx]
+                    if elapsed >= evt.get("time_sec", 0):
+                        desc = execute_action(evt["action"], ctrl_client, sim_client)
+                        event_record = {
+                            "time_sec": round(elapsed, 2),
+                            "action": evt["action"],
+                            "description": desc,
+                            "timestamp_utc": datetime.now(timezone.utc).isoformat(),
+                        }
+                        events.append(event_record)
+                        log.info("t=%.1fs  %s", elapsed, desc)
+                        next_event_idx += 1
+                    else:
+                        break
+
+                # Poll tags
+                row = poll_tags(ctrl_client, sim_client)
+                writer.writerow(row)
+
+                # Sleep to maintain poll rate
+                cycle_elapsed = time.monotonic() - start_time - elapsed
+                sleep = poll_sec - cycle_elapsed
+                if sleep > 0:
+                    time.sleep(sleep)
+
+    except KeyboardInterrupt:
+        log.info("Interrupted")
+    finally:
+        ctrl_client.close()
+        sim_client.close()
+        if bridge:
+            bridge.stop()
+            bridge.disconnect()
+
+    log.info("Collection done: %.1fs, %d events", time.monotonic() - start_time, len(events))
+
+    # Run invariant check
+    report_dir = run_invariant_check(
+        tags_tmp, args.invariant_rules, args.invariant_checker, args.output)
+
+    # Write bundle
+    write_bundle(args.output, scenario, events, tags_tmp, report_dir, profile)
+
+    # Clean up temp CSV
+    if os.path.exists(tags_tmp):
+        os.remove(tags_tmp)
+
+    log.info("Done. Bundle at: %s", args.output)
+
+
+if __name__ == "__main__":
+    main()

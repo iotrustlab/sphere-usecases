@@ -22,20 +22,23 @@ cd sphere-usecases
 
 #### Creating a New Use Case
 ```bash
-# Copy the template
-cp -r templates/single-process/ your-new-use-case/
+# Copy the template to the appropriate CISA sector
+cp -r templates/usecase/ <sector>/<vendor>-<domain>/usecases/<instance>/
+
+# Example: Create a new water treatment use case
+cp -r templates/usecase/ sector-water/acme-treatment/usecases/basic-demo/
 
 # Update the README with your process details
-vim your-new-use-case/README.md
+vim sector-water/acme-treatment/usecases/basic-demo/README.md
 ```
 
 #### Improving an Existing Use Case
 ```bash
 # Navigate to the use case
-cd water-treatment/  # or oil-and-gas-distribution/
+cd sector-water/rovisys-treatment/usecases/p1-onboarding/
 
 # Make your changes
-vim implementations/rockwell/plc/Controller_PLC.L5X
+vim implementations/rockwell/controller/Controller_PLC.L5X
 ```
 
 ## 📁 Use Case Structure Requirements

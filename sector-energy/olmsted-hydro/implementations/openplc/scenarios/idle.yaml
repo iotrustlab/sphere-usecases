@@ -1,0 +1,26 @@
+# Idle scenario - verify stable idle state
+# No commands issued, system should remain in IDLE with gate closed
+
+scenario_id: "ps-hydro-idle"
+description: "Verify stable idle state with no operator commands"
+duration_sec: 60
+poll_interval_ms: 500
+
+initial_conditions:
+  HY_Res_Level: 20.0          # m - normal reservoir level
+  HY_Head: 120.0              # m - normal head
+  HY_Gate_Pos: 0.0            # Gate closed
+  HY_Breaker_Sts: false       # Breaker open
+  HY_Power_MW: 0.0            # No power output
+  HY_Speed_Pct: 0.0           # Unit stopped
+
+timeline: []                  # No operator actions
+
+expected_state:
+  at_end:
+    HY_State_Idle: true
+    HY_State_Running: false
+    HY_Gate_Pos: 0.0
+    HY_Breaker_Sts: false
+
+reference_bundle: null

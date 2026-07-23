@@ -1,0 +1,209 @@
+# FUXA HMI Tag Mapping: Water Distribution UC0
+#
+# Maps HMI controls and displays to Modbus addresses on the Controller PLC.
+# Connect FUXA to 10.100.0.10:502 (Modbus TCP)
+#
+# Reference: ../water-distribution/implementations/openplc/configs/openplc_map.yaml
+
+api_version: sphere.mergetb.io/v1
+kind: HMITagMapping
+metadata:
+  usecase: water-distribution
+  usecase_code: wd
+  controller_address: "10.100.0.10:502"
+
+# ─── HMI Controls (Write) ───────────────────────────────────────────────────
+controls:
+  Start_PB:
+    modbus_type: discrete_input
+    address: 0              # %IX0.0
+    label: "Start"
+    description: "Start pushbutton - initiates system startup"
+    widget: button
+    color: green
+
+  Stop_PB:
+    modbus_type: discrete_input
+    address: 1              # %IX0.1
+    label: "Stop"
+    description: "Stop pushbutton - initiates controlled shutdown"
+    widget: button
+    color: red
+
+  Supply_Pump_Speed:
+    modbus_type: holding_register
+    address: 100            # %QW100
+    label: "Supply Pump Speed"
+    description: "Supply pump VFD speed setpoint"
+    widget: slider
+    units: "%"
+    range: [0, 100]
+    default: 50
+
+  Return_Pump_Speed:
+    modbus_type: holding_register
+    address: 101            # %QW101
+    label: "Return Pump Speed"
+    description: "Return water pump VFD speed setpoint"
+    widget: slider
+    units: "%"
+    range: [0, 100]
+    default: 50
+
+  Supply_Valve:
+    modbus_type: coil
+    address: 40             # %QX5.0
+    label: "Supply Valve"
+    description: "Supply tank outlet valve command"
+    widget: toggle
+
+  Elev_Valve:
+    modbus_type: coil
+    address: 41             # %QX5.1
+    label: "Elevated Tank Valve"
+    description: "Elevated tank inlet valve command"
+    widget: toggle
+
+  Return_Valve:
+    modbus_type: coil
+    address: 42             # %QX5.2
+    label: "Return Valve"
+    description: "Return water tank outlet valve command"
+    widget: toggle
+
+# ─── System State (Read-Only) ───────────────────────────────────────────────
+state:
+  IDLE:
+    modbus_type: coil
+    address: 56             # %QX7.0
+    label: "IDLE"
+    description: "System in idle state"
+    widget: indicator
+    color_on: gray
+    color_off: dark_gray
+
+  RUNNING:
+    modbus_type: coil
+    address: 57             # %QX7.1
+    label: "RUNNING"
+    description: "System running normally"
+    widget: indicator
+    color_on: green
+    color_off: dark_gray
+
+# ─── Sensors (Read-Only) ────────────────────────────────────────────────────
+sensors:
+  Supply_Tank_Level:
+    modbus_type: holding_register
+    address: 300            # Bridge HR
+    label: "Supply Tank"
+    description: "Supply tank level"
+    widget: gauge
+    units: "mm"
+    range: [0, 1500]
+    alarm_hh: 1200
+    alarm_ll: 200
+
+  Supply_Pump_Flow:
+    modbus_type: holding_register
+    address: 301            # Bridge HR
+    label: "Supply Flow"
+    description: "Supply pump discharge flow"
+    widget: gauge
+    units: "L/min"
+    range: [0, 200]
+
+  NaOCl_Level:
+    modbus_type: holding_register
+    address: 302            # Bridge HR
+    label: "NaOCl Level"
+    description: "Disinfectant tank level"
+    widget: gauge
+    units: "mm"
+    range: [0, 1000]
+
+  NH4Cl_Level:
+    modbus_type: holding_register
+    address: 303            # Bridge HR
+    label: "NH4Cl Level"
+    description: "Ammonia tank level"
+    widget: gauge
+    units: "mm"
+    range: [0, 1000]
+
+  Elev_Tank_Level:
+    modbus_type: holding_register
+    address: 304            # Bridge HR
+    label: "Elevated Tank"
+    description: "Elevated storage tank level"
+    widget: gauge
+    units: "mm"
+    range: [0, 2000]
+    alarm_hh: 1800
+    alarm_ll: 300
+
+  Consumer_Tank_Level:
+    modbus_type: holding_register
+    address: 305            # Bridge HR
+    label: "Consumer Tank"
+    description: "Consumer storage tank level"
+    widget: gauge
+    units: "mm"
+    range: [0, 2000]
+
+  Return_Tank_Level:
+    modbus_type: holding_register
+    address: 306            # Bridge HR
+    label: "Return Tank"
+    description: "Return water system tank level"
+    widget: gauge
+    units: "mm"
+    range: [0, 1500]
+
+# ─── Alarms (Read-Only) ─────────────────────────────────────────────────────
+alarms:
+  Supply_Tank_HH:
+    modbus_type: coil
+    address: 64             # %QX8.0
+    label: "Supply Tank High-High"
+    description: "Supply tank critically high (>=1200mm)"
+    severity: critical
+    color: red
+
+# ─── Equipment Status (Read-Only) ───────────────────────────────────────────
+equipment_status:
+  Supply_Pump_Sts:
+    modbus_type: discrete_input
+    address: 16             # %IX2.0
+    label: "Supply Pump"
+    description: "Supply pump running status"
+
+  Supply_Mixer_Sts:
+    modbus_type: discrete_input
+    address: 17             # %IX2.1
+    label: "Mixer"
+    description: "Supply tank mixer running status"
+
+  Supply_Valve_Sts:
+    modbus_type: discrete_input
+    address: 18             # %IX2.2
+    label: "Supply Valve"
+    description: "Supply tank outlet valve open"
+
+  Elev_Valve_Sts:
+    modbus_type: discrete_input
+    address: 19             # %IX2.3
+    label: "Elev Valve"
+    description: "Elevated tank inlet valve open"
+
+  Return_Pump_Sts:
+    modbus_type: discrete_input
+    address: 20             # %IX2.4
+    label: "Return Pump"
+    description: "Return water pump running status"
+
+  Return_Valve_Sts:
+    modbus_type: discrete_input
+    address: 21             # %IX2.5
+    label: "Return Valve"
+    description: "Return water tank outlet valve open"

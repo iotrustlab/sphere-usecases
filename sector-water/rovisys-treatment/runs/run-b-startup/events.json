@@ -1,0 +1,22 @@
+[
+  {
+    "type": "start",
+    "timestamp": "2025-01-28T10:05:00Z",
+    "message": "Run started (startup transition)"
+  },
+  {
+    "type": "health",
+    "timestamp": "2025-01-28T10:05:03Z",
+    "message": "Health OK"
+  },
+  {
+    "type": "health",
+    "timestamp": "2025-01-28T10:05:15Z",
+    "message": "Health OK - system running"
+  },
+  {
+    "type": "stop",
+    "timestamp": "2025-01-28T10:05:30Z",
+    "message": "Run completed"
+  }
+]

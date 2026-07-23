@@ -1,0 +1,674 @@
+# Diagram specification for the Water Treatment P&ID.
+# Used by cmd/gensvg/ to generate assets/generated/water-treatment.svg.
+# Coordinates match the hand-crafted SVG layout.
+
+diagram:
+  id: water-treatment
+  viewBox: { w: 1200, h: 800 }
+  title: "Water Treatment Process — P&ID"
+
+symbols:
+  - id: tank
+    ref: sym-tank
+    viewBox: "0 0 60 80"
+  - id: valve
+    ref: sym-valve
+    viewBox: "0 0 30 30"
+  - id: pump
+    ref: sym-pump
+    viewBox: "0 0 40 40"
+  - id: mixer
+    ref: sym-mixer
+    viewBox: "0 0 40 40"
+  - id: filter
+    ref: sym-filter
+    viewBox: "0 0 50 60"
+  - id: sensor
+    ref: sym-sensor
+    viewBox: "0 0 24 24"
+  - id: uv
+    ref: sym-uv
+    viewBox: "0 0 50 40"
+  - id: ro
+    ref: sym-ro
+    viewBox: "0 0 60 50"
+
+components:
+  # ── P1 — Raw Water Intake ──
+  - id: RW_Tank_PR_Valve
+    symbol: valve
+    pos: { x: 115, y: 100 }
+    size: { w: 24, h: 24 }
+    label: "PR Valve"
+    label_size: 8
+    stage: p1
+    anchors:
+      center: { x: 12, y: 12 }
+      inlet: { x: 0, y: 12 }
+      outlet: { x: 24, y: 12 }
+      badge_pos: { x: 12, y: -4 }
+
+  - id: RW_Tank
+    symbol: tank
+    pos: { x: 175, y: 75 }
+    size: { w: 60, h: 80 }
+    label: "RW Tank"
+    label_size: 9
+    stage: p1
+    anchors:
+      center: { x: 30, y: 40 }
+      inlet: { x: 0, y: 40 }
+      outlet: { x: 60, y: 40 }
+      badge_pos: { x: 30, y: 26 }
+
+  - id: RW_Tank_P6B_Valve
+    symbol: valve
+    pos: { x: 240, y: 120 }
+    size: { w: 18, h: 18 }
+    label: "P6B"
+    label_size: 7
+    stage: p1
+    anchors:
+      center: { x: 9, y: 9 }
+      inlet: { x: 0, y: 9 }
+      outlet: { x: 18, y: 9 }
+
+  - id: RW_Tank_P_Valve
+    symbol: valve
+    pos: { x: 278, y: 100 }
+    size: { w: 24, h: 24 }
+    label: "P Valve"
+    label_size: 8
+    stage: p1
+    anchors:
+      center: { x: 12, y: 12 }
+      inlet: { x: 0, y: 12 }
+      outlet: { x: 24, y: 12 }
+      badge_pos: { x: 12, y: -4 }
+
+  - id: RW_Pump
+    symbol: pump
+    pos: { x: 345, y: 95 }
+    size: { w: 40, h: 40 }
+    label: "RW Pump"
+    label_size: 9
+    stage: p1
+    anchors:
+      center: { x: 20, y: 20 }
+      inlet: { x: 0, y: 20 }
+      outlet: { x: 40, y: 20 }
+      badge_pos: { x: 20, y: -12 }
+      flow_pos: { x: 20, y: 55 }
+      status_pos: { x: 42, y: 10 }
+
+  # ── P2 — Chemical Treatment ──
+  - id: ChemTreat_NaCl
+    symbol: tank
+    pos: { x: 500, y: 75 }
+    size: { w: 50, h: 65 }
+    label: "NaCl"
+    label_size: 8
+    stage: p2
+    anchors:
+      center: { x: 25, y: 32 }
+      outlet: { x: 25, y: 65 }
+      badge_pos: { x: 25, y: 20 }
+
+  - id: ChemTreat_NaCl_Valve
+    symbol: valve
+    pos: { x: 512, y: 145 }
+    size: { w: 18, h: 18 }
+    label: ""
+    stage: p2
+    anchors:
+      center: { x: 9, y: 9 }
+      inlet: { x: 9, y: 0 }
+      outlet: { x: 9, y: 18 }
+
+  - id: ChemTreat_NaOCl
+    symbol: tank
+    pos: { x: 580, y: 75 }
+    size: { w: 50, h: 65 }
+    label: "NaOCl"
+    label_size: 8
+    stage: p2
+    anchors:
+      center: { x: 25, y: 32 }
+      outlet: { x: 25, y: 65 }
+      badge_pos: { x: 25, y: 20 }
+
+  - id: ChemTreat_NaOCl_Valve
+    symbol: valve
+    pos: { x: 592, y: 145 }
+    size: { w: 18, h: 18 }
+    label: ""
+    stage: p2
+    anchors:
+      center: { x: 9, y: 9 }
+      inlet: { x: 9, y: 0 }
+      outlet: { x: 9, y: 18 }
+
+  - id: ChemTreat_HCl
+    symbol: tank
+    pos: { x: 660, y: 75 }
+    size: { w: 50, h: 65 }
+    label: "HCl"
+    label_size: 8
+    stage: p2
+    anchors:
+      center: { x: 25, y: 32 }
+      outlet: { x: 25, y: 65 }
+      badge_pos: { x: 25, y: 20 }
+
+  - id: ChemTreat_HCl_Valve
+    symbol: valve
+    pos: { x: 672, y: 145 }
+    size: { w: 18, h: 18 }
+    label: ""
+    stage: p2
+    anchors:
+      center: { x: 9, y: 9 }
+      inlet: { x: 9, y: 0 }
+      outlet: { x: 9, y: 18 }
+
+  # ── P3 — Ultrafiltration ──
+  - id: UF_Drain_Valve
+    symbol: valve
+    pos: { x: 465, y: 228 }
+    size: { w: 24, h: 24 }
+    label: "Drain V"
+    label_size: 7
+    stage: p3
+    anchors:
+      center: { x: 12, y: 12 }
+      inlet: { x: 0, y: 12 }
+      outlet: { x: 24, y: 12 }
+
+  - id: UltraFilter
+    symbol: filter
+    pos: { x: 535, y: 210 }
+    size: { w: 50, h: 60 }
+    label: "UltraFilter"
+    label_size: 9
+    stage: p3
+    anchors:
+      center: { x: 25, y: 30 }
+      inlet: { x: 0, y: 30 }
+      outlet: { x: 50, y: 30 }
+
+  - id: UF_Pump
+    symbol: pump
+    pos: { x: 630, y: 220 }
+    size: { w: 40, h: 40 }
+    label: "UF Pump"
+    label_size: 9
+    stage: p3
+    anchors:
+      center: { x: 20, y: 20 }
+      inlet: { x: 0, y: 20 }
+      outlet: { x: 40, y: 20 }
+
+  - id: UF_Tank_Valve
+    symbol: valve
+    pos: { x: 715, y: 228 }
+    size: { w: 24, h: 24 }
+    label: "UF Tank V"
+    label_size: 7
+    stage: p3
+    anchors:
+      center: { x: 12, y: 12 }
+      inlet: { x: 0, y: 12 }
+      outlet: { x: 24, y: 12 }
+
+  - id: UF_UFFT_Tank
+    symbol: tank
+    pos: { x: 785, y: 200 }
+    size: { w: 60, h: 80 }
+    label: "UF Tank"
+    label_size: 9
+    stage: p3
+    anchors:
+      center: { x: 30, y: 40 }
+      inlet: { x: 0, y: 40 }
+      outlet: { x: 30, y: 80 }
+      badge_pos: { x: 30, y: 26 }
+
+  # ── P4 — Dechlorination ──
+  - id: UF_ROFT_Valve
+    symbol: valve
+    pos: { x: 752, y: 358 }
+    size: { w: 24, h: 24 }
+    label: "ROFT V"
+    label_size: 7
+    stage: p4
+    anchors:
+      center: { x: 12, y: 12 }
+      inlet: { x: 24, y: 12 }
+      outlet: { x: 0, y: 12 }
+
+  - id: UF_BWP_Valve
+    symbol: valve
+    pos: { x: 895, y: 358 }
+    size: { w: 24, h: 24 }
+    label: "BWP V"
+    label_size: 7
+    stage: p4
+    anchors:
+      center: { x: 12, y: 12 }
+      inlet: { x: 0, y: 12 }
+      outlet: { x: 24, y: 12 }
+
+  - id: BW_Pump
+    symbol: pump
+    pos: { x: 960, y: 350 }
+    size: { w: 40, h: 40 }
+    label: "BW Pump"
+    label_size: 9
+    stage: p4
+    anchors:
+      center: { x: 20, y: 20 }
+      inlet: { x: 0, y: 20 }
+      outlet: { x: 40, y: 20 }
+
+  - id: BW_Tank
+    symbol: tank
+    pos: { x: 1045, y: 330 }
+    size: { w: 60, h: 80 }
+    label: "BW Tank"
+    label_size: 9
+    stage: p4
+    anchors:
+      center: { x: 30, y: 40 }
+      inlet: { x: 0, y: 40 }
+
+  - id: Dechlor_UV
+    symbol: uv
+    pos: { x: 570, y: 350 }
+    size: { w: 50, h: 40 }
+    label: "UV Unit"
+    label_size: 8
+    stage: p4
+    anchors:
+      center: { x: 25, y: 20 }
+      inlet: { x: 50, y: 20 }
+      outlet: { x: 0, y: 20 }
+
+  - id: Dechlor_RO_Pump
+    symbol: pump
+    pos: { x: 475, y: 350 }
+    size: { w: 40, h: 40 }
+    label: "RO Pump"
+    label_size: 8
+    stage: p4
+    anchors:
+      center: { x: 20, y: 20 }
+      inlet: { x: 40, y: 20 }
+      outlet: { x: 0, y: 20 }
+
+  - id: ROFT_Valve
+    symbol: valve
+    pos: { x: 390, y: 358 }
+    size: { w: 24, h: 24 }
+    label: "ROFT V"
+    label_size: 7
+    stage: p4
+    anchors:
+      center: { x: 12, y: 12 }
+      inlet: { x: 24, y: 12 }
+      outlet: { x: 0, y: 12 }
+
+  - id: Dechlor_ROFT_Tank
+    symbol: tank
+    pos: { x: 265, y: 330 }
+    size: { w: 60, h: 80 }
+    label: "ROFT Tank"
+    label_size: 9
+    stage: p4
+    anchors:
+      center: { x: 30, y: 40 }
+      inlet: { x: 60, y: 40 }
+
+  # ── P5 — Reverse Osmosis ──
+  - id: NaHSO3_Tank
+    symbol: tank
+    pos: { x: 100, y: 480 }
+    size: { w: 50, h: 65 }
+    label: "NaHSO3"
+    label_size: 8
+    stage: p5
+    anchors:
+      center: { x: 25, y: 32 }
+      outlet: { x: 25, y: 65 }
+
+  - id: NaHSO3_Valve
+    symbol: valve
+    pos: { x: 112, y: 550 }
+    size: { w: 18, h: 18 }
+    label: ""
+    stage: p5
+    anchors:
+      center: { x: 9, y: 9 }
+      inlet: { x: 9, y: 0 }
+      outlet: { x: 9, y: 18 }
+
+  - id: Cartridge_Filter
+    symbol: filter
+    pos: { x: 355, y: 475 }
+    size: { w: 50, h: 60 }
+    label: "Cart. Filter"
+    label_size: 8
+    stage: p5
+    anchors:
+      center: { x: 25, y: 30 }
+      inlet: { x: 0, y: 30 }
+      outlet: { x: 50, y: 30 }
+
+  - id: RO_Pump
+    symbol: pump
+    pos: { x: 465, y: 485 }
+    size: { w: 40, h: 40 }
+    label: "RO Pump"
+    label_size: 9
+    stage: p5
+    anchors:
+      center: { x: 20, y: 20 }
+      inlet: { x: 0, y: 20 }
+      outlet: { x: 40, y: 20 }
+
+  - id: RO_Membrane
+    symbol: ro
+    pos: { x: 565, y: 480 }
+    size: { w: 60, h: 50 }
+    label: "RO Membrane"
+    label_size: 9
+    stage: p5
+    anchors:
+      center: { x: 30, y: 25 }
+      inlet: { x: 0, y: 25 }
+      outlet: { x: 60, y: 25 }
+
+  - id: RO_Tank_Valve
+    symbol: valve
+    pos: { x: 675, y: 493 }
+    size: { w: 24, h: 24 }
+    label: "RO Tank V"
+    label_size: 7
+    stage: p5
+    anchors:
+      center: { x: 12, y: 12 }
+      inlet: { x: 0, y: 12 }
+      outlet: { x: 24, y: 12 }
+
+  - id: RO_Tank
+    symbol: tank
+    pos: { x: 745, y: 465 }
+    size: { w: 60, h: 80 }
+    label: "RO Tank"
+    label_size: 9
+    stage: p5
+    anchors:
+      center: { x: 30, y: 40 }
+      inlet: { x: 0, y: 40 }
+      outlet: { x: 30, y: 80 }
+
+  # ── P6 — Permeate / Output ──
+  - id: Permeate_RO_Valve
+    symbol: valve
+    pos: { x: 688, y: 648 }
+    size: { w: 24, h: 24 }
+    label: "Perm V"
+    label_size: 7
+    stage: p6
+    anchors:
+      center: { x: 12, y: 12 }
+      inlet: { x: 24, y: 12 }
+      outlet: { x: 0, y: 12 }
+
+  - id: Permeate_Tank
+    symbol: tank
+    pos: { x: 555, y: 620 }
+    size: { w: 60, h: 80 }
+    label: "Permeate Tank"
+    label_size: 9
+    stage: p6
+    anchors:
+      center: { x: 30, y: 40 }
+      inlet: { x: 60, y: 40 }
+
+stage_labels:
+  - stage: p1
+    text: "P1 — Raw Water Intake"
+    pos: { x: 30, y: 60 }
+  - stage: p2
+    text: "P2 — Chemical Treatment"
+    pos: { x: 500, y: 60 }
+  - stage: p3
+    text: "P3 — Ultrafiltration"
+    pos: { x: 30, y: 210 }
+  - stage: p4
+    text: "P4 — Dechlorination"
+    pos: { x: 30, y: 340 }
+  - stage: p5
+    text: "P5 — Reverse Osmosis"
+    pos: { x: 30, y: 460 }
+  - stage: p6
+    text: "P6 — Permeate / Output"
+    pos: { x: 30, y: 620 }
+
+text_labels:
+  - text: ["PUB Raw", "Water In"]
+    pos: { x: 40, y: 110 }
+    size: 10
+  - text: ["Backwash"]
+    pos: { x: 870, y: 340 }
+    size: 10
+    bold: true
+  - text: ["To Water", "Distribution"]
+    pos: { x: 910, y: 655 }
+    size: 10
+
+pipes:
+  # P1 — Raw Water
+  - id: pipe_inlet_to_PR_valve
+    from: { x: 80, y: 115 }
+    to: { x: 110, y: 115 }
+    arrow: true
+
+  - id: pipe_PR_valve_to_tank
+    from: { x: 142, y: 115 }
+    to: { x: 170, y: 115 }
+    arrow: true
+
+  - id: pipe_tank_to_P6B
+    from: { x: 238, y: 115 }
+    to: { x: 275, y: 115 }
+
+  - id: pipe_P_valve_to_pump
+    from: { x: 305, y: 115 }
+    to: { x: 340, y: 115 }
+    arrow: true
+
+  - id: pipe_pump_out
+    from: { x: 388, y: 115 }
+    to: { x: 420, y: 115 }
+    arrow: true
+
+  # P2 — Chemical dosing pipes
+  - id: pipe_NaCl_to_valve
+    from: { x: 521, y: 142 }
+    to: { x: 521, y: 175 }
+
+  - id: pipe_NaOCl_to_valve
+    from: { x: 601, y: 142 }
+    to: { x: 601, y: 175 }
+
+  - id: pipe_HCl_to_valve
+    from: { x: 681, y: 142 }
+    to: { x: 681, y: 175 }
+
+  - id: pipe_chem_manifold
+    from: { x: 521, y: 175 }
+    to: { x: 681, y: 175 }
+
+  - id: pipe_chem_down
+    from: { x: 601, y: 175 }
+    to: { x: 601, y: 195 }
+    arrow: true
+
+  # P3 — Ultrafiltration
+  - id: pipe_p1_down
+    from: { x: 420, y: 115 }
+    to: { x: 420, y: 240 }
+
+  - id: pipe_p1_to_drain
+    from: { x: 420, y: 240 }
+    to: { x: 460, y: 240 }
+    arrow: true
+
+  - id: pipe_chem_to_uf
+    from: { x: 601, y: 195 }
+    to: { x: 601, y: 240 }
+
+  - id: pipe_chem_join
+    from: { x: 520, y: 240 }
+    to: { x: 601, y: 240 }
+    stroke_width: 1.5
+
+  - id: pipe_drain_to_filter
+    from: { x: 492, y: 240 }
+    to: { x: 530, y: 240 }
+    arrow: true
+
+  - id: pipe_filter_to_uf_pump
+    from: { x: 588, y: 240 }
+    to: { x: 625, y: 240 }
+    arrow: true
+
+  - id: pipe_uf_pump_to_valve
+    from: { x: 673, y: 240 }
+    to: { x: 710, y: 240 }
+    arrow: true
+
+  - id: pipe_valve_to_uf_tank
+    from: { x: 742, y: 240 }
+    to: { x: 780, y: 240 }
+    arrow: true
+
+  # P4 — Dechlorination
+  - id: pipe_uf_tank_down
+    from: { x: 815, y: 282 }
+    to: { x: 815, y: 370 }
+
+  - id: pipe_uf_tank_to_roft_v
+    from: { x: 815, y: 370 }
+    to: { x: 780, y: 370 }
+
+  - id: pipe_bw_branch
+    from: { x: 848, y: 370 }
+    to: { x: 890, y: 370 }
+
+  - id: pipe_bw_to_pump
+    from: { x: 922, y: 370 }
+    to: { x: 955, y: 370 }
+    arrow: true
+
+  - id: pipe_bw_pump_to_tank
+    from: { x: 1003, y: 370 }
+    to: { x: 1040, y: 370 }
+    arrow: true
+
+  - id: pipe_roft_main
+    from: { x: 749, y: 370 }
+    to: { x: 620, y: 370 }
+
+  - id: pipe_uv_to_ro_pump
+    from: { x: 567, y: 370 }
+    to: { x: 520, y: 370 }
+
+  - id: pipe_ro_pump_to_roft_v
+    from: { x: 472, y: 370 }
+    to: { x: 420, y: 370 }
+
+  - id: pipe_roft_v_to_tank
+    from: { x: 387, y: 370 }
+    to: { x: 330, y: 370 }
+
+  # P5 — Reverse Osmosis
+  - id: pipe_roft_tank_down
+    from: { x: 295, y: 412 }
+    to: { x: 295, y: 505 }
+
+  - id: pipe_roft_to_cart
+    from: { x: 295, y: 505 }
+    to: { x: 350, y: 505 }
+
+  - id: pipe_nahso3_down
+    from: { x: 121, y: 548 }
+    to: { x: 121, y: 570 }
+
+  - id: pipe_nahso3_join
+    from: { x: 121, y: 570 }
+    to: { x: 295, y: 570 }
+    stroke_width: 1.5
+
+  - id: pipe_nahso3_up
+    from: { x: 295, y: 530 }
+    to: { x: 295, y: 570 }
+    stroke_width: 1.5
+
+  - id: pipe_cart_to_ro_pump
+    from: { x: 408, y: 505 }
+    to: { x: 460, y: 505 }
+    arrow: true
+
+  - id: pipe_ro_pump_to_membrane
+    from: { x: 508, y: 505 }
+    to: { x: 560, y: 505 }
+    arrow: true
+
+  - id: pipe_membrane_to_valve
+    from: { x: 628, y: 505 }
+    to: { x: 670, y: 505 }
+    arrow: true
+
+  - id: pipe_valve_to_ro_tank
+    from: { x: 702, y: 505 }
+    to: { x: 740, y: 505 }
+    arrow: true
+
+  # P6 — Permeate / Output
+  - id: pipe_ro_tank_down
+    from: { x: 775, y: 547 }
+    to: { x: 775, y: 660 }
+
+  - id: pipe_to_perm_valve
+    from: { x: 775, y: 660 }
+    to: { x: 715, y: 660 }
+
+  - id: pipe_perm_valve_to_tank
+    from: { x: 685, y: 660 }
+    to: { x: 620, y: 660 }
+
+  - id: pipe_to_distribution
+    from: { x: 775, y: 660 }
+    to: { x: 900, y: 660 }
+    arrow: true
+
+# System / alarm anchor positions (not components with symbols)
+system_anchors:
+  - id: SYS_RUNNING
+    pos: { x: 500, y: 760 }
+    size: { w: 60, h: 14 }
+    stage: sys
+  - id: SYS_IDLE
+    pos: { x: 580, y: 760 }
+    size: { w: 60, h: 14 }
+    stage: sys
+  - id: Alarm_RW_Tank_HH
+    pos: { x: 175, y: 65 }
+    size: { w: 60, h: 12 }
+    stage: alm
+
+sys_label:
+  text: "SYS"
+  pos: { x: 530, y: 772 }

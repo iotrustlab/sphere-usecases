@@ -1,0 +1,93 @@
+# Load following scenario - power setpoint changes over time
+# Tests governor response to varying grid demand
+
+scenario_id: "ps-hydro-load-following"
+description: "Power setpoint changes simulating grid demand variations"
+duration_sec: 300
+poll_interval_ms: 500
+
+initial_conditions:
+  HY_Res_Level: 20.0          # m - normal reservoir level
+  HY_Head: 120.0              # m - normal head
+  HY_Gate_Pos: 0.0            # Gate closed
+  HY_Breaker_Sts: false       # Breaker open
+  HY_Power_MW: 0.0            # No power output
+  HY_Speed_Pct: 0.0           # Unit stopped
+  HY_Run_Enable: true         # Permissive enabled
+
+timeline:
+  # Initial setpoint
+  - time_sec: 3
+    action: set_tag
+    tag: HY_Power_Setpoint_MW
+    value: 40.0               # 50% load
+
+  # Start unit
+  - time_sec: 5
+    action: start_cmd
+    comment: "Initiate startup"
+
+  # Allow time to synchronize and stabilize
+  # Setpoint changes begin after 60s
+
+  # Morning ramp up (simulate increasing demand)
+  - time_sec: 60
+    action: set_tag
+    tag: HY_Power_Setpoint_MW
+    value: 50.0               # 62.5% load
+
+  - time_sec: 90
+    action: set_tag
+    tag: HY_Power_Setpoint_MW
+    value: 60.0               # 75% load
+
+  - time_sec: 120
+    action: set_tag
+    tag: HY_Power_Setpoint_MW
+    value: 70.0               # 87.5% load
+
+  # Peak demand
+  - time_sec: 150
+    action: set_tag
+    tag: HY_Power_Setpoint_MW
+    value: 75.0               # ~94% load (near rated)
+
+  # Afternoon ramp down
+  - time_sec: 180
+    action: set_tag
+    tag: HY_Power_Setpoint_MW
+    value: 60.0               # 75% load
+
+  - time_sec: 210
+    action: set_tag
+    tag: HY_Power_Setpoint_MW
+    value: 45.0               # 56% load
+
+  - time_sec: 240
+    action: set_tag
+    tag: HY_Power_Setpoint_MW
+    value: 30.0               # 37.5% load (low demand)
+
+  # Shutdown
+  - time_sec: 280
+    action: stop_cmd
+    comment: "End of dispatch period"
+
+expected_state:
+  at_time_75:
+    HY_State_Running: true
+    HY_Power_MW: {min: 45, max: 55}
+
+  at_time_165:
+    HY_State_Running: true
+    HY_Power_MW: {min: 70, max: 78}  # Near peak
+
+  at_time_255:
+    HY_State_Running: true
+    HY_Power_MW: {min: 25, max: 35}  # Low load
+
+  at_end:
+    HY_State_Idle: true
+    HY_Breaker_Sts: false
+
+reference_bundle: null

@@ -1,0 +1,20 @@
+scenario_id: "wd-uc0-alarm-hh"
+description: "Fill supply tank past HH threshold (1200mm) to trigger alarm"
+duration_sec: 90
+poll_interval_ms: 500
+
+initial_conditions:
+  Supply_Tank_Level: 1100
+  Supply_NaOCl_Level: 800
+  Supply_NH4Cl_Level: 800
+  Grid_Elev_Tank_Level: 5500
+  Grid_Consum_Tank_Level: 3000
+  RWS_Tank_Level: 500
+
+timeline:
+  - { time_sec: 5, action: hmi_start }
+  # Force supply tank level high by increasing inflow
+  - { time_sec: 10, action: "set_sim_level:supply:1250" }
+  - { time_sec: 70, action: hmi_stop }
+
+reference_bundle: null

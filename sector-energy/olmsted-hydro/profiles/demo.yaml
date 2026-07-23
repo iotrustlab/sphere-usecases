@@ -1,0 +1,101 @@
+# Demo simulation profile for SPHERE Power Systems - Hydro Station (PS-1)
+# Accelerated timing for demonstrations and quick testing
+#
+# Changes from realistic profile:
+#   - Gate travel: 1s (10x faster)
+#   - Penstock tau: 0.5s (10x faster)
+#   - Sensor tau: 10ms (faster updates)
+#   - Smaller reservoir for visible level changes
+#   - Faster breaker operation (visible in UI)
+
+api_version: sphere.mergetb.io/v1
+kind: SimProfile
+metadata:
+  name: demo
+  version: "1.0.0"
+  description: Accelerated timing for demos and quick visualization
+  basis: "Derived from realistic profile with 10x speedup factors"
+
+timing:
+  dt_sec: 0.1              # Simulation timestep
+  poll_interval_ms: 500    # Tag polling interval (same as realistic)
+
+# ─── Reservoir (smaller for visible changes) ────────────────────────────────
+reservoir:
+  area_m2: 1000            # 10x smaller - level changes more visible
+  initial_level_m: 20.0    # Starting water level
+  max_level_m: 25.0        # High water mark
+  min_level_m: 5.0         # Minimum operating level
+  inflow_m3s: 50.0         # Natural inflow rate
+
+# ─── Penstock (faster dynamics) ─────────────────────────────────────────────
+penstock:
+  length_m: 500
+  diameter_m: 2.0
+  tau_sec: 0.5             # 10x faster flow dynamics
+  max_pressure_rise_pct: 150
+
+# ─── Turbine (same physics) ─────────────────────────────────────────────────
+turbine:
+  q_max_m3s: 100.0
+  eta_t: 0.90
+  k_q: 10.0
+
+# ─── Generator (same ratings) ──────────────────────────────────────────────
+generator:
+  eta_g: 0.97
+  p_rated_mw: 80.0
+  sync_speed_rpm: 150
+  poles: 48
+  inertia_h_sec: 4.0
+
+# ─── Wicket Gate (10x faster) ───────────────────────────────────────────────
+gate:
+  travel_time_sec: 1.0     # 10x faster for demo (1s full stroke)
+  slew_rate_pct_s: 100.0   # 100%/s maximum velocity
+  tau_servo_sec: 0.1       # Fast servo response
+  emergency_close_sec: 0.3 # Fast emergency close
+
+# ─── Breaker (slightly slower for visibility) ──────────────────────────────
+breaker:
+  open_time_sec: 0.2       # 200ms (visible in UI)
+  close_time_sec: 0.2      # 200ms
+  arc_time_sec: 0.05       # 50ms
+
+# ─── Sensors (faster response) ──────────────────────────────────────────────
+sensors:
+  speed:
+    tau_sec: 0.001         # 1ms - instant
+    noise_sigma: 0.05      # Less noise for cleaner demo
+
+  flow:
+    tau_sec: 0.01          # 10ms - fast
+    noise_sigma: 0.2       # Less noise
+
+  pressure:
+    tau_sec: 0.01          # 10ms
+    noise_sigma: 2.0       # Less noise
+
+  level:
+    tau_sec: 0.1           # 100ms - faster
+    noise_sigma: 0.05      # Less noise
+
+# ─── Safety Limits (same thresholds) ────────────────────────────────────────
+safety:
+  overspeed_trip_pct: 110
+  overspeed_alarm_pct: 105
+  overpressure_trip_pct: 150
+  min_head_m: 10.0
+  min_flow_pct: 10.0
+  gate_mismatch_pct: 5.0
+  gate_mismatch_delay_sec: 1.0    # Faster alarm
+  breaker_mismatch_delay_sec: 0.2 # Faster alarm
+
+# ─── Control Parameters (same tuning) ──────────────────────────────────────
+control:
+  kp_gate: 2.0
+  ki_gate: 0.1
+  no_load_gate_pct: 5.0
+  sync_speed_band_pct: 0.5
+  sync_phase_deg: 10.0
+  min_power_for_breaker_mw: 1.0

@@ -1,0 +1,553 @@
+﻿(*********************************************
+
+  Import-Export
+  Version   := RSLogix 5000 v37.00
+  Owner     := , 
+  Exported  := Thu Apr  9 22:34:06 2026
+
+  Note:  File encoded in UTF-8.  Only edit file in a program 
+         which supports UTF-8 (like Notepad, not Wordpad).
+
+**********************************************)
+IE_VER := 2.28;
+
+CONTROLLER Simulation_PLC (ProcessorType := "1756-L72",
+                           Major := 37,
+                           TimeSlice := 20,
+                           ShareUnusedTimeSlice := 1,
+                           RedundancyEnabled := 0,
+                           KeepTestEditsOnSwitchOver := 0,
+                           DataTablePadPercentage := 50,
+                           SecurityCode := 0,
+                           ChangesToDetect := 16#ffff_ffff_ffff_ffff,
+                           SFCExecutionControl := "CurrentActive",
+                           SFCRestartPosition := "MostRecent",
+                           SFCLastScan := "DontScan",
+                           SerialNumber := 16#70a2_1dea,
+                           MatchProjectToController := No,
+                           CanUseRPIFromProducer := No,
+                           InhibitAutomaticFirmwareUpdate := 0,
+                           PassThroughConfiguration := EnabledWithAppend,
+                           DownloadProjectDocumentationAndExtendedProperties := Yes,
+                           ReportMinorOverflow := 0,
+                           DataExchangeId := {D1EB459E-651C-44D3-9256-6BAF815C161A})
+	DATATYPE HMI_UDT (FamilyType := NoFamily)
+		SINT ZZZZZZZZZZUDT0 (Hidden := 1);
+		BIT Start_PB ZZZZZZZZZZUDT0 : 0 (Description := "HMI start button");
+		BIT Stop_PB ZZZZZZZZZZUDT0 : 1 (Description := "HMI stop button");
+		BIT Start_Active ZZZZZZZZZZUDT0 : 2 (Description := "output from the HMI to controller for start");
+		BIT Stop_Active ZZZZZZZZZZUDT0 : 3 (Description := "output from HMI to controller to stop");
+	END_DATATYPE
+
+	DATATYPE P1_UDT (FamilyType := NoFamily)
+		INT RW_Tank_tnk_lvl;
+		REAL RW_Pump_flow;
+		SINT ZZZZZZZZZZP1_UDT2 (Hidden := 1);
+		BIT RW_Tank_PR_Valve_sts ZZZZZZZZZZP1_UDT2 : 0;
+		BIT RW_Tank_P6B_Valve_sts ZZZZZZZZZZP1_UDT2 : 1;
+		BIT RW_Tank_P_Valve_sts ZZZZZZZZZZP1_UDT2 : 2;
+		BIT RW_Pump_sts ZZZZZZZZZZP1_UDT2 : 3;
+		BIT RW_Pump_fault ZZZZZZZZZZP1_UDT2 : 4;
+		REAL RW_Pump;
+		SINT ZZZZZZZZZZP1_UDT9 (Hidden := 1);
+		BIT RW_Tank_PR_Valve ZZZZZZZZZZP1_UDT9 : 0;
+		BIT RW_Tank_P_Valve ZZZZZZZZZZP1_UDT9 : 1;
+		BIT RW_Pump_start ZZZZZZZZZZP1_UDT9 : 2;
+		BIT RW_Pump_stop ZZZZZZZZZZP1_UDT9 : 3;
+		BIT RW_Tank_P6B_Valve ZZZZZZZZZZP1_UDT9 : 4;
+	END_DATATYPE
+
+	DATATYPE P2_UDT (FamilyType := NoFamily)
+		REAL ChemTreat_NaCl_Tank_tnk_lvl;
+		REAL ChemTreat_NaOCl_Tank_tnk_lvl;
+		REAL ChemTreat_HCl_Tank_tnk_lvl;
+		SINT ZZZZZZZZZZP2_UDT3 (Hidden := 1);
+		BIT ChemTreat_NaCl_Tank_Valve_sts ZZZZZZZZZZP2_UDT3 : 0;
+		BIT ChemTreat_NaOCl_Tank_Valve_sts ZZZZZZZZZZP2_UDT3 : 1;
+		BIT ChemTreat_HCl_Tank_Valve_sts ZZZZZZZZZZP2_UDT3 : 2;
+		BIT ChemTreat_NaCl_Tank_Valve ZZZZZZZZZZP2_UDT3 : 3;
+		BIT ChemTreat_NaOCl_Tank_Valve ZZZZZZZZZZP2_UDT3 : 4;
+		BIT ChemTreat_HCl_Tank_Valve ZZZZZZZZZZP2_UDT3 : 5;
+	END_DATATYPE
+
+	DATATYPE P3_UDT (FamilyType := NoFamily)
+		INT Ultrafiltration_UFFT_Tank_tnk_lvl;
+		SINT ZZZZZZZZZZP3_UDT1 (Hidden := 1);
+		BIT Ultrafiltration_UFFT_Tank_Valve_sts ZZZZZZZZZZP3_UDT1 : 0;
+		BIT Ultrafiltration_UF_Drain_Valve_sts ZZZZZZZZZZP3_UDT1 : 1;
+		BIT Ultrafiltration_UF_ROFT_Valve_sts ZZZZZZZZZZP3_UDT1 : 2;
+		BIT Ultrafiltration_UF_BWP_Valve_sts ZZZZZZZZZZP3_UDT1 : 3;
+		BIT Ultrafiltration_UFFT_Tank_Valve ZZZZZZZZZZP3_UDT1 : 4;
+		BIT Ultrafiltration_UF_Drain_Valve ZZZZZZZZZZP3_UDT1 : 5;
+		BIT Ultrafiltration_UF_ROFT_Valve ZZZZZZZZZZP3_UDT1 : 6;
+		BIT Ultrafiltration_UF_BWP_Valve ZZZZZZZZZZP3_UDT1 : 7;
+	END_DATATYPE
+
+	DATATYPE Phases_UDT (FamilyType := NoFamily)
+		SINT ZZZZZZZZZZPhases_UDT0 (Hidden := 1);
+		BIT Filling ZZZZZZZZZZPhases_UDT0 : 0;
+		BIT Draining ZZZZZZZZZZPhases_UDT0 : 1;
+	END_DATATYPE
+
+	DATATYPE RW_tank_AL_UDT (FamilyType := NoFamily)
+		SINT ZZZZZZZZZZRW_tank_AL0 (Hidden := 1);
+		BIT LL_alarm ZZZZZZZZZZRW_tank_AL0 : 0;
+		BIT L_alarm ZZZZZZZZZZRW_tank_AL0 : 1;
+		BIT H_alarm ZZZZZZZZZZRW_tank_AL0 : 2;
+		BIT HH_alarm ZZZZZZZZZZRW_tank_AL0 : 3;
+	END_DATATYPE
+
+	DATATYPE System_State_UDT (FamilyType := NoFamily)
+		SINT ZZZZZZZZZZSystem_Sta0 (Hidden := 1);
+		BIT IDLE ZZZZZZZZZZSystem_Sta0 : 0;
+		BIT START ZZZZZZZZZZSystem_Sta0 : 1;
+		BIT RUNNING ZZZZZZZZZZSystem_Sta0 : 2;
+		BIT SHUTDOWN ZZZZZZZZZZSystem_Sta0 : 3;
+		BOOL Permissives[32];
+		SINT ZZZZZZZZZZSystem_Sta6 (Hidden := 1);
+		BIT Permissives_Ready ZZZZZZZZZZSystem_Sta6 : 0;
+	END_DATATYPE
+
+	DATATYPE SYS_MESSAGES (FamilyType := NoFamily)
+		DINT ProgramScanTime;
+		REAL AvailableMemory;
+		SINT ControllerStatus;
+		REAL ScanTime;
+	END_DATATYPE
+
+	MODULE Local (Parent := "Local",
+	              ParentModPortId := 1,
+	              CatalogNumber := "1756-L72",
+	              Vendor := 1,
+	              ProductType := 14,
+	              ProductCode := 93,
+	              Major := 37,
+	              Minor := 11,
+	              ChassisSize := 13,
+	              Slot := 0,
+	              Mode := 2#0000_0000_0000_0001,
+	              CompatibleModule := 0,
+	              KeyMask := 2#0000_0000_0001_1111)
+	END_MODULE
+
+	MODULE Communcation (Description := "Connect to the plc",
+	                     Parent := "Local",
+	                     ParentModPortId := 1,
+	                     CatalogNumber := "1756-EN2T",
+	                     Vendor := 1,
+	                     ProductType := 12,
+	                     ProductCode := 166,
+	                     Major := 11,
+	                     Minor := 2,
+	                     PortLabel := "RxBACKPLANE",
+	                     Slot := 1,
+	                     CommMethod := 536870914,
+	                     Mode := 2#0000_0000_0000_0000,
+	                     CompatibleModule := 1,
+	                     KeyMask := 2#0000_0000_0001_1111,
+	                     DataExchangeId := {C33D876B-026F-4F24-8425-AFEDC69FDD28})
+			ExtendedProp := [[[___<public><Vendor>Rockwell Automation/Allen-Bradley</Vendor><CatNum>1756-EN2T</CatNum><ConfigID>4325481</ConfigID></public>___]]]
+	END_MODULE
+
+	MODULE Dig_Out_1 (Description := "32 point Digital Output",
+	                  Parent := "Local",
+	                  ParentModPortId := 1,
+	                  CatalogNumber := "1756-OB32",
+	                  Vendor := 1,
+	                  ProductType := 7,
+	                  ProductCode := 17,
+	                  Major := 3,
+	                  Minor := 1,
+	                  PortLabel := "RxBACKPLANE",
+	                  Slot := 2,
+	                  CommMethod := 536870913,
+	                  ConfigMethod := 8388609,
+	                  Mode := 2#0000_0000_0000_0000,
+	                  CompatibleModule := 1,
+	                  KeyMask := 2#0000_0000_0001_1111,
+	                  DataExchangeId := {2D51E499-2C5A-41B9-9469-BE48778B12A5})
+			ExtendedProp := [[[___<public><ConfigID>401</ConfigID><CatNum>1756-OB32</CatNum></public>___]]]
+			ConfigData  := [28,18,0,0,0,0,0,0,0,0];
+			CONNECTION Standard (Rate := 20000,
+			                     EventID := 0)
+					InputData  := [0,0];
+					OutputData (Description := "using this as digital output this is the first module") := [0];
+			END_CONNECTION
+
+	END_MODULE
+
+	MODULE Dig_Out_2 (Description := "32 point digital output module number 1",
+	                  Parent := "Local",
+	                  ParentModPortId := 1,
+	                  CatalogNumber := "1756-OB32",
+	                  Vendor := 1,
+	                  ProductType := 7,
+	                  ProductCode := 17,
+	                  Major := 3,
+	                  Minor := 1,
+	                  PortLabel := "RxBACKPLANE",
+	                  Slot := 3,
+	                  CommMethod := 536870913,
+	                  ConfigMethod := 8388609,
+	                  Mode := 2#0000_0000_0000_0000,
+	                  CompatibleModule := 1,
+	                  KeyMask := 2#0000_0000_0001_1111,
+	                  DataExchangeId := {A5729AF1-643E-409A-9C3A-EF1ABCAE639E})
+			ExtendedProp := [[[___<public><ConfigID>401</ConfigID><CatNum>1756-OB32</CatNum></public>___]]]
+			ConfigData  := [28,18,0,0,0,0,0,0,0,0];
+			CONNECTION Standard (Rate := 20000,
+			                     EventID := 0)
+					InputData  := [0,0];
+					OutputData (Description := "using this as digital output this is the second module") := [0];
+			END_CONNECTION
+
+	END_MODULE
+
+	MODULE Dig_Out_3 (Description := "32 point  Digital Output third module ",
+	                  Parent := "Local",
+	                  ParentModPortId := 1,
+	                  CatalogNumber := "1756-OB32",
+	                  Vendor := 1,
+	                  ProductType := 7,
+	                  ProductCode := 17,
+	                  Major := 3,
+	                  Minor := 1,
+	                  PortLabel := "RxBACKPLANE",
+	                  Slot := 4,
+	                  CommMethod := 536870913,
+	                  ConfigMethod := 8388609,
+	                  Mode := 2#0000_0000_0000_0000,
+	                  CompatibleModule := 1,
+	                  KeyMask := 2#0000_0000_0001_1111,
+	                  DataExchangeId := {739E970C-ECDC-4C00-9863-6304467228A4})
+			ExtendedProp := [[[___<public><ConfigID>401</ConfigID><CatNum>1756-OB32</CatNum></public>___]]]
+			ConfigData  := [28,18,0,0,0,0,0,0,0,0];
+			CONNECTION Standard (Rate := 20000,
+			                     EventID := 0)
+					InputData  := [0,0];
+					OutputData (Description := "using this as digital output this is the third module") := [0];
+			END_CONNECTION
+
+	END_MODULE
+
+	MODULE Dig_In_1 (Description := "32 point Digital Input module zero",
+	                 Parent := "Local",
+	                 ParentModPortId := 1,
+	                 CatalogNumber := "1756-IB32/B",
+	                 Vendor := 1,
+	                 ProductType := 7,
+	                 ProductCode := 12,
+	                 Major := 3,
+	                 Minor := 1,
+	                 PortLabel := "RxBACKPLANE",
+	                 Slot := 5,
+	                 CommMethod := 536870913,
+	                 ConfigMethod := 8388609,
+	                 Mode := 2#0000_0000_0000_0000,
+	                 CompatibleModule := 1,
+	                 KeyMask := 2#0000_0000_0001_1111,
+	                 DataExchangeId := {FAC87FBE-3FC8-4220-A9A3-390F89F54E32})
+			ExtendedProp := [[[___<public><ConfigID>113</ConfigID><CatNum>1756-IB32</CatNum></public>___]]]
+			ConfigData  := [28,16,0,0,0,0,1,1,1,1,1,1,1,1,-1,-1];
+			CONNECTION StandardInput (Rate := 20000,
+			                          EventID := 0)
+					InputData (Description := "using this as digital input module 1 on simulator PLC") := [0,36];
+			END_CONNECTION
+
+	END_MODULE
+
+	MODULE Dig_In_2 (Description := "32 Point Digital Input",
+	                 Parent := "Local",
+	                 ParentModPortId := 1,
+	                 CatalogNumber := "1756-IB32/B",
+	                 Vendor := 1,
+	                 ProductType := 7,
+	                 ProductCode := 12,
+	                 Major := 3,
+	                 Minor := 1,
+	                 PortLabel := "RxBACKPLANE",
+	                 Slot := 6,
+	                 CommMethod := 536870913,
+	                 ConfigMethod := 8388609,
+	                 Mode := 2#0000_0000_0000_0000,
+	                 CompatibleModule := 1,
+	                 KeyMask := 2#0000_0000_0001_1111,
+	                 DataExchangeId := {450138A9-50FE-446E-AEC4-57B6DF9CAE45})
+			ExtendedProp := [[[___<public><ConfigID>113</ConfigID><CatNum>1756-IB32</CatNum></public>___]]]
+			ConfigData  := [28,16,0,0,0,0,1,1,1,1,1,1,1,1,-1,-1];
+			CONNECTION StandardInput (Rate := 20000,
+			                          EventID := 0)
+					InputData (Description := "using this as digital input module 2 on simulator PLC") := [0,0];
+			END_CONNECTION
+
+	END_MODULE
+
+	MODULE An_Out_1 (Description := "8 channel slot 7 analog output",
+	                 Parent := "Local",
+	                 ParentModPortId := 1,
+	                 CatalogNumber := "1756-OF8/B",
+	                 Vendor := 1,
+	                 ProductType := 10,
+	                 ProductCode := 9,
+	                 Major := 2,
+	                 Minor := 11,
+	                 PortLabel := "RxBACKPLANE",
+	                 Slot := 7,
+	                 CommMethod := 536870913,
+	                 Mode := 2#0000_0000_0000_0000,
+	                 CompatibleModule := 1,
+	                 KeyMask := 2#0000_0000_0001_1111,
+	                 DataExchangeId := {C6B24958-1F61-4E52-B7FF-4416185E5428})
+			ExtendedProp := [[[___<public><ConfigID>303</ConfigID><CatNum>1756-OF8</CatNum></public>___]]]
+			ConfigData  := [360,34,0,0,0,[0,1,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,2.00000000e+001
+		,0.00000000e+000,1.20000000e+003,0.00000000e+000,1.00000000e+002,0.00000000e+000],[0,1,0.00000000e+000
+		,0.00000000e+000,0.00000000e+000,0.00000000e+000,2.00000000e+001,0.00000000e+000,1.00000000e+002
+		,0.00000000e+000,1.00000000e+002,0.00000000e+000],[0,1,0.00000000e+000,0.00000000e+000,0.00000000e+000
+		,0.00000000e+000,2.00000000e+001,0.00000000e+000,1.00000000e+002,0.00000000e+000,1.00000000e+002
+		,0.00000000e+000],[0,1,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,2.00000000e+001
+		,0.00000000e+000,1.00000000e+002,0.00000000e+000,1.00000000e+002,0.00000000e+000],[0,1,0.00000000e+000
+		,0.00000000e+000,0.00000000e+000,0.00000000e+000,2.00000000e+001,0.00000000e+000,1.00000000e+002
+		,0.00000000e+000,1.00000000e+002,0.00000000e+000],[0,1,0.00000000e+000,0.00000000e+000,0.00000000e+000
+		,0.00000000e+000,2.00000000e+001,0.00000000e+000,1.00000000e+002,0.00000000e+000,1.00000000e+002
+		,0.00000000e+000],[0,1,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,2.00000000e+001
+		,0.00000000e+000,1.00000000e+002,0.00000000e+000,1.00000000e+002,0.00000000e+000],[0,1,0.00000000e+000
+		,0.00000000e+000,0.00000000e+000,0.00000000e+000,2.00000000e+001,0.00000000e+000,1.00000000e+002
+		,0.00000000e+000,1.00000000e+002,0.00000000e+000]];
+			CONNECTION Float (Rate := 12000,
+			                  EventID := 0,
+			                  Unicast := No)
+					InputData  := [0,0,0,0,0,0,0,0,0,0,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000
+		,0.00000000e+000,0.00000000e+000,0.00000000e+000,0];
+					OutputData (EngineeringUnit.CH0DATA := "mm") := [0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000
+		,0.00000000e+000,0.00000000e+000];
+			END_CONNECTION
+
+	END_MODULE
+
+	MODULE An_Out_2 (Description := "8 channel Analog output module 1",
+	                 Parent := "Local",
+	                 ParentModPortId := 1,
+	                 CatalogNumber := "1756-OF8/B",
+	                 Vendor := 1,
+	                 ProductType := 10,
+	                 ProductCode := 9,
+	                 Major := 2,
+	                 Minor := 11,
+	                 PortLabel := "RxBACKPLANE",
+	                 Slot := 8,
+	                 CommMethod := 536870914,
+	                 Mode := 2#0000_0000_0000_0000,
+	                 CompatibleModule := 1,
+	                 KeyMask := 2#0000_0000_0001_1111,
+	                 DataExchangeId := {6603BE8C-EFD4-4DB8-980E-2A03F63A30C8})
+			ExtendedProp := [[[___<public><ConfigID>304</ConfigID><CatNum>1756-OF8</CatNum></public>___]]]
+			ConfigData  := [62,35,0,0,-128,-128,-128,-128,-128,-128,-128,-128,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+			CONNECTION Integer (Rate := 8000,
+			                    EventID := 0,
+			                    Unicast := No)
+					InputData  := [0,0,0,0,0,0,0,0,0,0,0,0];
+					OutputData  := [0,0,0,0,0,0,0,0];
+			END_CONNECTION
+
+	END_MODULE
+
+	MODULE An_Out_3 (Description := "8 channel analog output module 2",
+	                 Parent := "Local",
+	                 ParentModPortId := 1,
+	                 CatalogNumber := "1756-OF8/B",
+	                 Vendor := 1,
+	                 ProductType := 10,
+	                 ProductCode := 9,
+	                 Major := 2,
+	                 Minor := 11,
+	                 PortLabel := "RxBACKPLANE",
+	                 Slot := 9,
+	                 CommMethod := 536870913,
+	                 Mode := 2#0000_0000_0000_0000,
+	                 CompatibleModule := 1,
+	                 KeyMask := 2#0000_0000_0001_1111,
+	                 DataExchangeId := {A81DD297-20BD-4767-A4DA-FD6F5A9C25DA})
+			ExtendedProp := [[[___<public><ConfigID>303</ConfigID><CatNum>1756-OF8</CatNum></public>___]]]
+			ConfigData  := [360,34,0,0,0,[0,1,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,2.00000000e+001
+		,0.00000000e+000,1.20000000e+003,0.00000000e+000,1.00000000e+002,0.00000000e+000],[0,1,0.00000000e+000
+		,0.00000000e+000,0.00000000e+000,0.00000000e+000,2.00000000e+001,0.00000000e+000,1.00000000e+002
+		,0.00000000e+000,1.00000000e+002,0.00000000e+000],[0,1,0.00000000e+000,0.00000000e+000,0.00000000e+000
+		,0.00000000e+000,2.00000000e+001,0.00000000e+000,1.00000000e+002,0.00000000e+000,1.00000000e+002
+		,0.00000000e+000],[0,1,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,2.00000000e+001
+		,0.00000000e+000,1.00000000e+002,0.00000000e+000,1.00000000e+002,0.00000000e+000],[0,1,0.00000000e+000
+		,0.00000000e+000,0.00000000e+000,0.00000000e+000,2.00000000e+001,0.00000000e+000,1.00000000e+002
+		,0.00000000e+000,1.00000000e+002,0.00000000e+000],[0,1,0.00000000e+000,0.00000000e+000,0.00000000e+000
+		,0.00000000e+000,2.00000000e+001,0.00000000e+000,1.00000000e+002,0.00000000e+000,1.00000000e+002
+		,0.00000000e+000],[0,1,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,2.00000000e+001
+		,0.00000000e+000,1.00000000e+002,0.00000000e+000,1.00000000e+002,0.00000000e+000],[0,1,0.00000000e+000
+		,0.00000000e+000,0.00000000e+000,0.00000000e+000,2.00000000e+001,0.00000000e+000,1.00000000e+002
+		,0.00000000e+000,1.00000000e+002,0.00000000e+000]];
+			CONNECTION Float (Rate := 12000,
+			                  EventID := 0,
+			                  Unicast := No)
+					InputData  := [0,0,0,0,0,0,0,0,0,0,1.66666675e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000
+		,0.00000000e+000,0.00000000e+000,0.00000000e+000,2478];
+					OutputData (Description := "using this as analog output module 3 on simulator",
+            EngineeringUnit.CH0DATA := "mm") := [1.66666675e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000
+		,0.00000000e+000,0.00000000e+000];
+			END_CONNECTION
+
+	END_MODULE
+
+	MODULE An_out_4 (Description := "output analog number 4",
+	                 Parent := "Local",
+	                 ParentModPortId := 1,
+	                 CatalogNumber := "1756-OF8/B",
+	                 Vendor := 1,
+	                 ProductType := 10,
+	                 ProductCode := 9,
+	                 Major := 2,
+	                 Minor := 11,
+	                 PortLabel := "RxBACKPLANE",
+	                 Slot := 10,
+	                 CommMethod := 536870913,
+	                 Mode := 2#0000_0000_0000_0000,
+	                 CompatibleModule := 1,
+	                 KeyMask := 2#0000_0000_0001_1111,
+	                 DataExchangeId := {F4C7117B-C4AE-433C-A5D7-8F5CF2BB2230})
+			ExtendedProp := [[[___<public><ConfigID>303</ConfigID><CatNum>1756-OF8</CatNum></public>___]]]
+			ConfigData  := [360,34,0,0,0,[0,1,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,2.00000000e+001
+		,0.00000000e+000,1.00000000e+002,0.00000000e+000,1.00000000e+002,0.00000000e+000],[0,1,0.00000000e+000
+		,0.00000000e+000,0.00000000e+000,0.00000000e+000,2.00000000e+001,0.00000000e+000,1.00000000e+002
+		,0.00000000e+000,1.00000000e+002,0.00000000e+000],[0,1,0.00000000e+000,0.00000000e+000,0.00000000e+000
+		,0.00000000e+000,2.00000000e+001,0.00000000e+000,1.00000000e+002,0.00000000e+000,1.00000000e+002
+		,0.00000000e+000],[0,1,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,2.00000000e+001
+		,0.00000000e+000,1.00000000e+002,0.00000000e+000,1.00000000e+002,0.00000000e+000],[0,1,0.00000000e+000
+		,0.00000000e+000,0.00000000e+000,0.00000000e+000,2.00000000e+001,0.00000000e+000,1.00000000e+002
+		,0.00000000e+000,1.00000000e+002,0.00000000e+000],[0,1,0.00000000e+000,0.00000000e+000,0.00000000e+000
+		,0.00000000e+000,2.00000000e+001,0.00000000e+000,1.00000000e+002,0.00000000e+000,1.00000000e+002
+		,0.00000000e+000],[0,1,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,2.00000000e+001
+		,0.00000000e+000,1.00000000e+002,0.00000000e+000,1.00000000e+002,0.00000000e+000],[0,1,0.00000000e+000
+		,0.00000000e+000,0.00000000e+000,0.00000000e+000,2.00000000e+001,0.00000000e+000,1.00000000e+002
+		,0.00000000e+000,1.00000000e+002,0.00000000e+000]];
+			CONNECTION Float (Rate := 12000,
+			                  EventID := 0,
+			                  Unicast := No)
+					InputData  := [0,0,0,0,0,0,0,0,0,0,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000
+		,0.00000000e+000,0.00000000e+000,0.00000000e+000,23350];
+					OutputData  := [0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000
+		,0.00000000e+000,0.00000000e+000];
+			END_CONNECTION
+
+	END_MODULE
+
+	MODULE An_out_5 (Description := "8 channel analog output",
+	                 Parent := "Local",
+	                 ParentModPortId := 1,
+	                 CatalogNumber := "1756-OF8/B",
+	                 Vendor := 1,
+	                 ProductType := 10,
+	                 ProductCode := 9,
+	                 Major := 2,
+	                 Minor := 11,
+	                 PortLabel := "RxBACKPLANE",
+	                 Slot := 11,
+	                 CommMethod := 536870913,
+	                 Mode := 2#0000_0000_0000_0000,
+	                 CompatibleModule := 1,
+	                 KeyMask := 2#0000_0000_0001_1111,
+	                 DataExchangeId := {7EF7E4D7-9E6D-4E24-AE93-61931DFCBD3B})
+			ExtendedProp := [[[___<public><ConfigID>303</ConfigID><CatNum>1756-OF8</CatNum></public>___]]]
+			ConfigData  := [360,34,0,0,0,[0,1,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,2.00000000e+001
+		,0.00000000e+000,1.00000000e+002,0.00000000e+000,1.00000000e+002,0.00000000e+000],[0,1,0.00000000e+000
+		,0.00000000e+000,0.00000000e+000,0.00000000e+000,2.00000000e+001,0.00000000e+000,1.00000000e+002
+		,0.00000000e+000,1.00000000e+002,0.00000000e+000],[0,1,0.00000000e+000,0.00000000e+000,0.00000000e+000
+		,0.00000000e+000,2.00000000e+001,0.00000000e+000,1.00000000e+002,0.00000000e+000,1.00000000e+002
+		,0.00000000e+000],[0,1,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,2.00000000e+001
+		,0.00000000e+000,1.00000000e+002,0.00000000e+000,1.00000000e+002,0.00000000e+000],[0,1,0.00000000e+000
+		,0.00000000e+000,0.00000000e+000,0.00000000e+000,2.00000000e+001,0.00000000e+000,1.00000000e+002
+		,0.00000000e+000,1.00000000e+002,0.00000000e+000],[0,1,0.00000000e+000,0.00000000e+000,0.00000000e+000
+		,0.00000000e+000,2.00000000e+001,0.00000000e+000,1.00000000e+002,0.00000000e+000,1.00000000e+002
+		,0.00000000e+000],[0,1,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,2.00000000e+001
+		,0.00000000e+000,1.00000000e+002,0.00000000e+000,1.00000000e+002,0.00000000e+000],[0,1,0.00000000e+000
+		,0.00000000e+000,0.00000000e+000,0.00000000e+000,2.00000000e+001,0.00000000e+000,1.00000000e+002
+		,0.00000000e+000,1.00000000e+002,0.00000000e+000]];
+			CONNECTION Float (Rate := 12000,
+			                  EventID := 0,
+			                  Unicast := No)
+					InputData  := [0,0,0,0,0,0,0,0,0,0,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000
+		,0.00000000e+000,0.00000000e+000,0.00000000e+000,31107];
+					OutputData  := [0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000
+		,0.00000000e+000,0.00000000e+000];
+			END_CONNECTION
+
+	END_MODULE
+
+	TAG
+		Alarms : RW_tank_AL_UDT  := [0];
+		Ao_MA : INT (RADIX := Decimal) := 20;
+		AO_MA_1 : REAL (RADIX := Float) := 1.06191044e+001;
+		Cycle_Time_drain : FBD_TIMER  := [3,7,1000,449,0,0,1142400,1536,981668463,0,449,7];
+		Cycle_Time_fill : FBD_TIMER  := [3,7,1000,253,0,0,1142204,1536,981668463,0,253,7];
+		dLvl_mm : REAL (RADIX := Float) := 1.87500000e+001;
+		drain_fill_rate : REAL (RADIX := Float) := 7.16195583e+000;
+		False : BOOL (RADIX := Decimal,
+		            Constant := Yes) := 0;
+		FLOW_LPM_OPEN : REAL (RADIX := Float,
+		            Constant := Yes) := 3.60000000e+002;
+		GSV_Message : SYS_MESSAGES  := [0,0.00000000e+000,0,0.00000000e+000];
+		HMI : HMI_UDT  := [0];
+		L_PER_MM : REAL (RADIX := Float,
+		            Constant := Yes) := 2.29999995e+000;
+		P1 : P1_UDT  := [250,0.00000000e+000,0,0.00000000e+000,0];
+		P1_SYS : System_State_UDT  := [0,[2#0,2#0,2#0,2#0,2#0,2#0,2#0,2#0,2#0,2#0,2#0,2#0,2#0,2#0,2#0,2#0,2#0,2#0,2#0,2#0,2#0,2#0,2#0,2#0,2#0,2#0,2#0
+				,2#0,2#0,2#0,2#0,2#0],0];
+		P2 : P2_UDT  := [0.00000000e+000,0.00000000e+000,0.00000000e+000,0];
+		P3 : P3_UDT  := [100,0];
+		RST_ACTIVE : BOOL (RADIX := Decimal) := 0;
+		Rst_Sim : BOOL (RADIX := Decimal) := 0;
+		SIMValue : REAL (RADIX := Float) := 0.00000000e+000;
+		Start_ACTIVE : BOOL (RADIX := Decimal) := 0;
+		Start_Sim : BOOL (RADIX := Decimal) := 0;
+		TICK_S : REAL (RADIX := Float,
+		            Constant := Yes) := 5.00000000e+000;
+		True : BOOL (RADIX := Decimal,
+		            Constant := Yes) := 1;
+	END_TAG
+
+	PROGRAM MainProgram (MAIN := "Main",
+	                     MODE := 0,
+	                     DisableFlag := 0,
+	                     UseAsFolder := 0)
+		TAG
+		END_TAG
+
+		ROUTINE Main 
+				N: JSR(Test_Sim,0);
+		END_ROUTINE
+
+		ST_ROUTINE Test_Sim 
+			'SIMValue := 1200;
+			'Local:7:O.Ch0Data := SIMValue;
+		END_ST_ROUTINE
+
+		CHILD_PROGRAMS
+		END_CHILD_PROGRAMS
+
+	END_PROGRAM
+
+	TASK MainTask (Type := CONTINUOUS,
+	               Rate := 10,
+	               Priority := 10,
+	               Watchdog := 500,
+	               DisableUpdateOutputs := No,
+	               InhibitTask := No)
+			MainProgram;
+	END_TASK
+
+CONFIG CST(SystemTimeMasterID := 0) END_CONFIG
+
+CONFIG TimeSynchronize(Priority1 := 128,
+	                                 Priority2 := 128,
+	                                 PTPEnable := 0) END_CONFIG
+
+CONFIG WallClockTime(LocalTimeAdjustment := 0,
+	                     TimeZone := 0) END_CONFIG
+
+END_CONTROLLER
+

@@ -1,0 +1,290 @@
+# GRFICS Tennessee Eastman — SPHERE Source Map
+#
+# Maps SPHERE canonical tags to Modbus registers on the Controller PLC.
+#
+# SPHERE Architecture (dual-PLC with bridge):
+#   Controller PLC ←→ Bridge ←→ Simulator PLC
+#
+# All tags are read from/written to the Controller. The bridge shuttles
+# data between Controller and Simulator internally.
+#
+# Register layout on Controller:
+#   HR 0..3:     Valve setpoints (%QW0-3, written by controller logic)
+#   HR 300..312: Sensor values (copied from Simulator by bridge)
+#
+# All registers use 16-bit scaling (0-65535) to engineering units.
+# Formula: eng_value = (raw / 65535) * (eng_max - eng_min) + eng_min
+
+api_version: sphere.mergetb.io/v1
+kind: SourceMap
+
+metadata:
+  name: grfics-sphere-map
+  backend: sphere-openplc
+  version: "2.0.0"
+  description: |
+    SPHERE-native Modbus mapping for Tennessee Eastman process.
+
+    Deployment options:
+    - Local Docker: controller at localhost:1502
+    - SPHERE Testbed: controller at 10.100.0.10:502
+
+    This replaces the original GRFICSv3 6-endpoint architecture with
+    SPHERE's dual-PLC pattern where all tags are accessed via the
+    Controller PLC.
+
+# Primary endpoint — the Controller PLC
+# Override host/port based on deployment target
+endpoints:
+  controller:
+    host: "${CONTROLLER_HOST:-localhost}"
+    port: "${CONTROLLER_PORT:-1502}"
+    slave_id: 1
+    description: "Controller PLC (aggregates all tags via bridge)"
+
+# Deployment presets
+deployment_presets:
+  local_docker:
+    controller:
+      host: "localhost"
+      port: 1502
+  sphere_testbed:
+    controller:
+      host: "10.100.0.10"
+      port: 502
+
+# Tag-to-register mappings
+# All tags reference the 'controller' endpoint
+mappings:
+  # ═══════════════════════════════════════════════════════════════════════════
+  # ACTUATOR SETPOINTS (Controller HR 0..3, written by control logic)
+  # Bridge copies these to Simulator HR 200..203
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  TE_Feed1_Valve_SP:
+    endpoint: controller
+    register_type: holding_register
+    address: 0
+    scale:
+      raw_min: 0
+      raw_max: 65535
+      eng_min: 0
+      eng_max: 100
+      eng_units: "%"
+    description: "Feed 1 valve setpoint (controller → simulator)"
+
+  TE_Feed2_Valve_SP:
+    endpoint: controller
+    register_type: holding_register
+    address: 1
+    scale:
+      raw_min: 0
+      raw_max: 65535
+      eng_min: 0
+      eng_max: 100
+      eng_units: "%"
+    description: "Feed 2 valve setpoint (controller → simulator)"
+
+  TE_Purge_Valve_SP:
+    endpoint: controller
+    register_type: holding_register
+    address: 2
+    scale:
+      raw_min: 0
+      raw_max: 65535
+      eng_min: 0
+      eng_max: 100
+      eng_units: "%"
+    description: "Purge valve setpoint (controller → simulator)"
+
+  TE_Product_Valve_SP:
+    endpoint: controller
+    register_type: holding_register
+    address: 3
+    scale:
+      raw_min: 0
+      raw_max: 65535
+      eng_min: 0
+      eng_max: 100
+      eng_units: "%"
+    description: "Product valve setpoint (controller → simulator)"
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # SENSOR VALUES (Controller HR 300..312, copied from Simulator by bridge)
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  # ─── Feed 1 ────────────────────────────────────────────────────────────────
+  TE_Feed1_Valve_Pos:
+    endpoint: controller
+    register_type: holding_register
+    address: 300
+    scale:
+      raw_min: 0
+      raw_max: 65535
+      eng_min: 0
+      eng_max: 100
+      eng_units: "%"
+    description: "Feed 1 valve position (actual, from simulator)"
+
+  TE_Feed1_Flow:
+    endpoint: controller
+    register_type: holding_register
+    address: 301
+    scale:
+      raw_min: 0
+      raw_max: 65535
+      eng_min: 0
+      eng_max: 500
+      eng_units: "kmol/h"
+    description: "Feed 1 flow rate (from simulator)"
+
+  # ─── Feed 2 ────────────────────────────────────────────────────────────────
+  TE_Feed2_Valve_Pos:
+    endpoint: controller
+    register_type: holding_register
+    address: 302
+    scale:
+      raw_min: 0
+      raw_max: 65535
+      eng_min: 0
+      eng_max: 100
+      eng_units: "%"
+    description: "Feed 2 valve position (actual, from simulator)"
+
+  TE_Feed2_Flow:
+    endpoint: controller
+    register_type: holding_register
+    address: 303
+    scale:
+      raw_min: 0
+      raw_max: 65535
+      eng_min: 0
+      eng_max: 500
+      eng_units: "kmol/h"
+    description: "Feed 2 flow rate (from simulator)"
+
+  # ─── Purge ─────────────────────────────────────────────────────────────────
+  TE_Purge_Valve_Pos:
+    endpoint: controller
+    register_type: holding_register
+    address: 304
+    scale:
+      raw_min: 0
+      raw_max: 65535
+      eng_min: 0
+      eng_max: 100
+      eng_units: "%"
+    description: "Purge valve position (actual, from simulator)"
+
+  TE_Purge_Flow:
+    endpoint: controller
+    register_type: holding_register
+    address: 305
+    scale:
+      raw_min: 0
+      raw_max: 65535
+      eng_min: 0
+      eng_max: 500
+      eng_units: "kmol/h"
+    description: "Purge flow rate (from simulator)"
+
+  # ─── Product ───────────────────────────────────────────────────────────────
+  TE_Product_Valve_Pos:
+    endpoint: controller
+    register_type: holding_register
+    address: 306
+    scale:
+      raw_min: 0
+      raw_max: 65535
+      eng_min: 0
+      eng_max: 100
+      eng_units: "%"
+    description: "Product valve position (actual, from simulator)"
+
+  TE_Product_Flow:
+    endpoint: controller
+    register_type: holding_register
+    address: 307
+    scale:
+      raw_min: 0
+      raw_max: 65535
+      eng_min: 0
+      eng_max: 500
+      eng_units: "kmol/h"
+    description: "Product flow rate (from simulator)"
+
+  # ─── Tank ──────────────────────────────────────────────────────────────────
+  TE_Tank_Pressure:
+    endpoint: controller
+    register_type: holding_register
+    address: 308
+    scale:
+      raw_min: 0
+      raw_max: 65535
+      eng_min: 0
+      eng_max: 3200
+      eng_units: "kPa"
+    description: "Reactor tank pressure (from simulator)"
+
+  TE_Tank_Level:
+    endpoint: controller
+    register_type: holding_register
+    address: 309
+    scale:
+      raw_min: 0
+      raw_max: 65535
+      eng_min: 0
+      eng_max: 100
+      eng_units: "%"
+    description: "Reactor tank liquid level (from simulator)"
+
+  # ─── Analyzer ──────────────────────────────────────────────────────────────
+  TE_Purge_CompA:
+    endpoint: controller
+    register_type: holding_register
+    address: 310
+    scale:
+      raw_min: 0
+      raw_max: 65535
+      eng_min: 0
+      eng_max: 1
+      eng_units: "frac"
+    description: "Mole fraction of component A in purge stream"
+
+  TE_Purge_CompB:
+    endpoint: controller
+    register_type: holding_register
+    address: 311
+    scale:
+      raw_min: 0
+      raw_max: 65535
+      eng_min: 0
+      eng_max: 1
+      eng_units: "frac"
+    description: "Mole fraction of component B in purge stream"
+
+  TE_Purge_CompC:
+    endpoint: controller
+    register_type: holding_register
+    address: 312
+    scale:
+      raw_min: 0
+      raw_max: 65535
+      eng_min: 0
+      eng_max: 1
+      eng_units: "frac"
+    description: "Mole fraction of component C in purge stream"
+
+# Bridge data flow reference (internal, not directly accessible)
+# Documented here for understanding the architecture
+bridge_flow:
+  controller_to_simulator:
+    source: "Controller HR 0..3"
+    destination: "Simulator HR 200..203"
+    tags: ["TE_Feed1_Valve_SP", "TE_Feed2_Valve_SP", "TE_Purge_Valve_SP", "TE_Product_Valve_SP"]
+  simulator_to_controller:
+    source: "Simulator HR 300..312"
+    destination: "Controller HR 300..312"
+    tags: ["TE_Feed1_Valve_Pos", "TE_Feed1_Flow", "TE_Feed2_Valve_Pos", "TE_Feed2_Flow",
+           "TE_Purge_Valve_Pos", "TE_Purge_Flow", "TE_Product_Valve_Pos", "TE_Product_Flow",
+           "TE_Tank_Pressure", "TE_Tank_Level", "TE_Purge_CompA", "TE_Purge_CompB", "TE_Purge_CompC"]

@@ -1,0 +1,219 @@
+# Canonical Tag Contract for GRFICSv3 Tennessee Eastman Process
+#
+# This file is the backend-agnostic source of truth for all tags in the
+# Tennessee Eastman chemical reactor scenario. Tag names here must be used
+# identically across all SPHERE tooling.
+#
+# Backend-specific protocol bindings (Modbus addresses) are in source_map.yaml.
+#
+# Process overview:
+#   - 4 control valves (Feed 1, Feed 2, Purge, Product)
+#   - Tank with pressure and level measurements
+#   - Composition analyzer for purge stream (A, B, C fractions)
+#   - Reaction: A + C → D (product)
+
+api_version: sphere.mergetb.io/v1
+kind: TagContract
+
+metadata:
+  name: grfics-te-v1
+  use_case: grfics-tennessee-eastman
+  version: "1.0.0"
+  description: |
+    Tennessee Eastman chemical reactor process from GRFICSv3 testbed.
+
+    The process consists of a continuously stirred reactor with:
+    - Two feed streams (Feed 1: A+B+C mixture, Feed 2: pure A)
+    - One purge stream (removes unreacted gas)
+    - One product stream (liquid product D)
+    - Pressure and level control via valve manipulation
+
+    The simulation uses a simplified kinetic model where A + C → D.
+
+  references:
+    - "GRFICSv3: https://github.com/Fortiphyd/GRFICSv3"
+    - "Tennessee Eastman Process: Downs & Vogel (1993)"
+  process_models:
+    - "docs/process-models/te-reactor.md"
+
+tags:
+  # ─── Feed 1 (A+B+C mixture) ─────────────────────────────────────────────
+  - name: TE_Feed1_Valve_Pos
+    type: real
+    direction: sensor
+    role: simulator
+    group: feed
+    units: "%"
+    range: [0, 100]
+    description: "Feed 1 valve position (actual)"
+
+  - name: TE_Feed1_Valve_SP
+    type: real
+    direction: actuator
+    role: controller
+    group: feed
+    units: "%"
+    range: [0, 100]
+    description: "Feed 1 valve setpoint (command)"
+
+  - name: TE_Feed1_Flow
+    type: real
+    direction: sensor
+    role: simulator
+    group: feed
+    units: "kmol/h"
+    range: [0, 500]
+    description: "Feed 1 flow rate"
+
+  # ─── Feed 2 (pure A) ────────────────────────────────────────────────────
+  - name: TE_Feed2_Valve_Pos
+    type: real
+    direction: sensor
+    role: simulator
+    group: feed
+    units: "%"
+    range: [0, 100]
+    description: "Feed 2 valve position (actual)"
+
+  - name: TE_Feed2_Valve_SP
+    type: real
+    direction: actuator
+    role: controller
+    group: feed
+    units: "%"
+    range: [0, 100]
+    description: "Feed 2 valve setpoint (command)"
+
+  - name: TE_Feed2_Flow
+    type: real
+    direction: sensor
+    role: simulator
+    group: feed
+    units: "kmol/h"
+    range: [0, 500]
+    description: "Feed 2 flow rate"
+
+  # ─── Purge (unreacted gas removal) ──────────────────────────────────────
+  - name: TE_Purge_Valve_Pos
+    type: real
+    direction: sensor
+    role: simulator
+    group: purge
+    units: "%"
+    range: [0, 100]
+    description: "Purge valve position (actual)"
+
+  - name: TE_Purge_Valve_SP
+    type: real
+    direction: actuator
+    role: controller
+    group: purge
+    units: "%"
+    range: [0, 100]
+    description: "Purge valve setpoint (command)"
+
+  - name: TE_Purge_Flow
+    type: real
+    direction: sensor
+    role: simulator
+    group: purge
+    units: "kmol/h"
+    range: [0, 500]
+    description: "Purge flow rate"
+
+  # ─── Product (liquid D) ─────────────────────────────────────────────────
+  - name: TE_Product_Valve_Pos
+    type: real
+    direction: sensor
+    role: simulator
+    group: product
+    units: "%"
+    range: [0, 100]
+    description: "Product valve position (actual)"
+
+  - name: TE_Product_Valve_SP
+    type: real
+    direction: actuator
+    role: controller
+    group: product
+    units: "%"
+    range: [0, 100]
+    description: "Product valve setpoint (command)"
+
+  - name: TE_Product_Flow
+    type: real
+    direction: sensor
+    role: simulator
+    group: product
+    units: "kmol/h"
+    range: [0, 500]
+    description: "Product flow rate"
+
+  # ─── Tank (reactor vessel) ──────────────────────────────────────────────
+  - name: TE_Tank_Pressure
+    type: real
+    direction: sensor
+    role: simulator
+    group: tank
+    units: "kPa"
+    range: [0, 3200]
+    description: "Reactor tank pressure"
+
+  - name: TE_Tank_Level
+    type: real
+    direction: sensor
+    role: simulator
+    group: tank
+    units: "%"
+    range: [0, 100]
+    description: "Reactor tank liquid level"
+
+  # ─── Analyzer (purge composition) ───────────────────────────────────────
+  - name: TE_Purge_CompA
+    type: real
+    direction: sensor
+    role: simulator
+    group: analyzer
+    units: "frac"
+    range: [0, 1]
+    description: "Mole fraction of component A in purge stream"
+
+  - name: TE_Purge_CompB
+    type: real
+    direction: sensor
+    role: simulator
+    group: analyzer
+    units: "frac"
+    range: [0, 1]
+    description: "Mole fraction of component B in purge stream"
+
+  - name: TE_Purge_CompC
+    type: real
+    direction: sensor
+    role: simulator
+    group: analyzer
+    units: "frac"
+    range: [0, 1]
+    description: "Mole fraction of component C in purge stream"
+
+# Alarm thresholds (reference - actual logic may be in PLC program)
+alarm_thresholds:
+  TE_Tank_Pressure:
+    LL: 1800    # kPa - Low-Low
+    L: 2200     # kPa - Low
+    H: 3000     # kPa - High
+    HH: 3200    # kPa - High-High (emergency relief)
+  TE_Tank_Level:
+    LL: 10      # % - Low-Low
+    L: 20       # % - Low
+    H: 80       # % - High
+    HH: 90      # % - High-High
+
+# Headline tags for UI overlays and trend displays
+headline_tags:
+  - TE_Tank_Pressure
+  - TE_Tank_Level
+  - TE_Feed1_Flow
+  - TE_Purge_Flow
+  - TE_Product_Flow
+  - TE_Purge_CompA

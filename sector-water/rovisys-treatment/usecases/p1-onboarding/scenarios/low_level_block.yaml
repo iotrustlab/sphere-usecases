@@ -1,0 +1,18 @@
+scenario_id: "wt-uc1-low-level-block"
+description: "RW tank below 250mm — permissives should block transition to RUNNING"
+duration_sec: 60
+poll_interval_ms: 500
+
+initial_conditions:
+  RW_Tank_Level: 200
+  UF_UFFT_Tank_Level: 400
+  ChemTreat_NaCl_Level: 800
+  ChemTreat_NaOCl_Level: 800
+  ChemTreat_HCl_Level: 800
+
+timeline:
+  - { time_sec: 5, action: hmi_start }
+  # System should stay in START (permissive[0] = FALSE)
+  - { time_sec: 50, action: hmi_stop }
+
+reference_bundle: null

@@ -1,0 +1,100 @@
+# SPHERE CPS Scenario Descriptor
+# Water Treatment Process One - OpenPLC Implementation
+#
+# This scenario runs the water treatment controller and simulator
+# using OpenPLC runtime containers communicating via Modbus TCP.
+#
+# Usage:
+#   cps-enclave scenario validate scenario.yaml
+#   cps-enclave scenario generate scenario.yaml
+#   docker-compose up
+
+api_version: sphere.mergetb.io/v1
+kind: Scenario
+
+metadata:
+  name: water-treatment-process-one
+  version: "1.0.0"
+  description: |
+    Water treatment Process One (P1) - Raw water tank control system.
+    Demonstrates controller-simulator closed-loop operation with:
+    - Tank level monitoring and control
+    - Pump and valve sequencing
+    - State machine (IDLE, START, RUNNING, SHUTDOWN)
+    - Alarm handling (LL, L, H, HH levels)
+  labels:
+    use-case: water-treatment
+    process: P1
+    backend: openplc
+
+spec:
+  # Network configuration
+  network:
+    name: water-treatment-net
+    subnet: "10.100.0.0/24"
+    gateway: "10.100.0.1"
+
+  # PLC Nodes
+  nodes:
+    - name: controller
+      type: openplc
+      role: controller
+      program_path: projects/controller_project/plc.xml
+      io_map_path: configs/modbus_map.yaml
+      network:
+        ip_address: "10.100.0.10"
+        modbus_port: 502
+      backend_config:
+        # Use master branch by default; pin to specific commit for reproducibility
+        version: master
+        project_format: xml
+        scan_cycle_ms: 50
+        webui_enabled: true
+        webui_port: 8080
+
+    - name: simulator
+      type: openplc
+      role: simulator
+      program_path: projects/simulator_project/plc.xml
+      io_map_path: configs/modbus_map.yaml
+      network:
+        ip_address: "10.100.0.20"
+        modbus_port: 503
+      backend_config:
+        version: master
+        project_format: xml
+        scan_cycle_ms: 50
+        webui_enabled: true
+        webui_port: 8081
+
+  # Infrastructure services
+  infrastructure:
+    historian:
+      enabled: true
+      image: python:3.11-slim
+      script: scripts/historian_collector.py
+      poll_rate_ms: 500
+      output_path: /logs/tags.csv
+      output_format: csv
+
+    capture:
+      enabled: true
+      output_path: /logs/modbus.pcap
+      filter: "port 502 or port 503"
+
+    operator_ui:
+      enabled: true
+      type: cli
+      script: scripts/operator.py
+
+  # Lifecycle hooks (scripts in scripts/ directory)
+  hooks:
+    # inject_fault: scripts/inject_fault.sh  # Stub for future
+
+  # Artifact references
+  artifacts:
+    base_dir: .
+    docs:
+      io_contract: docs/io_contract.md
+      modbus_map: configs/modbus_map.yaml
+      architecture: docs/architecture.md

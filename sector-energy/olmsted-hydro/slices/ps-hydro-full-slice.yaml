@@ -1,0 +1,65 @@
+api_version: sphere.mergetb.io/v1
+kind: SliceDefinition
+
+metadata:
+  slice_id: ps-hydro-full-slice-01
+  usecase_id: power-hydro-ps1
+  version: "1.0.0"
+  description: Complete hydro station slice covering all process variables, actuators, states, trips, and alarms.
+
+active_groups:
+  - hmi
+  - actuators
+  - status
+  - sensors
+  - trips
+  - alarms
+  - system
+
+diagram:
+  asset: "power-hydro.svg"
+
+overlay_tags:
+  # Primary process values
+  - HY_Res_Level
+  - HY_Head
+  - HY_Flow
+  - HY_Pressure
+  - HY_Speed_Pct
+  - HY_Freq_Hz
+  - HY_Power_MW
+
+  # Actuator status
+  - HY_Gate_Pos
+  - HY_Gate_Cmd
+  - HY_Breaker_Sts
+  - HY_Spill_Sts
+
+  # System state
+  - HY_State_Idle
+  - HY_State_Startup
+  - HY_State_Running
+  - HY_State_Shutdown
+  - HY_State_Tripped
+  - HY_Permissives_Ready
+
+  # Trips
+  - HY_Trip_Overspeed
+  - HY_Trip_Overpressure
+  - HY_Trip_LowHead
+  - HY_Trip_Manual
+
+  # Alarms
+  - HY_Alarm_GateMismatch
+  - HY_Alarm_BreakerMismatch
+  - HY_Alarm_LowLevel
+
+trend_tags:
+  - HY_Power_MW
+  - HY_Gate_Pos
+  - HY_Flow
+  - HY_Speed_Pct
+  - HY_Res_Level
+  - HY_Head
+
+notes: Full PS-1 hydro station slice for comprehensive monitoring and validation.

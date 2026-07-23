@@ -1,0 +1,534 @@
+<?xml version='1.0' encoding='utf-8'?>
+<project xmlns:ns1="http://www.plcopen.org/xml/tc6_0201" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.plcopen.org/xml/tc6_0201">
+  <fileHeader companyName="CrossPLC" productName="PS_Hydro_Simulator" productVersion="1.0" creationDateTime="2026-02-10T12:28:05" />
+  <contentHeader name="PS_Hydro_Simulator" modificationDateTime="2026-02-10T12:28:05">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="10" y="10" />
+      </fbd>
+      <ld>
+        <scaling x="10" y="10" />
+      </ld>
+      <sfc>
+        <scaling x="10" y="10" />
+      </sfc>
+    </coordinateInfo>
+  </contentHeader>
+  <types>
+    <dataTypes />
+    <pous>
+      <pou name="HydroSimulator" pouType="program">
+        <interface>
+          <inputVars>
+            <variable name="in_Gate_Cmd">
+              <type>
+                <INT;                (* Gate command 0-1000 = 0-100% *) />
+              </type>
+            </variable>
+            <variable name="in_Breaker_Cmd">
+              <type>
+                <BOOL;            (* Breaker close command *) />
+              </type>
+            </variable>
+            <variable name="in_Spill_Cmd">
+              <type>
+                <BOOL;              (* Spillway open command *) />
+              </type>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="out_Gate_Pos">
+              <type>
+                <INT;               (* Gate position 0-1000 = 0-100% *) />
+              </type>
+            </variable>
+            <variable name="out_Res_Level">
+              <type>
+                <INT;              (* Reservoir level 0-3000 = 0-30.00 m *) />
+              </type>
+            </variable>
+            <variable name="out_Head">
+              <type>
+                <INT;                   (* Head 0-1500 = 0-150.0 m *) />
+              </type>
+            </variable>
+            <variable name="out_Flow">
+              <type>
+                <INT;                   (* Flow 0-1500 = 0-150.0 m3/s *) />
+              </type>
+            </variable>
+            <variable name="out_Pressure">
+              <type>
+                <INT;               (* Pressure 0-2000 kPa *) />
+              </type>
+            </variable>
+            <variable name="out_Speed_Pct">
+              <type>
+                <INT;              (* Speed 0-1500 = 0-150.0% *) />
+              </type>
+            </variable>
+            <variable name="out_Freq_Hz">
+              <type>
+                <INT;                (* Frequency 5500-6500 = 55.00-65.00 Hz *) />
+              </type>
+            </variable>
+            <variable name="out_Power_MW">
+              <type>
+                <INT;               (* Power 0-1000 = 0-100.0 MW *) />
+              </type>
+            </variable>
+            <variable name="out_Breaker_Sts">
+              <type>
+                <BOOL;           (* Breaker closed status *) />
+              </type>
+            </variable>
+            <variable name="out_Spill_Sts">
+              <type>
+                <BOOL;             (* Spillway open status *) />
+              </type>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="Res_Area_m2">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="Res_Level_m">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="Res_Inflow_m3s">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="Res_Min_m">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="Res_Max_m">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="Tailwater_m">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="Penstock_Tau_sec">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="Static_Head_m">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="Q_Max_m3s">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="Eta_Turbine">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="K_Q">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="Eta_Gen">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="P_Rated_MW">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="Inertia_H">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="Sync_Speed_Pct">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="Gate_Travel_sec">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="Gate_Slew_Max">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="Gate_Tau_sec">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="Gate_Emerg_sec">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="Breaker_Open_sec">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="Breaker_Close_sec">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="Spill_Open_sec">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="RHO">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="G">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="Gate_Pos_Pct">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="Gate_Vel">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="Flow_m3s">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="Flow_Target_m3s">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="Head_m">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="Pressure_kPa">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="Speed_Pct">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="Freq_Hz">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="P_Mech_MW">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="P_Elec_MW">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="Breaker_Closed">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Breaker_Timer">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="Spill_Open">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Spill_Timer">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="Gate_Cmd_Pct">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="Gate_Error">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="dQ_dt">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="dLevel_dt">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="dSpeed_dt">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="P_Load_MW">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="Spill_Flow_m3s">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="abs_dQ_dt">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="Timestep">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="Overspeed">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Overpressure">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="LowHead">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="OverpresThreshold">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+          </localVars>
+        </interface>
+        <body>
+          <ST>
+            <xhtml:p>(* 1. PROCESS INPUTS *)
+  Gate_Cmd_Pct := INT_TO_REAL(in_Gate_Cmd) / 10.0;
+
+  IF Gate_Cmd_Pct &lt; 0.0 THEN
+    Gate_Cmd_Pct := 0.0;
+  END_IF;
+  IF Gate_Cmd_Pct &gt; 100.0 THEN
+    Gate_Cmd_Pct := 100.0;
+  END_IF;
+
+  (* 2. GATE ACTUATOR DYNAMICS *)
+  Gate_Error := Gate_Cmd_Pct - Gate_Pos_Pct;
+  Gate_Vel := Gate_Error / Gate_Tau_sec;
+
+  IF Gate_Vel &gt; Gate_Slew_Max THEN
+    Gate_Vel := Gate_Slew_Max;
+  ELSIF Gate_Vel &lt; -Gate_Slew_Max THEN
+    Gate_Vel := -Gate_Slew_Max;
+  END_IF;
+
+  Gate_Pos_Pct := Gate_Pos_Pct + Gate_Vel * Timestep;
+
+  IF Gate_Pos_Pct &lt; 0.0 THEN
+    Gate_Pos_Pct := 0.0;
+  END_IF;
+  IF Gate_Pos_Pct &gt; 100.0 THEN
+    Gate_Pos_Pct := 100.0;
+  END_IF;
+
+  (* 3. RESERVOIR MASS BALANCE *)
+  IF Spill_Open THEN
+    IF Res_Level_m &gt; 22.0 THEN
+      Spill_Flow_m3s := 20.0 * (Res_Level_m - 22.0);
+    ELSE
+      Spill_Flow_m3s := 0.0;
+    END_IF;
+  ELSE
+    Spill_Flow_m3s := 0.0;
+  END_IF;
+
+  dLevel_dt := (Res_Inflow_m3s - Flow_m3s - Spill_Flow_m3s) / Res_Area_m2;
+  Res_Level_m := Res_Level_m + dLevel_dt * Timestep;
+
+  IF Res_Level_m &lt; 0.0 THEN
+    Res_Level_m := 0.0;
+  END_IF;
+  IF Res_Level_m &gt; Res_Max_m THEN
+    Res_Level_m := Res_Max_m;
+  END_IF;
+
+  Head_m := Res_Level_m + Static_Head_m - Tailwater_m;
+  IF Head_m &lt; 0.0 THEN
+    Head_m := 0.0;
+  END_IF;
+
+  (* 4. PENSTOCK FLOW DYNAMICS *)
+  IF Head_m &gt; 0.0 THEN
+    Flow_Target_m3s := K_Q * (Gate_Pos_Pct / 100.0) * SQRT(Head_m);
+  ELSE
+    Flow_Target_m3s := 0.0;
+  END_IF;
+
+  IF Flow_Target_m3s &gt; Q_Max_m3s THEN
+    Flow_Target_m3s := Q_Max_m3s;
+  END_IF;
+
+  dQ_dt := (Flow_Target_m3s - Flow_m3s) / Penstock_Tau_sec;
+  Flow_m3s := Flow_m3s + dQ_dt * Timestep;
+
+  IF Flow_m3s &lt; 0.0 THEN
+    Flow_m3s := 0.0;
+  END_IF;
+
+  Pressure_kPa := RHO * G * Head_m / 1000.0;
+
+  abs_dQ_dt := dQ_dt;
+  IF abs_dQ_dt &lt; 0.0 THEN
+    abs_dQ_dt := -abs_dQ_dt;
+  END_IF;
+  IF abs_dQ_dt &gt; 20.0 THEN
+    Pressure_kPa := Pressure_kPa * 1.5;
+  END_IF;
+
+  (* 5. TURBINE/GENERATOR DYNAMICS *)
+  P_Mech_MW := RHO * G * Flow_m3s * Head_m * Eta_Turbine / 1000000.0;
+
+  IF Breaker_Closed THEN
+    Speed_Pct := 100.0;
+    Freq_Hz := 60.0;
+
+    P_Elec_MW := P_Mech_MW * Eta_Gen;
+    IF P_Elec_MW &gt; P_Rated_MW THEN
+      P_Elec_MW := P_Rated_MW;
+    END_IF;
+  ELSE
+    IF Flow_m3s &gt; 0.1 THEN
+      dSpeed_dt := (P_Mech_MW / (P_Rated_MW * 0.1) - Speed_Pct / 50.0) / Inertia_H;
+      Speed_Pct := Speed_Pct + dSpeed_dt * Timestep;
+    ELSE
+      dSpeed_dt := -Speed_Pct / (Inertia_H * 10.0);
+      Speed_Pct := Speed_Pct + dSpeed_dt * Timestep;
+    END_IF;
+
+    IF Speed_Pct &lt; 0.0 THEN
+      Speed_Pct := 0.0;
+    END_IF;
+    IF Speed_Pct &gt; 150.0 THEN
+      Speed_Pct := 150.0;
+    END_IF;
+
+    Freq_Hz := 60.0 * Speed_Pct / 100.0;
+    P_Elec_MW := 0.0;
+  END_IF;
+
+  (* 6. BREAKER DYNAMICS *)
+  IF in_Breaker_Cmd AND NOT Breaker_Closed THEN
+    Breaker_Timer := Breaker_Timer + Timestep;
+    IF Breaker_Timer &gt;= Breaker_Close_sec THEN
+      IF Speed_Pct &gt;= 99.0 AND Speed_Pct &lt;= 101.0 THEN
+        Breaker_Closed := TRUE;
+      END_IF;
+      Breaker_Timer := 0.0;
+    END_IF;
+  ELSIF NOT in_Breaker_Cmd AND Breaker_Closed THEN
+    Breaker_Timer := Breaker_Timer + Timestep;
+    IF Breaker_Timer &gt;= Breaker_Open_sec THEN
+      Breaker_Closed := FALSE;
+      Breaker_Timer := 0.0;
+    END_IF;
+  ELSE
+    Breaker_Timer := 0.0;
+  END_IF;
+
+  (* 7. SPILLWAY DYNAMICS *)
+  IF in_Spill_Cmd AND NOT Spill_Open THEN
+    Spill_Timer := Spill_Timer + Timestep;
+    IF Spill_Timer &gt;= Spill_Open_sec THEN
+      Spill_Open := TRUE;
+      Spill_Timer := 0.0;
+    END_IF;
+  ELSIF NOT in_Spill_Cmd AND Spill_Open THEN
+    Spill_Timer := Spill_Timer + Timestep;
+    IF Spill_Timer &gt;= Spill_Open_sec THEN
+      Spill_Open := FALSE;
+      Spill_Timer := 0.0;
+    END_IF;
+  ELSE
+    Spill_Timer := 0.0;
+  END_IF;
+
+  (* 8. TRIP CONDITION DETECTION *)
+  Overspeed := Speed_Pct &gt; 110.0;
+  OverpresThreshold := (RHO * G * Static_Head_m / 1000.0) * 1.5;
+  Overpressure := Pressure_kPa &gt; OverpresThreshold;
+  LowHead := Head_m &lt; 10.0;
+
+  (* 9. WRITE OUTPUTS *)
+  out_Gate_Pos := REAL_TO_INT(Gate_Pos_Pct * 10.0);
+  out_Res_Level := REAL_TO_INT(Res_Level_m * 100.0);
+  out_Head := REAL_TO_INT(Head_m * 10.0);
+  out_Flow := REAL_TO_INT(Flow_m3s * 10.0);
+  out_Pressure := REAL_TO_INT(Pressure_kPa);
+  out_Speed_Pct := REAL_TO_INT(Speed_Pct * 10.0);
+  out_Freq_Hz := REAL_TO_INT(Freq_Hz * 100.0);
+  out_Power_MW := REAL_TO_INT(P_Elec_MW * 10.0);
+
+  out_Breaker_Sts := Breaker_Closed;
+  out_Spill_Sts := Spill_Open;</xhtml:p>
+          </ST>
+        </body>
+      </pou>
+    </pous>
+  </types>
+  <instances>
+    <configurations>
+      <configuration name="Config0">
+        <resource name="Res0">
+          <task name="task_HydroSimulator" priority="0" interval="T#100ms" />
+          <pouInstance name="HydroSimulator_instance" typeName="HydroSimulator" />
+        </resource>
+      </configuration>
+    </configurations>
+  </instances>
+</project>

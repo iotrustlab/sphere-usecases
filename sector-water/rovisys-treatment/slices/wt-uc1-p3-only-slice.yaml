@@ -1,0 +1,34 @@
+api_version: sphere.mergetb.io/v1
+kind: SliceDefinition
+metadata:
+  slice_id: wt-uc1-p3-only
+  usecase_id: water-treatment-uc1
+  version: "1.0.0"
+  description: >
+    P3 only - Ultrafiltration. Focused slice for Process 3 analysis
+    covering the UF feed tank and associated valves.
+
+active_groups:
+  - p3
+  - system
+
+diagram:
+  asset: "water-treatment.png"
+
+overlay_tags:
+  # P3 tank level
+  - UF_UFFT_Tank_Level
+  # P3 valve status
+  - UF_UFFT_Tank_Valve_Sts
+  - UF_Drain_Valve_Sts
+  - UF_ROFT_Valve_Sts
+  - UF_BWP_Valve_Sts
+  # System state
+  - SYS_RUNNING
+
+trend_tags:
+  - UF_UFFT_Tank_Level
+
+notes: >
+  Single-process slice for P3 (Ultrafiltration). Use this slice for
+  focused analysis of the UF feed tank behavior in isolation.

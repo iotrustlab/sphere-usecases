@@ -1,0 +1,269 @@
+# GRFICSv3 Tennessee Eastman P&ID Diagram Specification
+#
+# Generates SVG for use with SPHERE viewer overlays.
+# Run: go run ./cps-enclave-viewer/cmd/gensvg/ \
+#   -spec ../sphere-usecases/grfics/assets/grfics-te.diagram.yaml \
+#   -out ../sphere-usecases/grfics/assets/grfics-te.svg
+
+diagram:
+  id: grfics-te
+  viewBox:
+    w: 1000
+    h: 600
+  title: Tennessee Eastman Chemical Reactor (GRFICSv3)
+
+components:
+  # Feed 1 valve (A+B+C mixture)
+  - id: Feed1_Valve
+    symbol: valve
+    pos: {x: 80, y: 180}
+    size: {w: 40, h: 40}
+    label: "Feed 1"
+    stage: feed
+    anchors:
+      badge_pos: {x: 20, y: -15}
+      flow_pos: {x: 20, y: 50}
+      sp_pos: {x: 20, y: -30}
+
+  # Feed 2 valve (Pure A)
+  - id: Feed2_Valve
+    symbol: valve
+    pos: {x: 80, y: 300}
+    size: {w: 40, h: 40}
+    label: "Feed 2"
+    stage: feed
+    anchors:
+      badge_pos: {x: 20, y: -15}
+      flow_pos: {x: 20, y: 50}
+      sp_pos: {x: 20, y: -30}
+
+  # Reactor vessel
+  - id: Reactor
+    symbol: reactor
+    pos: {x: 350, y: 120}
+    size: {w: 120, h: 170}
+    label: "REACTOR"
+    label_size: 11
+    stage: tank
+    anchors:
+      pressure_pos: {x: 130, y: 30}
+      level_pos: {x: 130, y: 120}
+
+  # Purge valve
+  - id: Purge_Valve
+    symbol: valve
+    pos: {x: 600, y: 150}
+    size: {w: 40, h: 40}
+    label: "Purge"
+    stage: purge
+    anchors:
+      badge_pos: {x: 20, y: -15}
+      flow_pos: {x: 20, y: 50}
+      sp_pos: {x: 20, y: -30}
+
+  # Product valve
+  - id: Product_Valve
+    symbol: valve
+    pos: {x: 600, y: 280}
+    size: {w: 40, h: 40}
+    label: "Product"
+    stage: product
+    anchors:
+      badge_pos: {x: 20, y: -15}
+      flow_pos: {x: 20, y: 50}
+      sp_pos: {x: 20, y: -30}
+
+  # Analyzer
+  - id: Analyzer
+    symbol: analyzer
+    pos: {x: 780, y: 140}
+    size: {w: 100, h: 80}
+    label: "Composition"
+    stage: analyzer
+    anchors:
+      compA_pos: {x: 10, y: 100}
+      compB_pos: {x: 40, y: 100}
+      compC_pos: {x: 70, y: 100}
+
+pipes:
+  # Feed 1 to reactor
+  - id: pipe-feed1-in
+    from: {x: 40, y: 200}
+    to: {x: 80, y: 200}
+    arrow: true
+  - id: pipe-feed1-out
+    from: {x: 120, y: 200}
+    to: {x: 350, y: 200}
+    arrow: true
+
+  # Feed 2 to reactor
+  - id: pipe-feed2-in
+    from: {x: 40, y: 320}
+    to: {x: 80, y: 320}
+    arrow: true
+  - id: pipe-feed2-out
+    from: {x: 120, y: 320}
+    to: {x: 300, y: 320}
+  - id: pipe-feed2-up
+    from: {x: 300, y: 320}
+    to: {x: 300, y: 250}
+  - id: pipe-feed2-to-reactor
+    from: {x: 300, y: 250}
+    to: {x: 350, y: 250}
+    arrow: true
+
+  # Reactor to purge
+  - id: pipe-purge-out
+    from: {x: 470, y: 170}
+    to: {x: 600, y: 170}
+    arrow: true
+  - id: pipe-purge-exit
+    from: {x: 640, y: 170}
+    to: {x: 720, y: 170}
+    arrow: true
+
+  # Purge to analyzer
+  - id: pipe-analyzer
+    from: {x: 720, y: 170}
+    to: {x: 720, y: 180}
+  - id: pipe-analyzer-in
+    from: {x: 720, y: 180}
+    to: {x: 780, y: 180}
+    arrow: true
+
+  # Reactor to product
+  - id: pipe-product-out
+    from: {x: 470, y: 260}
+    to: {x: 550, y: 260}
+  - id: pipe-product-down
+    from: {x: 550, y: 260}
+    to: {x: 550, y: 300}
+  - id: pipe-product-to-valve
+    from: {x: 550, y: 300}
+    to: {x: 600, y: 300}
+    arrow: true
+  - id: pipe-product-exit
+    from: {x: 640, y: 300}
+    to: {x: 720, y: 300}
+    arrow: true
+
+stage_labels:
+  - stage: feed
+    text: "FEED STREAMS"
+    pos: {x: 50, y: 130}
+  - stage: tank
+    text: "REACTOR VESSEL"
+    pos: {x: 350, y: 100}
+  - stage: purge
+    text: "PURGE"
+    pos: {x: 600, y: 120}
+  - stage: product
+    text: "PRODUCT"
+    pos: {x: 600, y: 260}
+  - stage: analyzer
+    text: "ANALYZER"
+    pos: {x: 780, y: 120}
+
+text_labels:
+  - text:
+      - "Feed 1: A (48.5%), B (0.5%), C (51%)"
+    pos: {x: 50, y: 420}
+    size: 10
+  - text:
+      - "Feed 2: Pure A (100%)"
+    pos: {x: 50, y: 440}
+    size: 10
+  - text:
+      - "Reaction: A + C -> D (liquid product)"
+    pos: {x: 50, y: 460}
+    size: 10
+  - text:
+      - "Nominal: 2700 kPa, 45% level"
+    pos: {x: 50, y: 480}
+    size: 10
+
+# Overlay anchors for tag badges (17 tags total)
+system_anchors:
+  # Feed 1 tags
+  - id: TE_Feed1_Valve_Pos
+    pos: {x: 135, y: 175}
+    size: {w: 60, h: 20}
+    stage: feed
+  - id: TE_Feed1_Valve_SP
+    pos: {x: 135, y: 155}
+    size: {w: 60, h: 20}
+    stage: feed
+  - id: TE_Feed1_Flow
+    pos: {x: 135, y: 195}
+    size: {w: 60, h: 20}
+    stage: feed
+
+  # Feed 2 tags
+  - id: TE_Feed2_Valve_Pos
+    pos: {x: 135, y: 295}
+    size: {w: 60, h: 20}
+    stage: feed
+  - id: TE_Feed2_Valve_SP
+    pos: {x: 135, y: 275}
+    size: {w: 60, h: 20}
+    stage: feed
+  - id: TE_Feed2_Flow
+    pos: {x: 135, y: 315}
+    size: {w: 60, h: 20}
+    stage: feed
+
+  # Tank tags
+  - id: TE_Tank_Pressure
+    pos: {x: 480, y: 150}
+    size: {w: 80, h: 20}
+    stage: tank
+  - id: TE_Tank_Level
+    pos: {x: 480, y: 240}
+    size: {w: 80, h: 20}
+    stage: tank
+
+  # Purge tags
+  - id: TE_Purge_Valve_Pos
+    pos: {x: 650, y: 145}
+    size: {w: 60, h: 20}
+    stage: purge
+  - id: TE_Purge_Valve_SP
+    pos: {x: 650, y: 125}
+    size: {w: 60, h: 20}
+    stage: purge
+  - id: TE_Purge_Flow
+    pos: {x: 650, y: 165}
+    size: {w: 60, h: 20}
+    stage: purge
+
+  # Product tags
+  - id: TE_Product_Valve_Pos
+    pos: {x: 650, y: 275}
+    size: {w: 60, h: 20}
+    stage: product
+  - id: TE_Product_Valve_SP
+    pos: {x: 650, y: 255}
+    size: {w: 60, h: 20}
+    stage: product
+  - id: TE_Product_Flow
+    pos: {x: 650, y: 295}
+    size: {w: 60, h: 20}
+    stage: product
+
+  # Analyzer tags
+  - id: TE_Purge_CompA
+    pos: {x: 790, y: 230}
+    size: {w: 60, h: 20}
+    stage: analyzer
+  - id: TE_Purge_CompB
+    pos: {x: 790, y: 250}
+    size: {w: 60, h: 20}
+    stage: analyzer
+  - id: TE_Purge_CompC
+    pos: {x: 790, y: 270}
+    size: {w: 60, h: 20}
+    stage: analyzer
+
+sys_label:
+  text: "GRFICSv3 Tennessee Eastman Process - SPHERE Integration"
+  pos: {x: 500, y: 560}

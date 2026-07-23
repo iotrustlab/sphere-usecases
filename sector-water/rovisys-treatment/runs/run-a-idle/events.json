@@ -1,0 +1,17 @@
+[
+  {
+    "type": "start",
+    "timestamp": "2025-01-28T10:00:00Z",
+    "message": "Run started (idle baseline)"
+  },
+  {
+    "type": "health",
+    "timestamp": "2025-01-28T10:00:05Z",
+    "message": "Health OK"
+  },
+  {
+    "type": "stop",
+    "timestamp": "2025-01-28T10:00:30Z",
+    "message": "Run completed"
+  }
+]

@@ -1,0 +1,35 @@
+---
+# Teardown local OpenPLC deployment
+#
+# Usage:
+#   ansible-playbook -i ../inventory/local.yml teardown-local.yml
+
+- name: Teardown OpenPLC Water Treatment Scenario (Local)
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - ../vars/openplc.yml
+
+  tasks:
+    - name: Stop and remove Controller container
+      community.docker.docker_container:
+        name: "{{ controller.container_name }}"
+        state: absent
+      ignore_errors: true
+
+    - name: Stop and remove Simulator container
+      community.docker.docker_container:
+        name: "{{ simulator.container_name }}"
+        state: absent
+      ignore_errors: true
+
+    - name: Remove Docker network
+      community.docker.docker_network:
+        name: "{{ docker_network_name }}"
+        state: absent
+        force: true
+      ignore_errors: true
+
+    - name: Teardown complete
+      ansible.builtin.debug:
+        msg: "All OpenPLC containers and network removed."

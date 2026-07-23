@@ -1,0 +1,229 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600" font-family="Arial, Helvetica, sans-serif" font-size="11">
+  <defs>
+    <symbol id="sym-tank" viewBox="0 0 60 80">
+      <rect x="2" y="2" width="56" height="76" rx="4" fill="#e8f0f6" stroke="#3a6d8c" stroke-width="2"/>
+      <line x1="2" y1="12" x2="58" y2="12" stroke="#3a6d8c" stroke-width="1.5"/>
+    </symbol>
+    <symbol id="sym-valve" viewBox="0 0 30 30">
+      <polygon points="0,0 15,15 0,30" fill="#3a6d8c" opacity="0.7"/>
+      <polygon points="30,0 15,15 30,30" fill="#3a6d8c" opacity="0.7"/>
+      <line x1="15" y1="0" x2="15" y2="30" stroke="#3a6d8c" stroke-width="2"/>
+    </symbol>
+    <symbol id="sym-pump" viewBox="0 0 40 40">
+      <circle cx="20" cy="20" r="18" fill="#e8f0f6" stroke="#3a6d8c" stroke-width="2"/>
+      <polygon points="8,28 20,8 32,28" fill="#3a6d8c" opacity="0.6"/>
+    </symbol>
+    <symbol id="sym-mixer" viewBox="0 0 40 40">
+      <circle cx="20" cy="20" r="18" fill="#e8f0f6" stroke="#3a6d8c" stroke-width="2"/>
+      <line x1="20" y1="6" x2="20" y2="34" stroke="#3a6d8c" stroke-width="2"/>
+      <line x1="12" y1="14" x2="28" y2="14" stroke="#3a6d8c" stroke-width="2"/>
+      <line x1="12" y1="26" x2="28" y2="26" stroke="#3a6d8c" stroke-width="2"/>
+    </symbol>
+    <symbol id="sym-sensor" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="10" fill="none" stroke="#3a6d8c" stroke-width="2"/>
+      <text x="12" y="16" text-anchor="middle" font-size="10" fill="#3a6d8c" font-weight="bold">S</text>
+    </symbol>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#3a6d8c"/>
+    </marker>
+  </defs>
+
+  <rect width="1200" height="600" fill="#ffffff"/>
+  <text x="600" y="28" text-anchor="middle" font-size="16" font-weight="bold" fill="#3a6d8c">Water Distribution Process — P&amp;ID</text>
+
+  <!-- ============================================================ -->
+  <!-- ROW 1: Supply line                                           -->
+  <!-- ============================================================ -->
+  <g id="group-supply">
+    <text x="30" y="60" font-size="12" font-weight="bold" fill="#3a6d8c">Supply Line</text>
+
+    <!-- From Water Treatment -->
+    <text x="30" y="120" font-size="10" fill="#555">From Water</text>
+    <text x="30" y="132" font-size="10" fill="#555">Treatment</text>
+    <line x1="90" y1="125" x2="125" y2="125" stroke="#3a6d8c" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <!-- PUB_Water_Valve -->
+    <g id="comp-PUB_Water_Valve" transform="translate(130, 113)">
+      <use href="#sym-valve" width="24" height="24"/>
+      <text x="12" y="36" text-anchor="middle" font-size="8" fill="#555">PUB V</text>
+    </g>
+
+    <line x1="157" y1="125" x2="200" y2="125" stroke="#3a6d8c" stroke-width="2"/>
+
+    <!-- Supply chemical tanks -->
+    <!-- Supply_NaOCl_Tank -->
+    <g id="comp-Supply_NaOCl" transform="translate(200, 50)">
+      <use href="#sym-tank" width="50" height="60"/>
+      <text x="25" y="72" text-anchor="middle" font-size="8" fill="#555">NaOCl</text>
+    </g>
+    <g transform="translate(212, 115)">
+      <use href="#sym-valve" width="18" height="18"/>
+    </g>
+
+    <!-- Supply_NH4Cl_Tank -->
+    <g id="comp-Supply_NH4Cl" transform="translate(270, 50)">
+      <use href="#sym-tank" width="50" height="60"/>
+      <text x="25" y="72" text-anchor="middle" font-size="8" fill="#555">NH4Cl</text>
+    </g>
+    <g transform="translate(282, 115)">
+      <use href="#sym-valve" width="18" height="18"/>
+    </g>
+
+    <!-- Chemical lines merge -->
+    <line x1="221" y1="135" x2="221" y2="155" stroke="#3a6d8c" stroke-width="1.5"/>
+    <line x1="291" y1="135" x2="291" y2="155" stroke="#3a6d8c" stroke-width="1.5"/>
+    <line x1="221" y1="155" x2="291" y2="155" stroke="#3a6d8c" stroke-width="1.5"/>
+    <line x1="256" y1="155" x2="256" y2="125" stroke="#3a6d8c" stroke-width="1.5"/>
+
+    <!-- Pipe to mixer -->
+    <line x1="256" y1="125" x2="330" y2="125" stroke="#3a6d8c" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <!-- Supply_Mixer -->
+    <g id="comp-Supply_Mixer" transform="translate(335, 105)">
+      <use href="#sym-mixer" width="40" height="40"/>
+      <text x="20" y="52" text-anchor="middle" font-size="9" fill="#555">Mixer</text>
+      <rect id="anchor_Supply_Mixer_Sts" x="42" y="5" width="12" height="12" fill="transparent"/>
+    </g>
+
+    <!-- Pipe to Supply_Tank -->
+    <line x1="378" y1="125" x2="430" y2="125" stroke="#3a6d8c" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <!-- Supply_Tank -->
+    <g id="comp-Supply_Tank" transform="translate(435, 85)">
+      <use href="#sym-tank" width="60" height="80"/>
+      <text x="30" y="95" text-anchor="middle" font-size="9" fill="#555">Supply Tank</text>
+      <rect id="anchor_Supply_Tank_Level" x="5" y="20" width="50" height="12" fill="transparent"/>
+    </g>
+
+    <!-- Supply_Tank_Valve -->
+    <g id="comp-Supply_Tank_Valve" transform="translate(505, 113)">
+      <use href="#sym-valve" width="24" height="24"/>
+      <text x="12" y="36" text-anchor="middle" font-size="7" fill="#555">Tank V</text>
+    </g>
+
+    <line x1="498" y1="125" x2="502" y2="125" stroke="#3a6d8c" stroke-width="2"/>
+    <line x1="532" y1="125" x2="570" y2="125" stroke="#3a6d8c" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <!-- Supply_Pump -->
+    <g id="comp-Supply_Pump" transform="translate(575, 105)">
+      <use href="#sym-pump" width="40" height="40"/>
+      <text x="20" y="52" text-anchor="middle" font-size="9" fill="#555">Supply Pump</text>
+      <rect id="anchor_Supply_Pump_Flow" x="-10" y="55" width="60" height="12" fill="transparent"/>
+      <rect id="anchor_Supply_Pump_Sts" x="42" y="5" width="12" height="12" fill="transparent"/>
+    </g>
+
+    <!-- Pipe to sensors -->
+    <line x1="618" y1="125" x2="670" y2="125" stroke="#3a6d8c" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <!-- Supply_Sensors -->
+    <g id="comp-Supply_Sensors" transform="translate(675, 113)">
+      <use href="#sym-sensor" width="24" height="24"/>
+      <text x="12" y="36" text-anchor="middle" font-size="8" fill="#555">Sensors</text>
+    </g>
+
+    <!-- Pipe out to distribution -->
+    <line x1="702" y1="125" x2="760" y2="125" stroke="#3a6d8c" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="770" y="120" font-size="10" fill="#555">To Grid</text>
+  </g>
+
+  <!-- ============================================================ -->
+  <!-- ROW 2: PRM Grid / Elevated + Consumer Tanks                  -->
+  <!-- ============================================================ -->
+  <g id="group-grid">
+    <text x="30" y="220" font-size="12" font-weight="bold" fill="#3a6d8c">Distribution Grid</text>
+
+    <!-- PRMGrid_Elev_Tank -->
+    <g id="comp-PRMGrid_Elev_Tank" transform="translate(100, 240)">
+      <use href="#sym-tank" width="60" height="80"/>
+      <text x="30" y="95" text-anchor="middle" font-size="8" fill="#555">Elevated Tank</text>
+    </g>
+
+    <!-- PRMGrid_Elev_Tank_Valve -->
+    <g id="comp-PRMGrid_Elev_Valve" transform="translate(170, 268)">
+      <use href="#sym-valve" width="24" height="24"/>
+      <text x="12" y="36" text-anchor="middle" font-size="7" fill="#555">Elev V</text>
+    </g>
+
+    <line x1="163" y1="280" x2="167" y2="280" stroke="#3a6d8c" stroke-width="2"/>
+    <line x1="197" y1="280" x2="300" y2="280" stroke="#3a6d8c" stroke-width="2"/>
+
+    <!-- Connect to supply sensors via vertical line -->
+    <line x1="686" y1="140" x2="686" y2="280" stroke="#3a6d8c" stroke-width="2" stroke-dasharray="6,3"/>
+    <line x1="300" y1="280" x2="686" y2="280" stroke="#3a6d8c" stroke-width="2"/>
+    <line x1="686" y1="280" x2="900" y2="280" stroke="#3a6d8c" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <!-- PRMGrid_Consum_Tank -->
+    <g id="comp-PRMGrid_Consum_Tank" transform="translate(910, 240)">
+      <use href="#sym-tank" width="60" height="80"/>
+      <text x="30" y="95" text-anchor="middle" font-size="8" fill="#555">Consumer Tank</text>
+    </g>
+  </g>
+
+  <!-- ============================================================ -->
+  <!-- ROW 3: Return Water System (RWS)                             -->
+  <!-- ============================================================ -->
+  <g id="group-rws">
+    <text x="30" y="380" font-size="12" font-weight="bold" fill="#3a6d8c">Return Water System</text>
+
+    <!-- Return_NaHSC4_Tank -->
+    <g id="comp-Return_NaHSC4_Tank" transform="translate(100, 400)">
+      <use href="#sym-tank" width="50" height="65"/>
+      <text x="25" y="78" text-anchor="middle" font-size="8" fill="#555">NaHSC4</text>
+    </g>
+
+    <!-- Return_NaHSC4_Valve -->
+    <g id="comp-Return_NaHSC4_Valve" transform="translate(160, 420)">
+      <use href="#sym-valve" width="24" height="24"/>
+      <text x="12" y="36" text-anchor="middle" font-size="7" fill="#555">NaHSC4 V</text>
+    </g>
+
+    <line x1="153" y1="432" x2="157" y2="432" stroke="#3a6d8c" stroke-width="2"/>
+    <line x1="187" y1="432" x2="230" y2="432" stroke="#3a6d8c" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <!-- Return_Mixer -->
+    <g id="comp-Return_Mixer" transform="translate(235, 412)">
+      <use href="#sym-mixer" width="40" height="40"/>
+      <text x="20" y="52" text-anchor="middle" font-size="9" fill="#555">Mixer</text>
+    </g>
+
+    <!-- Pipe to Return_Tank -->
+    <line x1="278" y1="432" x2="330" y2="432" stroke="#3a6d8c" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <!-- Return_Tank (RWS Tank) -->
+    <g id="comp-Return_Tank" transform="translate(335, 392)">
+      <use href="#sym-tank" width="60" height="80"/>
+      <text x="30" y="95" text-anchor="middle" font-size="9" fill="#555">Return Tank</text>
+      <rect id="anchor_RWS_Tank_Level" x="5" y="20" width="50" height="12" fill="transparent"/>
+    </g>
+
+    <!-- Return_Tank_Valve -->
+    <g id="comp-Return_Tank_Valve" transform="translate(405, 420)">
+      <use href="#sym-valve" width="24" height="24"/>
+      <text x="12" y="36" text-anchor="middle" font-size="7" fill="#555">Tank V</text>
+    </g>
+
+    <line x1="398" y1="432" x2="402" y2="432" stroke="#3a6d8c" stroke-width="2"/>
+    <line x1="432" y1="432" x2="470" y2="432" stroke="#3a6d8c" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <!-- Return_Pump (RWS Pump) -->
+    <g id="comp-Return_Pump" transform="translate(475, 412)">
+      <use href="#sym-pump" width="40" height="40"/>
+      <text x="20" y="52" text-anchor="middle" font-size="9" fill="#555">Return Pump</text>
+      <rect id="anchor_RWS_Pump_Sts" x="42" y="5" width="12" height="12" fill="transparent"/>
+    </g>
+
+    <!-- Pipe to sensors -->
+    <line x1="518" y1="432" x2="570" y2="432" stroke="#3a6d8c" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <!-- Return_Sensors -->
+    <g id="comp-Return_Sensors" transform="translate(575, 420)">
+      <use href="#sym-sensor" width="24" height="24"/>
+      <text x="12" y="36" text-anchor="middle" font-size="8" fill="#555">Sensors</text>
+    </g>
+
+    <!-- Return line back -->
+    <line x1="602" y1="432" x2="660" y2="432" stroke="#3a6d8c" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="670" y="427" font-size="10" fill="#555">Return to</text>
+    <text x="670" y="439" font-size="10" fill="#555">Treatment</text>
+  </g>
+</svg>

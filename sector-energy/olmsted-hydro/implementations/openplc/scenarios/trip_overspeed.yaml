@@ -1,0 +1,90 @@
+# Overspeed trip scenario - force trip condition to test safety response
+# Tests trip detection, emergency gate closure, and breaker opening
+
+scenario_id: "ps-hydro-trip-overspeed"
+description: "Force overspeed trip condition and verify safety response"
+duration_sec: 120
+poll_interval_ms: 500
+
+initial_conditions:
+  HY_Res_Level: 20.0          # m - normal reservoir level
+  HY_Head: 120.0              # m - normal head
+  HY_Gate_Pos: 0.0            # Gate closed
+  HY_Breaker_Sts: false       # Breaker open
+  HY_Power_MW: 0.0            # No power output
+  HY_Speed_Pct: 0.0           # Unit stopped
+  HY_Run_Enable: true         # Permissive enabled
+
+timeline:
+  # Set moderate power setpoint
+  - time_sec: 3
+    action: set_tag
+    tag: HY_Power_Setpoint_MW
+    value: 40.0               # 50% load
+
+  # Start unit normally
+  - time_sec: 5
+    action: start_cmd
+    comment: "Initiate startup"
+
+  # Let it run to stable state
+  # At t=40s, inject overspeed condition by simulating grid loss
+  # (In reality this would be breaker opening unexpectedly with gate still open)
+  - time_sec: 40
+    action: inject_fault
+    fault_type: overspeed
+    comment: "Simulate grid loss causing overspeed"
+    description: |
+      This fault simulates a sudden grid disconnection while the unit
+      is generating. With the gate still open and no electrical load,
+      the turbine accelerates toward overspeed trip threshold (110%).
+
+  # Verify trip occurs and unit goes to TRIPPED state
+  # Controller should:
+  #   1. Detect overspeed (>110%)
+  #   2. Open breaker (if not already)
+  #   3. Fast-close gate
+  #   4. Transition to TRIPPED state
+
+  # After trip stabilizes, reset
+  - time_sec: 80
+    action: reset_cmd
+    comment: "Reset trip after gate closes"
+
+  # Verify return to IDLE
+  - time_sec: 100
+    action: stop_cmd
+    comment: "Ensure unit stays idle"
+
+expected_state:
+  at_time_25:
+    HY_State_Running: true
+    HY_Breaker_Sts: true
+
+  at_time_50:
+    HY_State_Tripped: true
+    HY_Trip_Overspeed: true
+
+  at_time_70:
+    HY_State_Tripped: true
+    HY_Gate_Pos: {max: 5.0}   # Gate should be mostly closed
+
+  at_time_90:
+    HY_State_Idle: true
+    HY_Trip_Overspeed: false  # Cleared by reset
+
+  at_end:
+    HY_State_Idle: true
+    HY_Gate_Pos: 0.0
+    HY_Breaker_Sts: false
+
+# Note: Fault injection requires simulator support or external perturbation
+fault_injection:
+  overspeed:
+    method: "force_breaker_open"
+    description: |
+      To simulate overspeed, the breaker is forced open while the gate
+      remains at operating position. Without electrical load, the turbine
+      accelerates. The controller must detect this and initiate trip sequence.
+
+reference_bundle: null

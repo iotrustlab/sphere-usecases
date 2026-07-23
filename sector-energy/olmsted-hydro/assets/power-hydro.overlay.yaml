@@ -1,0 +1,218 @@
+# Overlay tag positions for power-hydro.svg
+# Uses svg_id mode with direct anchor element references.
+# style: "badge" (colored pill), "text" (plain value), "indicator" (dot)
+
+overlays:
+  # ─── Primary Process Values ─────────────────────────────────────────────────
+  - tag: HY_Res_Level
+    mode: svg_id
+    svg_id: "anchor_HY_Res_Level"
+    offset_px: { dx: 0, dy: -2 }
+    fallback_percent: { x: 8, y: 30 }
+    style: badge
+    group: sensors
+
+  - tag: HY_Head
+    mode: svg_id
+    svg_id: "anchor_HY_Head"
+    offset_px: { dx: 0, dy: 0 }
+    fallback_percent: { x: 18, y: 22 }
+    style: badge
+    group: sensors
+
+  - tag: HY_Pressure
+    mode: svg_id
+    svg_id: "anchor_HY_Pressure"
+    offset_px: { dx: 0, dy: 0 }
+    fallback_percent: { x: 23, y: 22 }
+    style: badge
+    group: sensors
+
+  - tag: HY_Flow
+    mode: svg_id
+    svg_id: "anchor_HY_Flow"
+    offset_px: { dx: 0, dy: 0 }
+    fallback_percent: { x: 38, y: 32 }
+    style: badge
+    group: sensors
+
+  - tag: HY_Speed_Pct
+    mode: svg_id
+    svg_id: "anchor_HY_Speed_Pct"
+    offset_px: { dx: 0, dy: 0 }
+    fallback_percent: { x: 45, y: 18 }
+    style: badge
+    group: sensors
+
+  - tag: HY_Freq_Hz
+    mode: svg_id
+    svg_id: "anchor_HY_Freq_Hz"
+    offset_px: { dx: 0, dy: 0 }
+    fallback_percent: { x: 55, y: 40 }
+    style: badge
+    group: sensors
+
+  - tag: HY_Power_MW
+    mode: svg_id
+    svg_id: "anchor_HY_Power_MW"
+    offset_px: { dx: 0, dy: 0 }
+    fallback_percent: { x: 55, y: 20 }
+    style: badge
+    group: sensors
+
+  # ─── Actuator Status ────────────────────────────────────────────────────────
+  - tag: HY_Gate_Pos
+    mode: svg_id
+    svg_id: "anchor_HY_Gate_Pos"
+    offset_px: { dx: 0, dy: 0 }
+    fallback_percent: { x: 33, y: 20 }
+    style: badge
+    group: actuators
+
+  - tag: HY_Gate_Cmd
+    mode: svg_id
+    svg_id: "anchor_HY_Gate_Cmd"
+    offset_px: { dx: 0, dy: 0 }
+    fallback_percent: { x: 33, y: 40 }
+    style: text
+    group: actuators
+
+  - tag: HY_Breaker_Sts
+    mode: svg_id
+    svg_id: "anchor_HY_Breaker_Sts"
+    offset_px: { dx: 0, dy: 0 }
+    fallback_percent: { x: 63, y: 21 }
+    style: indicator
+    group: actuators
+
+  - tag: HY_Breaker_Cmd
+    mode: svg_id
+    svg_id: "anchor_HY_Breaker_Cmd"
+    offset_px: { dx: 0, dy: 0 }
+    fallback_percent: { x: 63, y: 39 }
+    style: indicator
+    group: actuators
+
+  - tag: HY_Spill_Sts
+    mode: svg_id
+    svg_id: "anchor_HY_Spill_Sts"
+    offset_px: { dx: 0, dy: 0 }
+    fallback_percent: { x: 13, y: 48 }
+    style: indicator
+    group: actuators
+
+  # ─── Power Setpoint ─────────────────────────────────────────────────────────
+  - tag: HY_Power_Setpoint_MW
+    mode: svg_id
+    svg_id: "anchor_HY_Power_Setpoint_MW"
+    offset_px: { dx: 0, dy: 0 }
+    fallback_percent: { x: 85, y: 25 }
+    style: badge
+    group: hmi
+
+  # ─── System State ───────────────────────────────────────────────────────────
+  - tag: HY_State_Idle
+    mode: svg_id
+    svg_id: "anchor_HY_State_Idle"
+    offset_px: { dx: 0, dy: 0 }
+    fallback_percent: { x: 10, y: 70 }
+    style: indicator
+    group: system
+
+  - tag: HY_State_Startup
+    mode: svg_id
+    svg_id: "anchor_HY_State_Startup"
+    offset_px: { dx: 0, dy: 0 }
+    fallback_percent: { x: 17, y: 70 }
+    style: indicator
+    group: system
+
+  - tag: HY_State_Running
+    mode: svg_id
+    svg_id: "anchor_HY_State_Running"
+    offset_px: { dx: 0, dy: 0 }
+    fallback_percent: { x: 24, y: 70 }
+    style: indicator
+    group: system
+
+  - tag: HY_State_Shutdown
+    mode: svg_id
+    svg_id: "anchor_HY_State_Shutdown"
+    offset_px: { dx: 0, dy: 0 }
+    fallback_percent: { x: 31, y: 70 }
+    style: indicator
+    group: system
+
+  - tag: HY_State_Tripped
+    mode: svg_id
+    svg_id: "anchor_HY_State_Tripped"
+    offset_px: { dx: 0, dy: 0 }
+    fallback_percent: { x: 38, y: 70 }
+    style: indicator
+    group: system
+
+  - tag: HY_Permissives_Ready
+    mode: svg_id
+    svg_id: "anchor_HY_Permissives_Ready"
+    offset_px: { dx: 0, dy: 0 }
+    fallback_percent: { x: 50, y: 70 }
+    style: indicator
+    group: system
+
+  # ─── Trips ──────────────────────────────────────────────────────────────────
+  - tag: HY_Trip_Overspeed
+    mode: svg_id
+    svg_id: "anchor_HY_Trip_Overspeed"
+    offset_px: { dx: 0, dy: 0 }
+    fallback_percent: { x: 65, y: 70 }
+    style: indicator
+    group: trips
+
+  - tag: HY_Trip_Overpressure
+    mode: svg_id
+    svg_id: "anchor_HY_Trip_Overpressure"
+    offset_px: { dx: 0, dy: 0 }
+    fallback_percent: { x: 74, y: 70 }
+    style: indicator
+    group: trips
+
+  - tag: HY_Trip_LowHead
+    mode: svg_id
+    svg_id: "anchor_HY_Trip_LowHead"
+    offset_px: { dx: 0, dy: 0 }
+    fallback_percent: { x: 83, y: 70 }
+    style: indicator
+    group: trips
+
+  - tag: HY_Trip_Manual
+    mode: svg_id
+    svg_id: "anchor_HY_Trip_Manual"
+    offset_px: { dx: 0, dy: 0 }
+    fallback_percent: { x: 90, y: 70 }
+    style: indicator
+    group: trips
+
+  # ─── Alarms ─────────────────────────────────────────────────────────────────
+  - tag: HY_Alarm_GateMismatch
+    mode: svg_id
+    svg_id: "anchor_HY_Alarm_GateMismatch"
+    offset_px: { dx: 0, dy: 0 }
+    fallback_percent: { x: 65, y: 82 }
+    style: indicator
+    group: alarms
+
+  - tag: HY_Alarm_BreakerMismatch
+    mode: svg_id
+    svg_id: "anchor_HY_Alarm_BreakerMismatch"
+    offset_px: { dx: 0, dy: 0 }
+    fallback_percent: { x: 76, y: 82 }
+    style: indicator
+    group: alarms
+
+  - tag: HY_Alarm_LowLevel
+    mode: svg_id
+    svg_id: "anchor_HY_Alarm_LowLevel"
+    offset_px: { dx: 0, dy: 0 }
+    fallback_percent: { x: 87, y: 82 }
+    style: indicator
+    group: alarms

@@ -1,0 +1,300 @@
+# FUXA HMI Tag Mapping: Power Hydro PS-1
+#
+# Maps HMI controls and displays to Modbus addresses on the Controller PLC.
+# Connect FUXA to 10.100.0.10:502 (Modbus TCP)
+#
+# Reference: ../power-hydro/implementations/openplc/configs/openplc_map.yaml
+
+api_version: sphere.mergetb.io/v1
+kind: HMITagMapping
+metadata:
+  usecase: power-hydro
+  usecase_code: ps
+  controller_address: "10.100.0.10:502"
+
+# ─── HMI Controls (Write) ───────────────────────────────────────────────────
+controls:
+  Start_Cmd:
+    modbus_type: discrete_input
+    address: 0              # %IX0.0
+    label: "Start"
+    description: "Start pushbutton - initiates turbine startup"
+    widget: button
+    color: green
+
+  Stop_Cmd:
+    modbus_type: discrete_input
+    address: 1              # %IX0.1
+    label: "Stop"
+    description: "Stop pushbutton - initiates controlled shutdown"
+    widget: button
+    color: red
+
+  Reset_Cmd:
+    modbus_type: discrete_input
+    address: 2              # %IX0.2
+    label: "Reset"
+    description: "Trip reset pushbutton"
+    widget: button
+    color: blue
+
+  Mode_Auto:
+    modbus_type: discrete_input
+    address: 3              # %IX0.3
+    label: "Auto Mode"
+    description: "Auto/Manual mode selector"
+    widget: toggle
+
+  Run_Enable:
+    modbus_type: discrete_input
+    address: 4              # %IX0.4
+    label: "Run Enable"
+    description: "Run enable permissive"
+    widget: toggle
+
+  Gate_Cmd:
+    modbus_type: holding_register
+    address: 100            # %QW100
+    label: "Gate Position"
+    description: "Wicket gate position command"
+    widget: slider
+    units: "%"
+    range: [0, 100]
+    scale: 10               # 0-1000 -> 0-100%
+    default: 0
+
+  Power_Setpoint:
+    modbus_type: holding_register
+    address: 101            # %QW101
+    label: "Power Setpoint"
+    description: "Power output setpoint"
+    widget: slider
+    units: "MW"
+    range: [0, 100]
+    scale: 10               # 0-1000 -> 0-100 MW
+    default: 0
+
+  Breaker_Cmd:
+    modbus_type: coil
+    address: 40             # %QX5.0
+    label: "Breaker Close"
+    description: "Generator breaker close command"
+    widget: toggle
+
+  Spill_Cmd:
+    modbus_type: coil
+    address: 41             # %QX5.1
+    label: "Spillway Open"
+    description: "Spillway gate open command"
+    widget: toggle
+
+# ─── System State (Read-Only) ───────────────────────────────────────────────
+state:
+  IDLE:
+    modbus_type: coil
+    address: 56             # %QX7.0
+    label: "IDLE"
+    description: "Unit in idle state"
+    widget: indicator
+    color_on: gray
+    color_off: dark_gray
+
+  STARTUP:
+    modbus_type: coil
+    address: 57             # %QX7.1
+    label: "STARTUP"
+    description: "Unit starting up"
+    widget: indicator
+    color_on: yellow
+    color_off: dark_gray
+
+  RUNNING:
+    modbus_type: coil
+    address: 58             # %QX7.2
+    label: "RUNNING"
+    description: "Unit running at power"
+    widget: indicator
+    color_on: green
+    color_off: dark_gray
+
+  SHUTDOWN:
+    modbus_type: coil
+    address: 59             # %QX7.3
+    label: "SHUTDOWN"
+    description: "Unit shutting down"
+    widget: indicator
+    color_on: orange
+    color_off: dark_gray
+
+  TRIPPED:
+    modbus_type: coil
+    address: 60             # %QX7.4
+    label: "TRIPPED"
+    description: "Unit tripped - requires reset"
+    widget: indicator
+    color_on: red
+    color_off: dark_gray
+
+  Permissives_Ready:
+    modbus_type: coil
+    address: 61             # %QX7.5
+    label: "READY"
+    description: "All start permissives satisfied"
+    widget: indicator
+    color_on: green
+    color_off: red
+
+# ─── Process Sensors (Read-Only) ────────────────────────────────────────────
+sensors:
+  Gate_Pos:
+    modbus_type: holding_register
+    address: 300            # Bridge HR
+    label: "Gate Position"
+    description: "Wicket gate actual position"
+    widget: gauge
+    units: "%"
+    range: [0, 100]
+    scale: 10               # 0-1000 -> 0-100%
+
+  Res_Level:
+    modbus_type: holding_register
+    address: 301            # Bridge HR
+    label: "Reservoir Level"
+    description: "Reservoir water level"
+    widget: gauge
+    units: "m"
+    range: [0, 30]
+    scale: 100              # 0-3000 -> 0-30.00 m
+
+  Head:
+    modbus_type: holding_register
+    address: 302            # Bridge HR
+    label: "Net Head"
+    description: "Net hydraulic head"
+    widget: gauge
+    units: "m"
+    range: [0, 150]
+    scale: 10               # 0-1500 -> 0-150.0 m
+
+  Flow:
+    modbus_type: holding_register
+    address: 303            # Bridge HR
+    label: "Flow Rate"
+    description: "Turbine flow rate"
+    widget: gauge
+    units: "m³/s"
+    range: [0, 150]
+    scale: 10               # 0-1500 -> 0-150.0 m³/s
+
+  Pressure:
+    modbus_type: holding_register
+    address: 304            # Bridge HR
+    label: "Penstock Pressure"
+    description: "Penstock pressure"
+    widget: gauge
+    units: "kPa"
+    range: [0, 2000]
+
+  Speed:
+    modbus_type: holding_register
+    address: 305            # Bridge HR
+    label: "Speed"
+    description: "Speed as % of synchronous"
+    widget: gauge
+    units: "%"
+    range: [0, 150]
+    scale: 10               # 0-1500 -> 0-150.0%
+
+  Frequency:
+    modbus_type: holding_register
+    address: 306            # Bridge HR
+    label: "Frequency"
+    description: "Generator frequency"
+    widget: gauge
+    units: "Hz"
+    range: [55, 65]
+    scale: 100              # 5500-6500 -> 55.00-65.00 Hz
+
+  Power_MW:
+    modbus_type: holding_register
+    address: 307            # Bridge HR
+    label: "Power Output"
+    description: "Electrical power output"
+    widget: gauge
+    units: "MW"
+    range: [0, 100]
+    scale: 10               # 0-1000 -> 0-100.0 MW
+
+# ─── Trip Outputs (Read-Only) ───────────────────────────────────────────────
+trips:
+  Overspeed:
+    modbus_type: coil
+    address: 64             # %QX8.0
+    label: "Overspeed Trip"
+    description: "Speed >110% of synchronous"
+    severity: critical
+    color: red
+
+  Overpressure:
+    modbus_type: coil
+    address: 65             # %QX8.1
+    label: "Overpressure Trip"
+    description: "Penstock pressure >1800 kPa"
+    severity: critical
+    color: red
+
+  LowHead:
+    modbus_type: coil
+    address: 66             # %QX8.2
+    label: "Low Head Trip"
+    description: "Net head <40 m"
+    severity: critical
+    color: red
+
+  Manual:
+    modbus_type: coil
+    address: 67             # %QX8.3
+    label: "Manual Trip"
+    description: "Manual emergency trip activated"
+    severity: critical
+    color: red
+
+# ─── Alarms (Read-Only) ─────────────────────────────────────────────────────
+alarms:
+  GateMismatch:
+    modbus_type: coil
+    address: 72             # %QX9.0
+    label: "Gate Mismatch"
+    description: "Gate command/position mismatch"
+    severity: warning
+    color: yellow
+
+  BreakerMismatch:
+    modbus_type: coil
+    address: 73             # %QX9.1
+    label: "Breaker Mismatch"
+    description: "Breaker command/status mismatch"
+    severity: warning
+    color: yellow
+
+  LowLevel:
+    modbus_type: coil
+    address: 74             # %QX9.2
+    label: "Low Reservoir"
+    description: "Low reservoir level warning"
+    severity: warning
+    color: yellow
+
+# ─── Equipment Status (Read-Only) ───────────────────────────────────────────
+equipment_status:
+  Breaker_Sts:
+    modbus_type: discrete_input
+    address: 16             # %IX2.0
+    label: "Breaker Closed"
+    description: "Generator breaker closed"
+
+  Spill_Sts:
+    modbus_type: discrete_input
+    address: 17             # %IX2.1
+    label: "Spillway Open"
+    description: "Spillway gate open"

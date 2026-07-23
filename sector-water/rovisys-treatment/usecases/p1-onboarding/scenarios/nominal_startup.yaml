@@ -1,0 +1,17 @@
+scenario_id: "wt-uc1-nominal-startup"
+description: "Clean startup, run 60s, clean shutdown"
+duration_sec: 90
+poll_interval_ms: 500
+
+initial_conditions:
+  RW_Tank_Level: 600
+  UF_UFFT_Tank_Level: 400
+  ChemTreat_NaCl_Level: 800
+  ChemTreat_NaOCl_Level: 800
+  ChemTreat_HCl_Level: 800
+
+timeline:
+  - { time_sec: 5, action: hmi_start }
+  - { time_sec: 70, action: hmi_stop }
+
+reference_bundle: null

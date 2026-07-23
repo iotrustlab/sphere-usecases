@@ -1,0 +1,36 @@
+# OpenPLC Runtime Versions
+#
+# This file documents tested OpenPLC versions for SPHERE CPS scenarios.
+# When developing a new scenario, use one of these tested versions for stability.
+# Pin scenarios to a specific commit SHA for reproducibility.
+
+# Default version (master branch - latest)
+# WARNING: master can change and break scenarios. Pin to a commit for production.
+default: master
+
+# Tested versions
+# Add entries here as versions are tested with SPHERE scenarios
+tested_versions:
+  # - version: "abc123def456789"
+  #   date: "2025-01-15"
+  #   notes: "Tested with water-treatment scenario"
+  #   tested_scenarios:
+  #     - water-treatment/process-one-openplc
+
+# How to find a specific commit:
+# 1. Go to https://github.com/thiagoralves/OpenPLC_v3/commits/master
+# 2. Find a commit that works with your scenario
+# 3. Copy the full 40-character SHA
+# 4. Add it to your scenario.yaml:
+#
+#    nodes:
+#      - name: controller
+#        type: openplc
+#        backend_config:
+#          version: "abc123def456789..."
+
+# Pre-built images (for faster deployment):
+# Build with: ./build.sh <version> --push
+# Use in scenario:
+#   backend_config:
+#     image: "ghcr.io/sphere-project/sphere-openplc:<version>"

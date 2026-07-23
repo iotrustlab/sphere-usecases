@@ -1,0 +1,28 @@
+api_version: sphere.mergetb.io/v1
+kind: SliceDefinition
+
+metadata:
+  slice_id: wd-uc0-grid-only-slice
+  usecase_id: water-distribution-uc0
+  version: "1.0.0"
+  description: Water Distribution UC0 Distribution Grid only slice. Isolates elevated tank, consumer tank, and grid valve for focused validation.
+
+active_groups:
+  - grid
+
+diagram:
+  asset: "water-distribution.svg"
+
+overlay_tags:
+  - Grid_Elev_Tank_Level
+  - Grid_Consum_Tank_Level
+  - Grid_Elev_Valve
+  - Grid_Elev_Valve_Sts
+  - SYS_IDLE
+  - SYS_RUNNING
+
+trend_tags:
+  - Grid_Elev_Tank_Level
+  - Grid_Consum_Tank_Level
+
+notes: Grid-only slice for isolated validation of the distribution grid process (elevated storage, consumer tank, demand modeling).

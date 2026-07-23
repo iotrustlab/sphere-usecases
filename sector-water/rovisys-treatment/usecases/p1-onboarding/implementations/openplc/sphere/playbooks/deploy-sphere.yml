@@ -1,0 +1,156 @@
+---
+# Deploy OpenPLC containers on SPHERE testbed
+#
+# This playbook deploys controller and simulator containers on their respective nodes.
+# Unlike local deployment, each container runs on a separate physical/virtual node.
+
+- name: Deploy OpenPLC Controller
+  hosts: controller
+  become: true
+
+  vars:
+    openplc_image_name: sphere-openplc
+    openplc_image_tag: latest
+    container_name: openplc-controller
+    modbus_port: 502
+    webui_port: 8080
+    program_file: controller_final.st
+    scan_cycle_ms: 100
+    # IP address from SPHERE model.py
+    node_ip: "10.100.0.10"
+
+  tasks:
+    - name: Create project directory
+      ansible.builtin.file:
+        path: /opt/openplc/project
+        state: directory
+        mode: '0755'
+
+    - name: Copy controller program
+      ansible.builtin.copy:
+        src: "{{ playbook_dir }}/../../projects/controller_project/{{ program_file }}"
+        dest: /opt/openplc/project/{{ program_file }}
+        mode: '0644'
+
+    - name: Deploy Controller container
+      community.docker.docker_container:
+        name: "{{ container_name }}"
+        image: "{{ openplc_image_name }}:{{ openplc_image_tag }}"
+        state: started
+        restart_policy: unless-stopped
+        network_mode: host  # Use host networking on SPHERE
+        volumes:
+          - /opt/openplc/project:/workdir/project:ro
+        env:
+          OPENPLC_PROGRAM: "/workdir/project/{{ program_file }}"
+          OPENPLC_SCAN_CYCLE_MS: "{{ scan_cycle_ms | string }}"
+          OPENPLC_MODBUS_PORT: "{{ modbus_port | string }}"
+        labels:
+          sphere.role: controller
+          sphere.scenario: water-treatment-p1
+      register: controller_container
+
+    - name: Wait for Modbus port
+      ansible.builtin.wait_for:
+        host: localhost
+        port: "{{ modbus_port }}"
+        timeout: 120
+        state: started
+
+    - name: Display Controller info
+      ansible.builtin.debug:
+        msg: |
+          Controller deployed on {{ inventory_hostname }}:
+            Container: {{ container_name }}
+            Modbus: {{ node_ip }}:{{ modbus_port }}
+            WebUI: http://{{ node_ip }}:{{ webui_port }}
+
+
+- name: Deploy OpenPLC Simulator
+  hosts: simulator
+  become: true
+
+  vars:
+    openplc_image_name: sphere-openplc
+    openplc_image_tag: latest
+    container_name: openplc-simulator
+    modbus_port: 502  # Same port, different node
+    webui_port: 8080
+    program_file: simulator_final.st
+    scan_cycle_ms: 100
+    node_ip: "10.100.0.20"
+
+  tasks:
+    - name: Create project directory
+      ansible.builtin.file:
+        path: /opt/openplc/project
+        state: directory
+        mode: '0755'
+
+    - name: Copy simulator program
+      ansible.builtin.copy:
+        src: "{{ playbook_dir }}/../../projects/simulator_project/{{ program_file }}"
+        dest: /opt/openplc/project/{{ program_file }}
+        mode: '0644'
+
+    - name: Deploy Simulator container
+      community.docker.docker_container:
+        name: "{{ container_name }}"
+        image: "{{ openplc_image_name }}:{{ openplc_image_tag }}"
+        state: started
+        restart_policy: unless-stopped
+        network_mode: host
+        volumes:
+          - /opt/openplc/project:/workdir/project:ro
+        env:
+          OPENPLC_PROGRAM: "/workdir/project/{{ program_file }}"
+          OPENPLC_SCAN_CYCLE_MS: "{{ scan_cycle_ms | string }}"
+          OPENPLC_MODBUS_PORT: "{{ modbus_port | string }}"
+        labels:
+          sphere.role: simulator
+          sphere.scenario: water-treatment-p1
+      register: simulator_container
+
+    - name: Wait for Modbus port
+      ansible.builtin.wait_for:
+        host: localhost
+        port: "{{ modbus_port }}"
+        timeout: 120
+        state: started
+
+    - name: Display Simulator info
+      ansible.builtin.debug:
+        msg: |
+          Simulator deployed on {{ inventory_hostname }}:
+            Container: {{ container_name }}
+            Modbus: {{ node_ip }}:{{ modbus_port }}
+            WebUI: http://{{ node_ip }}:{{ webui_port }}
+
+
+- name: Deployment Summary
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - name: Display deployment summary
+      ansible.builtin.debug:
+        msg: |
+          ============================================
+          OpenPLC SPHERE Deployment Complete
+          ============================================
+
+          Controller (10.100.0.10):
+            - Modbus TCP: 10.100.0.10:502
+            - WebUI: http://10.100.0.10:8080
+
+          Simulator (10.100.0.20):
+            - Modbus TCP: 10.100.0.20:502
+            - WebUI: http://10.100.0.20:8080
+
+          To access WebUI via SSH tunnel:
+            ssh -F ssh_config -L 8080:localhost:8080 controller
+            Then open: http://localhost:8080
+
+          To test Modbus communication:
+            ansible-playbook -i inventory.ini playbooks/test-modbus.yml
+          ============================================

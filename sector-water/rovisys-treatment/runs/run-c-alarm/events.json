@@ -1,0 +1,22 @@
+[
+  {
+    "type": "start",
+    "timestamp": "2025-01-28T10:10:00Z",
+    "message": "Run started (alarm demo)"
+  },
+  {
+    "type": "health",
+    "timestamp": "2025-01-28T10:10:05Z",
+    "message": "Health OK"
+  },
+  {
+    "type": "error",
+    "timestamp": "2025-01-28T10:10:20Z",
+    "message": "Alarm_RW_Tank_HH activated - tank level exceeded 1200mm"
+  },
+  {
+    "type": "stop",
+    "timestamp": "2025-01-28T10:10:30Z",
+    "message": "Run completed"
+  }
+]

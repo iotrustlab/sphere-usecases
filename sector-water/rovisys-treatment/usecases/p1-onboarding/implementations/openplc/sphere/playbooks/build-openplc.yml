@@ -1,0 +1,74 @@
+---
+# Build OpenPLC container image on SPHERE nodes using Docker
+#
+# This playbook copies the Dockerfile and builds the image locally on each node.
+
+- name: Build OpenPLC container image on SPHERE nodes
+  hosts: plcs
+  become: true
+
+  vars:
+    openplc_image_name: sphere-openplc
+    openplc_image_tag: latest
+    openplc_version: master
+    build_dir: /tmp/openplc-build
+
+  tasks:
+    - name: Create build directory
+      ansible.builtin.file:
+        path: "{{ build_dir }}"
+        state: directory
+        mode: '0755'
+
+    - name: Copy Dockerfile
+      ansible.builtin.copy:
+        src: "{{ playbook_dir }}/../../docker/openplc/Dockerfile"
+        dest: "{{ build_dir }}/Dockerfile"
+        mode: '0644'
+
+    - name: Copy entrypoint script
+      ansible.builtin.copy:
+        src: "{{ playbook_dir }}/../../docker/openplc/entrypoint.sh"
+        dest: "{{ build_dir }}/entrypoint.sh"
+        mode: '0755'
+
+    - name: Check if image already exists
+      ansible.builtin.command:
+        cmd: docker image exists {{ openplc_image_name }}:{{ openplc_image_tag }}
+      register: image_exists
+      changed_when: false
+      failed_when: false
+
+    - name: Build OpenPLC container image with Podman
+      ansible.builtin.command:
+        cmd: >
+          docker build
+          --build-arg OPENPLC_VERSION={{ openplc_version }}
+          -t {{ openplc_image_name }}:{{ openplc_image_tag }}
+          {{ build_dir }}
+        chdir: "{{ build_dir }}"
+      register: image_build
+      when: image_exists.rc != 0
+      # This can take 10-15 minutes on first build
+      async: 1800
+      poll: 30
+
+    - name: Display build result
+      ansible.builtin.debug:
+        msg: "OpenPLC image built: {{ openplc_image_name }}:{{ openplc_image_tag }}"
+      when: image_build is changed
+
+    - name: Verify image was built
+      ansible.builtin.command:
+        cmd: docker images {{ openplc_image_name }}:{{ openplc_image_tag }} --format "{{ '{{' }}.Repository{{ '}}' }}:{{ '{{' }}.Tag{{ '}}' }} ({{ '{{' }}.Size{{ '}}' }})"
+      register: image_info
+      changed_when: false
+
+    - name: Display image info
+      ansible.builtin.debug:
+        msg: "{{ image_info.stdout }}"
+
+    - name: Cleanup build directory
+      ansible.builtin.file:
+        path: "{{ build_dir }}"
+        state: absent
