@@ -9,14 +9,16 @@ The Rockwell L5X files are the **canonical source** for all PLC logic. OpenPLC i
 **Main files** (use these):
 | File | Format | Purpose |
 |------|--------|---------|
-| `plc/Controller_PLC.L5X` | Rockwell XML | Controller logic (import to Studio 5000) |
-| `plc/Controller_PLC.L5K` | Rockwell ASCII | Controller logic (text format) |
-| `plc/Simulator_PLC.L5X` | Rockwell XML | Simulator/plant model (import to Studio 5000) |
-| `plc/Simulator_PLC.L5K` | Rockwell ASCII | Simulator/plant model (text format) |
+| `controller/Controller_PLC.L5X` | Rockwell XML | Controller logic (import to Studio 5000) |
+| `controller/Controller_PLC.L5K` | Rockwell ASCII | Controller logic (text format) |
+| `simulator/Simulator_PLC.L5X` | Rockwell XML | Simulator/plant model (import to Studio 5000) |
+| `simulator/Simulator_PLC.L5K` | Rockwell ASCII | Simulator/plant model (text format) |
 
 **Supporting files**:
 | File | Purpose |
 |------|---------|
+| `hmi/Graph.xml`, `hmi/HMI_Start_Stop.xml` | FactoryTalk View SE display exports |
+| `hmi/BatchImport_PLC_V2.xml` | Batch-import manifest for both displays |
 | `rockwell_map.yaml` | Tag-to-address mapping for DPI and validation |
 | `scripts/` | Utility scripts for tag analysis |
 
@@ -47,8 +49,8 @@ To generate OpenPLC equivalents from these files:
 
 ```bash
 # Generate PLCopen XML from Rockwell L5X
-crossplc translate plc/Controller_PLC.L5X -o ../openplc/projects/controller_project/plc.xml
-crossplc translate plc/Simulator_PLC.L5X -o ../openplc/projects/simulator_project/plc.xml
+crossplc translate controller/Controller_PLC.L5X -o ../openplc/projects/controller_project/plc.xml
+crossplc translate simulator/Simulator_PLC.L5X -o ../openplc/projects/simulator_project/plc.xml
 ```
 
 ## Tag Mapping

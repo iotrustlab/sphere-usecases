@@ -3,7 +3,7 @@
   Import-Export
   Version   := RSLogix 5000 v37.00
   Owner     := , 
-  Exported  := Fri Jun 19 12:30:12 2026
+  Exported  := Thu Jul  2 13:57:20 2026
 
   Note:  File encoded in UTF-8.  Only edit file in a program 
          which supports UTF-8 (like Notepad, not Wordpad).
@@ -452,16 +452,19 @@ CONTROLLER Controller_PLC (ProcessorType := "1756-L72",
 
 	TAG
 		Alarms : RW_tank_AL_UDT (Description := "Struct that contains all level alarms for RW_tank") := [0];
+		clk_data : DINT[7] (RADIX := Decimal) := [0,0,0,0,0,0,0];
 		Cycle_Time_drain : FBD_TIMER  := [1,0,0,0,0,0,0,0,0,4,0,0];
 		False : BOOL (Description := "constant bool set at zero, this tag is used for structured text",
 		            RADIX := Decimal,
 		            Constant := Yes) := 0;
+		Fill_rate : REAL (RADIX := Float) := 0.00000000e+000;
 		GSV_Message : SYS_MESSAGES (Description := "system messages about the plc project") := [0,0.00000000e+000,0,0.00000000e+000];
 		HMI : HMI_UDT (Description := "struct that contains basic buttons and output tags",
 		            COMMENT.START_PB := "Start button from HMI",
 		            COMMENT.STOP_PB := "Stop button from HMI",
 		            COMMENT.START_ACTIVE := "Output of start button",
 		            COMMENT.STOP_ACTIVE := "Output of stop button") := [0];
+		My_Microseconds : DINT (RADIX := Decimal) := 0;
 		P1 : P1_UDT (Description := "struct that contains all P1 tags",
 		            COMMENT.RW_TANK_TNK_LVL := "analog input of the raw water tank level",
 		            COMMENT.RW_PUMP_FLOW := "Analog input of the pump flow percentage",
@@ -526,7 +529,7 @@ CONTROLLER Controller_PLC (ProcessorType := "1756-L72",
 			'Timer_done := False;
 			'
 			'P1.RW_Tank_tnk_lvl:= (Local:7:I.Ch0Data / 20) * 1200;
-			'P3.Ultrafiltration_UFFT_Tank_tnk_lvl := (Local:7:I.Ch1Data / 20) * 1200;
+			'P3.Ultrafiltration_UFFT_Tank_tnk_lvl := (Local:7:I.Ch1Data / 20) * 1000;
 		END_ST_ROUTINE
 
 		ROUTINE main 
@@ -542,14 +545,15 @@ CONTROLLER Controller_PLC (ProcessorType := "1756-L72",
 			'Local:5:O.Data.0 := P1.RW_Tank_PR_Valve;
 			'Local:5:O.Data.1 := P1.RW_Pump_start;
 			'Local:5:O.Data.2 := P3.Ultrafiltration_UFFT_Tank_Valve;
+			'Local:5:O.Data.3 := P1_SYS.SHUTDOWN;
 			'
 			'if(not HMI.Start_Active)then
 			'	P1_SYS.IDLE := True;
 			'	P1_SYS.START := False;
 			'	P1_SYS.RUNNING := False;
 			'	P1_SYS.SHUTDOWN := False;
-			'	 P1.RW_Tank_PR_Valve := False;
 			'	 
+			'	P1.RW_Tank_PR_Valve := False;
 			'elsif(HMI.Start_Active and not P1_SYS.Permissives_Ready)then 
 			'	P1_SYS.IDLE := False;
 			'	P1_SYS.START := True;
@@ -578,6 +582,7 @@ CONTROLLER Controller_PLC (ProcessorType := "1756-L72",
 			'	P1_SYS.START := False;
 			'	P1_SYS.RUNNING := False;
 			'	P1_SYS.SHUTDOWN := True;
+			'	
 			'end_if;
 			'
 			'
@@ -585,11 +590,12 @@ CONTROLLER Controller_PLC (ProcessorType := "1756-L72",
 
 		ST_ROUTINE Timer 
 			'
+			'GSV(WallClockTime, ,LocalDateTime, clk_data[0]);
 			'
-			'Cycle_Time_drain.PRE := 5000;
+			'Cycle_Time_drain.PRE := (clk_data[6] MOD 3001) + 5000;
 			'Cycle_Time_drain.TimerEnable := P3.Ultrafiltration_UFFT_Tank_Valve;
 			'
-			'// 2. Execute the timer unconditionally so it can process its bits
+			'//excute the timer
 			'TONR(Cycle_Time_drain);
 			'
 			'if(Cycle_Time_drain.DN)then
@@ -604,13 +610,16 @@ CONTROLLER Controller_PLC (ProcessorType := "1756-L72",
 
 		ST_ROUTINE Water_Treatment_Logic 
 			'P1.RW_Tank_tnk_lvl:= (Local:7:I.Ch0Data / 20) * 1200;
+			'
+			'
 			'P3.Ultrafiltration_UFFT_Tank_tnk_lvl := (Local:7:I.Ch1Data / 20) * 1200;
 			'
 			'if(P1_SYS.RUNNING and P1.RW_Tank_tnk_lvl <= 500 and P3.Ultrafiltration_UFFT_Tank_tnk_lvl < 1000.0)then
 			'	P1.RW_Tank_PR_Valve := True;
 			'	P1.RW_Pump_start := False;
 			'	P1.RW_Tank_P_Valve := False;
-			'		P3.Ultrafiltration_UFFT_Tank_Valve := False;
+			'	P3.Ultrafiltration_UFFT_Tank_Valve := False;
+			'	P3.Ultrafiltration_UFFT_Tank_Valve := False;
 			'elsif(P1_SYS.RUNNING and P1.RW_Tank_tnk_lvl >= 800 and P3.Ultrafiltration_UFFT_Tank_tnk_lvl < 1000.0)then
 			'	P1.RW_Tank_PR_Valve := False;
 			'	P1.RW_Pump_start := True;

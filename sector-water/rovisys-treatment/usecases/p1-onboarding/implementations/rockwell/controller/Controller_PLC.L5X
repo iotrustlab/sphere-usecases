@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<RSLogix5000Content SchemaRevision="1.0" SoftwareRevision="37.00" TargetName="Controller_PLC" TargetType="Controller" ContainsContext="false" ExportDate="Fri Jun 19 12:34:36 2026" ExportOptions="NoRawData L5KData DecoratedData ForceProtectedEncoding AllProjDocTrans">
-<Controller Use="Target" Name="Controller_PLC" ProcessorType="1756-L72" MajorRev="37" MinorRev="11" TimeSlice="20" ShareUnusedTimeSlice="1" ProjectCreationDate="Thu Jun 12 15:07:29 2025" LastModifiedDate="Tue Jun 09 21:51:58 2026" SFCExecutionControl="CurrentActive" SFCRestartPosition="MostRecent"
+<RSLogix5000Content SchemaRevision="1.0" SoftwareRevision="37.00" TargetName="Controller_PLC" TargetType="Controller" ContainsContext="false" ExportDate="Thu Jul 02 13:57:33 2026" ExportOptions="NoRawData L5KData DecoratedData ForceProtectedEncoding AllProjDocTrans">
+<Controller Use="Target" Name="Controller_PLC" ProcessorType="1756-L72" MajorRev="37" MinorRev="11" TimeSlice="20" ShareUnusedTimeSlice="1" ProjectCreationDate="Thu Jun 12 15:07:29 2025" LastModifiedDate="Thu Jul 02 12:51:48 2026" SFCExecutionControl="CurrentActive" SFCRestartPosition="MostRecent"
  SFCLastScan="DontScan" ProjectSN="16#70a2_1e0e" MatchProjectToController="false" CanUseRPIFromProducer="false" InhibitAutomaticFirmwareUpdate="0" PassThroughConfiguration="EnabledWithAppend" DownloadProjectDocumentationAndExtendedProperties="true" DownloadProjectCustomProperties="true" ReportMinorOverflow="false" DataExchangeId="{D1EB459E-651C-44D3-9256-6BAF815C161A}">
 <RedundancyInfo Enabled="false" KeepTestEditsOnSwitchOver="false" IOMemoryPadPercentage="90" DataTablePadPercentage="50"/>
 <Security Code="0" ChangesToDetect="16#ffff_ffff_ffff_ffff"/>
@@ -1645,6 +1645,22 @@
 </Structure>
 </Data>
 </Tag>
+<Tag Name="clk_data" TagType="Base" DataType="DINT" Dimensions="7" Radix="Decimal" Constant="false" ExternalAccess="Read/Write">
+<Data Format="L5K">
+<![CDATA[[0,0,0,0,0,0,0]]]>
+</Data>
+<Data Format="Decorated">
+<Array DataType="DINT" Dimensions="7" Radix="Decimal">
+<Element Index="[0]" Value="0"/>
+<Element Index="[1]" Value="0"/>
+<Element Index="[2]" Value="0"/>
+<Element Index="[3]" Value="0"/>
+<Element Index="[4]" Value="0"/>
+<Element Index="[5]" Value="0"/>
+<Element Index="[6]" Value="0"/>
+</Array>
+</Data>
+</Tag>
 <Tag Name="Cycle_Time_drain" TagType="Base" DataType="FBD_TIMER" Constant="false" ExternalAccess="Read/Write">
 <Data Format="L5K">
 <![CDATA[[1,0,0,0,0,0,0,0,0,4,0,0]]]>
@@ -1675,6 +1691,14 @@
 </Data>
 <Data Format="Decorated">
 <DataValue DataType="BOOL" Radix="Decimal" Value="0"/>
+</Data>
+</Tag>
+<Tag Name="Fill_rate" TagType="Base" DataType="REAL" Radix="Float" Constant="false" ExternalAccess="Read/Write">
+<Data Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</Data>
+<Data Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
 </Data>
 </Tag>
 <Tag Name="GSV_Message" TagType="Base" DataType="SYS_MESSAGES" Constant="false" ExternalAccess="Read/Write">
@@ -1721,6 +1745,14 @@
 <DataValueMember Name="Start_Active" DataType="BOOL" Value="0"/>
 <DataValueMember Name="Stop_Active" DataType="BOOL" Value="0"/>
 </Structure>
+</Data>
+</Tag>
+<Tag Name="My_Microseconds" TagType="Base" DataType="DINT" Radix="Decimal" Constant="false" ExternalAccess="Read/Write">
+<Data Format="L5K">
+<![CDATA[0]]>
+</Data>
+<Data Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
 </Data>
 </Tag>
 <Tag Name="P1" TagType="Base" DataType="P1_UDT" Constant="false" ExternalAccess="Read/Write">
@@ -2030,7 +2062,7 @@ Running state is (true/false)]]>
 <![CDATA[P1.RW_Tank_tnk_lvl:= (Local:7:I.Ch0Data / 20) * 1200;]]>
 </Line>
 <Line Number="7">
-<![CDATA[P3.Ultrafiltration_UFFT_Tank_tnk_lvl := (Local:7:I.Ch1Data / 20) * 1200;]]>
+<![CDATA[P3.Ultrafiltration_UFFT_Tank_tnk_lvl := (Local:7:I.Ch1Data / 20) * 1000;]]>
 </Line>
 </STContent>
 </Routine>
@@ -2080,120 +2112,126 @@ Running state is (true/false)]]>
 <![CDATA[Local:5:O.Data.2 := P3.Ultrafiltration_UFFT_Tank_Valve;]]>
 </Line>
 <Line Number="3">
-<![CDATA[]]>
+<![CDATA[Local:5:O.Data.3 := P1_SYS.SHUTDOWN;]]>
 </Line>
 <Line Number="4">
-<![CDATA[if(not HMI.Start_Active)then]]>
+<![CDATA[]]>
 </Line>
 <Line Number="5">
-<![CDATA[	P1_SYS.IDLE := True;]]>
+<![CDATA[if(not HMI.Start_Active)then]]>
 </Line>
 <Line Number="6">
-<![CDATA[	P1_SYS.START := False;]]>
+<![CDATA[	P1_SYS.IDLE := True;]]>
 </Line>
 <Line Number="7">
-<![CDATA[	P1_SYS.RUNNING := False;]]>
+<![CDATA[	P1_SYS.START := False;]]>
 </Line>
 <Line Number="8">
-<![CDATA[	P1_SYS.SHUTDOWN := False;]]>
+<![CDATA[	P1_SYS.RUNNING := False;]]>
 </Line>
 <Line Number="9">
-<![CDATA[	 P1.RW_Tank_PR_Valve := False;]]>
+<![CDATA[	P1_SYS.SHUTDOWN := False;]]>
 </Line>
 <Line Number="10">
 <![CDATA[	 ]]>
 </Line>
 <Line Number="11">
-<![CDATA[elsif(HMI.Start_Active and not P1_SYS.Permissives_Ready)then ]]>
+<![CDATA[	P1.RW_Tank_PR_Valve := False;]]>
 </Line>
 <Line Number="12">
-<![CDATA[	P1_SYS.IDLE := False;]]>
+<![CDATA[elsif(HMI.Start_Active and not P1_SYS.Permissives_Ready)then ]]>
 </Line>
 <Line Number="13">
-<![CDATA[	P1_SYS.START := True;]]>
+<![CDATA[	P1_SYS.IDLE := False;]]>
 </Line>
 <Line Number="14">
-<![CDATA[	P1_SYS.RUNNING := False;]]>
+<![CDATA[	P1_SYS.START := True;]]>
 </Line>
 <Line Number="15">
-<![CDATA[	P1_SYS.SHUTDOWN := False;]]>
-</Line>
-<Line Number="16">
-<![CDATA[	]]>
-</Line>
-<Line Number="17">
-<![CDATA[	P1.RW_Tank_PR_Valve := True;]]>
-</Line>
-<Line Number="18">
-<![CDATA[	]]>
-</Line>
-<Line Number="19">
-<![CDATA[elsif(HMI.Start_Active and P1_SYS.Permissives_Ready)then]]>
-</Line>
-<Line Number="20">
-<![CDATA[	P1_SYS.IDLE := False;]]>
-</Line>
-<Line Number="21">
-<![CDATA[	P1_SYS.START := False;]]>
-</Line>
-<Line Number="22">
-<![CDATA[	P1_SYS.RUNNING := True;]]>
-</Line>
-<Line Number="23">
-<![CDATA[	P1_SYS.SHUTDOWN := False;]]>
-</Line>
-<Line Number="24">
-<![CDATA[end_if;]]>
-</Line>
-<Line Number="25">
-<![CDATA[]]>
-</Line>
-<Line Number="26">
-<![CDATA[if(P1.RW_Tank_tnk_lvl <= 300)then]]>
-</Line>
-<Line Number="27">
-<![CDATA[	P1_SYS.Permissives_Ready := False;]]>
-</Line>
-<Line Number="28">
-<![CDATA[else]]>
-</Line>
-<Line Number="29">
-<![CDATA[	P1_SYS.Permissives_Ready := True;]]>
-</Line>
-<Line Number="30">
-<![CDATA[end_if;]]>
-</Line>
-<Line Number="31">
-<![CDATA[]]>
-</Line>
-<Line Number="32">
-<![CDATA[if(HMI.Stop_Active)then]]>
-</Line>
-<Line Number="33">
-<![CDATA[	HMI.Start_PB := False;]]>
-</Line>
-<Line Number="34">
-<![CDATA[	]]>
-</Line>
-<Line Number="35">
-<![CDATA[	P1_SYS.IDLE := False;]]>
-</Line>
-<Line Number="36">
-<![CDATA[	P1_SYS.START := False;]]>
-</Line>
-<Line Number="37">
 <![CDATA[	P1_SYS.RUNNING := False;]]>
 </Line>
-<Line Number="38">
-<![CDATA[	P1_SYS.SHUTDOWN := True;]]>
+<Line Number="16">
+<![CDATA[	P1_SYS.SHUTDOWN := False;]]>
 </Line>
-<Line Number="39">
+<Line Number="17">
+<![CDATA[	]]>
+</Line>
+<Line Number="18">
+<![CDATA[	P1.RW_Tank_PR_Valve := True;]]>
+</Line>
+<Line Number="19">
+<![CDATA[	]]>
+</Line>
+<Line Number="20">
+<![CDATA[elsif(HMI.Start_Active and P1_SYS.Permissives_Ready)then]]>
+</Line>
+<Line Number="21">
+<![CDATA[	P1_SYS.IDLE := False;]]>
+</Line>
+<Line Number="22">
+<![CDATA[	P1_SYS.START := False;]]>
+</Line>
+<Line Number="23">
+<![CDATA[	P1_SYS.RUNNING := True;]]>
+</Line>
+<Line Number="24">
+<![CDATA[	P1_SYS.SHUTDOWN := False;]]>
+</Line>
+<Line Number="25">
 <![CDATA[end_if;]]>
 </Line>
-<Line Number="40">
+<Line Number="26">
 <![CDATA[]]>
 </Line>
+<Line Number="27">
+<![CDATA[if(P1.RW_Tank_tnk_lvl <= 300)then]]>
+</Line>
+<Line Number="28">
+<![CDATA[	P1_SYS.Permissives_Ready := False;]]>
+</Line>
+<Line Number="29">
+<![CDATA[else]]>
+</Line>
+<Line Number="30">
+<![CDATA[	P1_SYS.Permissives_Ready := True;]]>
+</Line>
+<Line Number="31">
+<![CDATA[end_if;]]>
+</Line>
+<Line Number="32">
+<![CDATA[]]>
+</Line>
+<Line Number="33">
+<![CDATA[if(HMI.Stop_Active)then]]>
+</Line>
+<Line Number="34">
+<![CDATA[	HMI.Start_PB := False;]]>
+</Line>
+<Line Number="35">
+<![CDATA[	]]>
+</Line>
+<Line Number="36">
+<![CDATA[	P1_SYS.IDLE := False;]]>
+</Line>
+<Line Number="37">
+<![CDATA[	P1_SYS.START := False;]]>
+</Line>
+<Line Number="38">
+<![CDATA[	P1_SYS.RUNNING := False;]]>
+</Line>
+<Line Number="39">
+<![CDATA[	P1_SYS.SHUTDOWN := True;]]>
+</Line>
+<Line Number="40">
+<![CDATA[	]]>
+</Line>
 <Line Number="41">
+<![CDATA[end_if;]]>
+</Line>
+<Line Number="42">
+<![CDATA[]]>
+</Line>
+<Line Number="43">
 <![CDATA[]]>
 </Line>
 </STContent>
@@ -2204,48 +2242,51 @@ Running state is (true/false)]]>
 <![CDATA[]]>
 </Line>
 <Line Number="1">
-<![CDATA[]]>
+<![CDATA[GSV(WallClockTime, ,LocalDateTime, clk_data[0]);]]>
 </Line>
 <Line Number="2">
-<![CDATA[Cycle_Time_drain.PRE := 5000;]]>
+<![CDATA[]]>
 </Line>
 <Line Number="3">
-<![CDATA[Cycle_Time_drain.TimerEnable := P3.Ultrafiltration_UFFT_Tank_Valve;]]>
+<![CDATA[Cycle_Time_drain.PRE := (clk_data[6] MOD 3001) + 5000;]]>
 </Line>
 <Line Number="4">
-<![CDATA[]]>
+<![CDATA[Cycle_Time_drain.TimerEnable := P3.Ultrafiltration_UFFT_Tank_Valve;]]>
 </Line>
 <Line Number="5">
-<![CDATA[// 2. Execute the timer unconditionally so it can process its bits]]>
-</Line>
-<Line Number="6">
-<![CDATA[TONR(Cycle_Time_drain);]]>
-</Line>
-<Line Number="7">
 <![CDATA[]]>
 </Line>
+<Line Number="6">
+<![CDATA[//excute the timer]]>
+</Line>
+<Line Number="7">
+<![CDATA[TONR(Cycle_Time_drain);]]>
+</Line>
 <Line Number="8">
-<![CDATA[if(Cycle_Time_drain.DN)then]]>
+<![CDATA[]]>
 </Line>
 <Line Number="9">
-<![CDATA[	Timer_done := True;]]>
+<![CDATA[if(Cycle_Time_drain.DN)then]]>
 </Line>
 <Line Number="10">
-<![CDATA[	P3.Ultrafiltration_UFFT_Tank_Valve := False;]]>
+<![CDATA[	Timer_done := True;]]>
 </Line>
 <Line Number="11">
-<![CDATA[	P1.RW_Tank_PR_Valve := True;]]>
+<![CDATA[	P3.Ultrafiltration_UFFT_Tank_Valve := False;]]>
 </Line>
 <Line Number="12">
-<![CDATA[else]]>
+<![CDATA[	P1.RW_Tank_PR_Valve := True;]]>
 </Line>
 <Line Number="13">
-<![CDATA[	Timer_done:= False;]]>
+<![CDATA[else]]>
 </Line>
 <Line Number="14">
-<![CDATA[end_if;]]>
+<![CDATA[	Timer_done:= False;]]>
 </Line>
 <Line Number="15">
+<![CDATA[end_if;]]>
+</Line>
+<Line Number="16">
 <![CDATA[]]>
 </Line>
 </STContent>
@@ -2256,60 +2297,69 @@ Running state is (true/false)]]>
 <![CDATA[P1.RW_Tank_tnk_lvl:= (Local:7:I.Ch0Data / 20) * 1200;]]>
 </Line>
 <Line Number="1">
-<![CDATA[P3.Ultrafiltration_UFFT_Tank_tnk_lvl := (Local:7:I.Ch1Data / 20) * 1200;]]>
+<![CDATA[]]>
 </Line>
 <Line Number="2">
 <![CDATA[]]>
 </Line>
 <Line Number="3">
-<![CDATA[if(P1_SYS.RUNNING and P1.RW_Tank_tnk_lvl <= 500 and P3.Ultrafiltration_UFFT_Tank_tnk_lvl < 1000.0)then]]>
+<![CDATA[P3.Ultrafiltration_UFFT_Tank_tnk_lvl := (Local:7:I.Ch1Data / 20) * 1200;]]>
 </Line>
 <Line Number="4">
-<![CDATA[	P1.RW_Tank_PR_Valve := True;]]>
-</Line>
-<Line Number="5">
-<![CDATA[	P1.RW_Pump_start := False;]]>
-</Line>
-<Line Number="6">
-<![CDATA[	P1.RW_Tank_P_Valve := False;]]>
-</Line>
-<Line Number="7">
-<![CDATA[		P3.Ultrafiltration_UFFT_Tank_Valve := False;]]>
-</Line>
-<Line Number="8">
-<![CDATA[elsif(P1_SYS.RUNNING and P1.RW_Tank_tnk_lvl >= 800 and P3.Ultrafiltration_UFFT_Tank_tnk_lvl < 1000.0)then]]>
-</Line>
-<Line Number="9">
-<![CDATA[	P1.RW_Tank_PR_Valve := False;]]>
-</Line>
-<Line Number="10">
-<![CDATA[	P1.RW_Pump_start := True;]]>
-</Line>
-<Line Number="11">
-<![CDATA[	P1.RW_Tank_P_Valve := True;]]>
-</Line>
-<Line Number="12">
-<![CDATA[elsif(P1_SYS.RUNNING and P3.Ultrafiltration_UFFT_Tank_tnk_lvl >= 1000.0)then]]>
-</Line>
-<Line Number="13">
-<![CDATA[	P1.RW_Tank_PR_Valve := False;]]>
-</Line>
-<Line Number="14">
-<![CDATA[	P1.RW_Pump_start := False;]]>
-</Line>
-<Line Number="15">
-<![CDATA[	P1.RW_Tank_P_Valve := False;]]>
-</Line>
-<Line Number="16">
-<![CDATA[	P3.Ultrafiltration_UFFT_Tank_Valve := True;]]>
-</Line>
-<Line Number="17">
-<![CDATA[end_if;]]>
-</Line>
-<Line Number="18">
 <![CDATA[]]>
 </Line>
+<Line Number="5">
+<![CDATA[if(P1_SYS.RUNNING and P1.RW_Tank_tnk_lvl <= 500 and P3.Ultrafiltration_UFFT_Tank_tnk_lvl < 1000.0)then]]>
+</Line>
+<Line Number="6">
+<![CDATA[	P1.RW_Tank_PR_Valve := True;]]>
+</Line>
+<Line Number="7">
+<![CDATA[	P1.RW_Pump_start := False;]]>
+</Line>
+<Line Number="8">
+<![CDATA[	P1.RW_Tank_P_Valve := False;]]>
+</Line>
+<Line Number="9">
+<![CDATA[	P3.Ultrafiltration_UFFT_Tank_Valve := False;]]>
+</Line>
+<Line Number="10">
+<![CDATA[	P3.Ultrafiltration_UFFT_Tank_Valve := False;]]>
+</Line>
+<Line Number="11">
+<![CDATA[elsif(P1_SYS.RUNNING and P1.RW_Tank_tnk_lvl >= 800 and P3.Ultrafiltration_UFFT_Tank_tnk_lvl < 1000.0)then]]>
+</Line>
+<Line Number="12">
+<![CDATA[	P1.RW_Tank_PR_Valve := False;]]>
+</Line>
+<Line Number="13">
+<![CDATA[	P1.RW_Pump_start := True;]]>
+</Line>
+<Line Number="14">
+<![CDATA[	P1.RW_Tank_P_Valve := True;]]>
+</Line>
+<Line Number="15">
+<![CDATA[elsif(P1_SYS.RUNNING and P3.Ultrafiltration_UFFT_Tank_tnk_lvl >= 1000.0)then]]>
+</Line>
+<Line Number="16">
+<![CDATA[	P1.RW_Tank_PR_Valve := False;]]>
+</Line>
+<Line Number="17">
+<![CDATA[	P1.RW_Pump_start := False;]]>
+</Line>
+<Line Number="18">
+<![CDATA[	P1.RW_Tank_P_Valve := False;]]>
+</Line>
 <Line Number="19">
+<![CDATA[	P3.Ultrafiltration_UFFT_Tank_Valve := True;]]>
+</Line>
+<Line Number="20">
+<![CDATA[end_if;]]>
+</Line>
+<Line Number="21">
+<![CDATA[]]>
+</Line>
+<Line Number="22">
 <![CDATA[]]>
 </Line>
 </STContent>

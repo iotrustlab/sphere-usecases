@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gfx xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="Gfx-SE16.xsd">
+    <displaySettings displayType="replace" position="useCurrentPosition" securityCode="*" backColor="white" titleBar="true" titleBarText="Graphs" maximumTagUpdateRate="1" focusHighlightColor="#0078D7" disableFocusHighlight="false" size="useCurrentSize" width="964" height="542" allowMultipleRunningCopies="false" cacheAfterDisplaying="false" systemMenu="true" minimizeButton="true" sizeToMainWindow="false" showLastAcquiredValue="true" TrackScreenForNavigation="true" TrackName="Graph" allowResizing="false" whenResized="scale" beepOnPress="false" highlightWhenCursorPassesOver="true" interactiveHighlightColor="#93C2E4" displayOnScreenKeyboard="false" allowButtonActionOnError="true" fieldNotSelectedTextColor="#3F3F3F" fieldNotSelectedFillColor="white" fieldSelectedTextColor="#3F3F3F" fieldSelectedFillColor="white" fieldInErrorNotSelectedTextColor="white" fieldInErrorNotSelectedFillColor="#E22028" fieldInErrorSelectedTextColor="white" fieldInErrorSelectedFillColor="#E22028" startupCommand="" shutdownCommand="" useGradientStyle="false" endColor="teal" gradientStop="50" gradientDirection="gradientDirectionHorizontal" gradientShadingStyle="gradientHorizontalFromRight"/>
+    <activeX name="Trend2" height="478" width="962" left="-8" top="65" visible="true" wallpaper="false" toolTipText="" exposeToVba="notExposed" isReferenceObject="false" classId="{D0569F8A-3B30-46B4-B889-EAFEFD50DD6C}" keyNavigation="true" focusHighlight="true" pointerHighlight="true" tabIndex="1">
+        <data progId="RSTX.Trend.1" fileName="RSTXView2.ocx" fileVersion="15.0.201.13" typeLibrary="{7B774452-2FB4-4B76-B11C-205D28E74BEB}" typeLibVersion="4.0" data="AAAEAG1jAABnMQAAAAAAAA0AAAD//v8FVAByAGUAbgBkAAEAAAAAAAAA/////8gAAAD//Q8A&#xA;AANS4wuRj84RneMAqgBLuFEBAAAAkAHcfAEAEEFyaWFsIFVuaWNvZGUgTVMAAAAAAAAAAAEA&#xA;AAAAAAAA//7/AP/+/wABYOoAAAAAAAD///8AAAAAAAIAAAAAkgcAAAIA//8BAA0AQ1ZpZXdM&#xA;aW5lSW5mbwcAAAABAAAAAAAAAAAAAAAAAAAAAMCSQP/+/wM/AD8APwD//v8DPwA/AD8AAAAA&#xA;AAAAAAD//v8AAAAAAAMAAAABAAAA//7/FFIAUwBWAGkAZQB3ADMAMgAuAEEAcABwAGwAaQBj&#xA;AGEAdABpAG8AbgD//v8A//7/BTEAMAAwADAAMAD//v8gewBbAEgATQBJAF8AUwBwAGgAZQBy&#xA;AGUAXQBQADEALgBSAFcAXwBUAGEAbgBrAF8AdABuAGsAXwBsAHYAbAB9ACABAAAA//7/AP/+&#xA;/wACAAAAAAAAAAAAAAAAAAAAAMCSQAGABwAAAAEAAAAAAAAAAAAAAAAAAAAAQI9A//7/Az8A&#xA;PwA/AP/+/wM/AD8APwAAAAAAAAAAAP/+/wAAAAAAAwAAAAEAAAD//v8UUgBTAFYAaQBlAHcA&#xA;MwAyAC4AQQBwAHAAbABpAGMAYQB0AGkAbwBuAP/+/wD//v8FMQAwADAAMAAxAP/+/zJ7AFsA&#xA;SABNAEkAXwBTAHAAaABlAHIAZQBdAFAAMwAuAFUAbAB0AHIAYQBmAGkAbAB0AHIAYQB0AGkA&#xA;bwBuAF8AVQBGAEYAVABfAFQAYQBuAGsAXwB0AG4AawBfAGwAdgBsAH0AIAEAAAD//v8A//7/&#xA;AAIAAAAAAAAAAAAAAAAAAAAAwJJADgAAAAIAAAAAAAAAAQAAAAEAAAABAAAAAQAAAAEAAAAB&#xA;AAAAAQAAAAEAAAABAAAAAQAAAAEAAAABAAAAAQAAAAIAAAD/APg9PQAAAAAAAAAAAAgAAAAI&#xA;AAAAAAAAAAAAAAAAAAAAAAAAAADAkkAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAACAAEAAAAB&#xA;AAAAAgAAAAAAAAAAAAIAAQAAAAEAAAACAAAAAAAAAAAA/////wAAAAAsAAAAAAAAAAAAAAAA&#xA;AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAICAgACAgIAA/+///v+///8KAACA2cxG&#xA;agAAAAABAAAAdAAAAAoAAIBRzUZqAAAAAAEAAAB0AAAA//7/AAEAAAABAAAAAgAAAAAAAAAA&#xA;AAIAAAAoAAAA6AMAAAAAAAAAAAAAXAAAAPP///8AAAAAAAAAAAAAAACQAQAAAAAAAAAAAQAA&#xA;AAAAAAAAAP/+/xBBAHIAaQBhAGwAIABVAG4AaQBjAG8AZABlACAATQBTAAAAAAAAAAAAAAAA&#xA;AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA&#xA;AAAAAAAAAAMAAAAAAAAA//7/AP/+/wD//v8A//7/ACABAAAA//7/AP/+/wADAAAAAAAAAP/+&#xA;/wD//v8A//7/AP/+/wAgAQAAAP/+/wD//v8AAAAAAAAAAAD///8AAAAAAAAAAAAAAAAAAQAA&#xA;AAgAAAACAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAACAP//AQAJAENMaW5lSW5mbwcAAAABAAAA&#xA;AAAAAAAAAAAAAAAAAMCSQP/+/wM/AD8APwD//v8DPwA/AD8AAAAAAAAAAAD//v8AAAAAAAMA&#xA;AAABAAAA//7/FFIAUwBWAGkAZQB3ADMAMgAuAEEAcABwAGwAaQBjAGEAdABpAG8AbgD//v8A&#xA;//7/BTEAMAAwADAAMAD//v8gewBbAEgATQBJAF8AUwBwAGgAZQByAGUAXQBQADEALgBSAFcA&#xA;XwBUAGEAbgBrAF8AdABuAGsAXwBsAHYAbAB9ACABAAAA//7/AP/+/wAEgAcAAAABAAAAAAAA&#xA;AAAAAAAAAAAAAECPQP/+/wM/AD8APwD//v8DPwA/AD8AAAAAAAAAAAD//v8AAAAAAAMAAAAB&#xA;AAAA//7/FFIAUwBWAGkAZQB3ADMAMgAuAEEAcABwAGwAaQBjAGEAdABpAG8AbgD//v8A//7/&#xA;BTEAMAAwADAAMQD//v8yewBbAEgATQBJAF8AUwBwAGgAZQByAGUAXQBQADMALgBVAGwAdABy&#xA;AGEAZgBpAGwAdAByAGEAdABpAG8AbgBfAFUARgBGAFQAXwBUAGEAbgBrAF8AdABuAGsAXwBs&#xA;AHYAbAB9ACABAAAA//7/AP/+/wAAAAIAAAAAAADAkkAAAAAAAECPQAIAAAAAAAAAAAAAAAAA&#xA;AAAAAAIA//7/IHsAWwBIAE0ASQBfAFMAcABoAGUAcgBlAF0AUAAxAC4AUgBXAF8AVABhAG4A&#xA;awBfAHQAbgBrAF8AbAB2AGwAfQD//v8yewBbAEgATQBJAF8AUwBwAGgAZQByAGUAXQBQADMA&#xA;LgBVAGwAdAByAGEAZgBpAGwAdAByAGEAdABpAG8AbgBfAFUARgBGAFQAXwBUAGEAbgBrAF8A&#xA;dABuAGsAXwBsAHYAbAB9AP/+/wD/////AgD//v8A//7/AAIA//7/Az8APwA/AP/+/wM/AD8A&#xA;PwACAP/+/wM/AD8APwD//v8DPwA/AD8AAgD//v8A//7/AAAAAAD///8AMgAAAAAAAAAAAAAA&#xA;AAAFAAAAAwAAAAQAAAAFAAAABgAAAAcAAAAAAAAAAAAAAA=="/>
+        <ActiveXEvents>
+            <ActiveXEvent eventCommand="" eventName="ChartModeChanged">
+                <ParameterTag tagName="" parameterName="NewMode"/>
+            </ActiveXEvent>
+            <ActiveXEvent eventCommand="" eventName="PenConfigChanged">
+                <ParameterTag tagName="" parameterName="Change"/>
+                <ParameterTag tagName="" parameterName="Pen"/>
+            </ActiveXEvent>
+            <ActiveXEvent eventCommand="" eventName="RefreshRateExpired"/>
+            <ActiveXEvent eventCommand="" eventName="StartTimeOrSpanChanged">
+                <ParameterTag tagName="" parameterName="NewStartDateTime"/>
+                <ParameterTag tagName="" parameterName="NewTimeSpan"/>
+            </ActiveXEvent>
+            <ActiveXEvent eventCommand="" eventName="ChartConfigChanged"/>
+            <ActiveXEvent eventCommand="" eventName="VcrButtonPressed">
+                <ParameterTag tagName="" parameterName="NewStartDateTime"/>
+                <ParameterTag tagName="" parameterName="ButtonPressed"/>
+            </ActiveXEvent>
+            <ActiveXEvent eventCommand="" eventName="HistoricalDataRequested">
+                <ParameterTag tagName="" parameterName="TransactionID"/>
+                <ParameterTag tagName="" parameterName="StartTime"/>
+                <ParameterTag tagName="" parameterName="StartMS"/>
+                <ParameterTag tagName="" parameterName="EndTime"/>
+                <ParameterTag tagName="" parameterName="EndMS"/>
+                <ParameterTag tagName="" parameterName="Pens"/>
+                <ParameterTag tagName="" parameterName="WillProcess"/>
+            </ActiveXEvent>
+            <ActiveXEvent eventCommand="" eventName="Error">
+                <ParameterTag tagName="" parameterName="Number"/>
+                <ParameterTag tagName="" parameterName="Description"/>
+                <ParameterTag tagName="" parameterName="Scode"/>
+                <ParameterTag tagName="" parameterName="Source"/>
+                <ParameterTag tagName="" parameterName="HelpFile"/>
+                <ParameterTag tagName="" parameterName="HelpContext"/>
+                <ParameterTag tagName="" parameterName="CancelDisplay"/>
+            </ActiveXEvent>
+        </ActiveXEvents>
+        <connections>
+            <connection name="Pen 1" expression="{[HMI_Sphere]P1.RW_Tank_tnk_lvl}"/>
+            <connection name="Pen 2" expression="{[HMI_Sphere]P3.Ultrafiltration_UFFT_Tank_tnk_lvl}"/>
+        </connections>
+    </activeX>
+    <button name="Button1" height="42" width="74" left="90" top="7" visible="true" wallpaper="false" toolTipText="" exposeToVba="notExposed" isReferenceObject="false" style="line" bevelWidth="1" borderColor="#9B9B9B" cornerRadius="5" captureCursor="false" highlightOnFocus="true" tabIndex="2">
+        <command pressAction="Display HMI_Start_Stop" repeatAction="" releaseAction="" repeatRate="0.25"/>
+        <up patternColor="black" patternStyle="none" backColor="#E0E0E0" backStyle="solid" foreColor="#3F3F3F" endColor="white" gradientStop="50" gradientDirection="gradientDirectionHorizontal" gradientShadingStyle="gradientHorizontalFromRight">
+            <caption fontFamily="Arial Unicode MS" fontSize="10" bold="false" italic="false" underline="false" strikethrough="false" caption="Main"/>
+            <imageSettings imageReference="noImage"/>
+        </up>
+        <down downSameAsUp="true" patternColor="black" patternStyle="none" backColor="#E0E0E0" backStyle="solid" foreColor="black" endColor="white" gradientStop="50" gradientDirection="gradientDirectionHorizontal" gradientShadingStyle="gradientHorizontalFromRight">
+            <caption fontFamily="Arial Unicode MS" fontSize="10" bold="false" italic="false" underline="false" strikethrough="false" caption=""/>
+            <imageSettings imageReference="noImage"/>
+        </down>
+        <ability showDisabledState="false" expression="" enabledWhenExpressionIsTrue="true" disabledImageType="useGrayscale"/>
+        <confirm confirmAction="false" buttonSetting="okCancel" titleBar="true" titleBarText="Confirmation" windowPosition="Centered of screen">
+            <caption fontFamily="Arial Unicode MS" fontSize="10" bold="false" italic="false" underline="false" strikethrough="false" caption="Are you sure you want to perform this action?"/>
+            <imageSettings imageReference="noImage"/>
+        </confirm>
+        <eSignature requireElectronicSignature="false" allowBlankComment="false" requireReAuthentication="false" requireCounterSignature="false" authorizedGroup="" ShowConfirmationMessage="false" ConfirmationMessage="By completing this action, I certify that I have reviewed the changes that will be made to the system. I have approval and permission to perform this change."/>
+        <useVariable requireUseVariable="false" tagName="" confirmationValue="1" eSigValue1="2" eSigValue2="3">
+            <confirm buttonSetting="okCancel" titleBar="true" titleBarText="Confirmation" windowPosition="Centered of screen">
+                <caption fontFamily="Arial Unicode MS" fontSize="10" bold="false" italic="false" underline="false" strikethrough="false" caption="Are you sure you want to perform this action?"/>
+                <imageSettings imageReference="noImage"/>
+            </confirm>
+            <eSignature_1 allowBlankComment="false" requireReAuthentication="false" ShowConfirmationMessage="false" ConfirmationMessage="By completing this action, I certify that I have reviewed the changes that will be made to the system. I have approval and permission to perform this change."/>
+            <eSignature_2 allowBlankComment="false" authorizedGroup="Administrators" ShowConfirmationMessage="false" ConfirmationMessage="By completing this action, I certify that I have reviewed the changes that will be made to the system. I have approval and permission to perform this change."/>
+        </useVariable>
+    </button>
+    <vbaProject>
+        <vbaReferencesLink>
+            <!--All checked references on the references dialog box!-->
+            <vbaRefLink hash="b05f10e648a926ab0f491eb9734a7ad8" TypeLib_Name="VBA" Description="Visual Basic For Applications">
+                <!--The following VBA code is encoded.Please do not edit or import will fail.-->
+                <![CDATA[VAB5AHAAZQBMAGkAYgBfAE4AYQBtAGUAPQBWAEIAQQAsACAARABlAHMAYwByAGkAcAB0AGkAbwBu
+AD0AVgBpAHMAdQBhAGwAIABCAGEAcwBpAGMAIABGAG8AcgAgAEEAcABwAGwAaQBjAGEAdABpAG8A
+bgBzACwAIABHAFUASQBEAD0AewAwADAAMAAyADAANABFAEYALQAwADAAMAAwAC0AMAAwADAAMAAt
+AEMAMAAwADAALQAwADAAMAAwADAAMAAwADAAMAAwADQANgB9ACwAIABNAGEAagBvAHIAVgBlAHIA
+cwBpAG8AbgA9ADQALAAgAE0AaQBuAG8AcgBWAGUAcgBzAGkAbwBuAD0AMgAsACAA
+]]>
+            </vbaRefLink>
+            <vbaRefLink hash="9bf92fbe175229b5f0601c4bf4381b5f" TypeLib_Name="DisplayClient" Description="RSView Display Client Object Model">
+                <!--The following VBA code is encoded.Please do not edit or import will fail.-->
+                <![CDATA[VAB5AHAAZQBMAGkAYgBfAE4AYQBtAGUAPQBEAGkAcwBwAGwAYQB5AEMAbABpAGUAbgB0ACwAIABE
+AGUAcwBjAHIAaQBwAHQAaQBvAG4APQBSAFMAVgBpAGUAdwAgAEQAaQBzAHAAbABhAHkAIABDAGwA
+aQBlAG4AdAAgAE8AYgBqAGUAYwB0ACAATQBvAGQAZQBsACwAIABHAFUASQBEAD0AewA4ADUANAA2
+ADkAMwA0ADAALQBGADEAOAA5AC0AMQAxAEQAMQAtADkAQwAxADcALQAwADAANgAwADkANwA3AEMA
+QQBBAEYAMQB9ACwAIABNAGEAagBvAHIAVgBlAHIAcwBpAG8AbgA9ADEALAAgAE0AaQBuAG8AcgBW
+AGUAcgBzAGkAbwBuAD0AMAAsACAA
+]]>
+            </vbaRefLink>
+            <vbaRefLink hash="b0d387d1804d29964988314e5c534502" TypeLib_Name="stdole" Description="OLE Automation">
+                <!--The following VBA code is encoded.Please do not edit or import will fail.-->
+                <![CDATA[VAB5AHAAZQBMAGkAYgBfAE4AYQBtAGUAPQBzAHQAZABvAGwAZQAsACAARABlAHMAYwByAGkAcAB0
+AGkAbwBuAD0ATwBMAEUAIABBAHUAdABvAG0AYQB0AGkAbwBuACwAIABHAFUASQBEAD0AewAwADAA
+MAAyADAANAAzADAALQAwADAAMAAwAC0AMAAwADAAMAAtAEMAMAAwADAALQAwADAAMAAwADAAMAAw
+ADAAMAAwADQANgB9ACwAIABNAGEAagBvAHIAVgBlAHIAcwBpAG8AbgA9ADIALAAgAE0AaQBuAG8A
+cgBWAGUAcgBzAGkAbwBuAD0AMAAsACAA
+]]>
+            </vbaRefLink>
+        </vbaReferencesLink>
+        <vbaItem>
+            <!--Item Name:ThisDisplay, Item Type:HostProjectItem-->
+            <encryptedData hash="8d11e2ea90dfed5a96a34bbe51e8b9ff">
+                <!--The following VBA code is encoded.Please do not edit or import will fail.-->
+                <![CDATA[J05BTUU9VGhpc0Rpc3BsYXksVFlQRT0zDQpWRVJTSU9OIDEuMCBDTEFTUw0KQkVHSU4NCiAgTXVs
+dGlVc2UgPSAtMSAgJ1RydWUNCkVORA0KQXR0cmlidXRlIFZCX05hbWUgPSAiVGhpc0Rpc3BsYXki
+DQpBdHRyaWJ1dGUgVkJfR2xvYmFsTmFtZVNwYWNlID0gRmFsc2UNCkF0dHJpYnV0ZSBWQl9DcmVh
+dGFibGUgPSBGYWxzZQ0KQXR0cmlidXRlIFZCX1ByZWRlY2xhcmVkSWQgPSBUcnVlDQpBdHRyaWJ1
+dGUgVkJfRXhwb3NlZCA9IFRydWUNCg==]]>
+            </encryptedData>
+        </vbaItem>
+    </vbaProject>
+</gfx>

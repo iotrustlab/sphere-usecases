@@ -35,8 +35,8 @@ cd usecases/p1-onboarding/implementations/openplc
 #### Rockwell (SPHERE Testbed)
 ```bash
 cd usecases/p1-onboarding/implementations/rockwell
-# Controller: controller/Controller_PLC_V1.1.L5X
-# Simulator: simulator/Simulator_PLC_V1.1.L5X
+# Controller: controller/Controller_PLC.L5X
+# Simulator: simulator/Simulator_PLC.L5X
 ```
 
 ## Structure

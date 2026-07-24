@@ -3,7 +3,7 @@
   Import-Export
   Version   := RSLogix 5000 v37.00
   Owner     := , 
-  Exported  := Fri Jun 19 12:30:36 2026
+  Exported  := Thu Jul  2 13:55:09 2026
 
   Note:  File encoded in UTF-8.  Only edit file in a program 
          which supports UTF-8 (like Notepad, not Wordpad).
@@ -481,20 +481,22 @@ CONTROLLER Simulation_PLC (ProcessorType := "1756-L72",
 
 	TAG
 		Alarms : RW_tank_AL_UDT  := [0];
-		Ao_MA : INT (RADIX := Decimal) := 20;
-		AO_MA_1 : REAL (RADIX := Float) := 1.06191044e+001;
+		CurrentScanTime_ms : DINT (RADIX := Decimal) := 0;
 		Cycle_Time_drain : FBD_TIMER  := [3,7,1000,449,0,0,1142400,1536,981668463,0,449,7];
 		Cycle_Time_fill : FBD_TIMER  := [3,7,1000,253,0,0,1142204,1536,981668463,0,253,7];
-		dLvl_mm : REAL (RADIX := Float) := 1.87500000e+001;
-		drain_fill_rate : REAL (RADIX := Float) := 7.16195583e+000;
+		dt : REAL (RADIX := Float) := 0.00000000e+000;
 		False : BOOL (RADIX := Decimal,
 		            Constant := Yes) := 0;
 		FLOW_LPM_OPEN : REAL (RADIX := Float,
 		            Constant := Yes) := 3.60000000e+002;
 		GSV_Message : SYS_MESSAGES  := [0,0.00000000e+000,0,0.00000000e+000];
 		HMI : HMI_UDT  := [0];
+		InFlow : REAL (RADIX := Float) := 0.00000000e+000;
+		In_Flow_P3 : REAL (RADIX := Float) := 0.00000000e+000;
 		L_PER_MM : REAL (RADIX := Float,
 		            Constant := Yes) := 2.29999995e+000;
+		Out_flow : REAL (RADIX := Float) := 0.00000000e+000;
+		Out_Flow_P3 : REAL (RADIX := Float) := 0.00000000e+000;
 		P1 : P1_UDT  := [250,0.00000000e+000,0,0.00000000e+000,0];
 		P1_SYS : System_State_UDT  := [0,[2#0,2#0,2#0,2#0,2#0,2#0,2#0,2#0,2#0,2#0,2#0,2#0,2#0,2#0,2#0,2#0,2#0,2#0,2#0,2#0,2#0,2#0,2#0,2#0,2#0,2#0,2#0
 				,2#0,2#0,2#0,2#0,2#0],0];
@@ -502,6 +504,8 @@ CONTROLLER Simulation_PLC (ProcessorType := "1756-L72",
 		P3 : P3_UDT  := [100,0];
 		RST_ACTIVE : BOOL (RADIX := Decimal) := 0;
 		Rst_Sim : BOOL (RADIX := Decimal) := 0;
+		SimP3TankLevel : REAL (RADIX := Float) := 0.00000000e+000;
+		SimTankLevel : REAL (RADIX := Float) := 0.00000000e+000;
 		SIMValue : REAL (RADIX := Float) := 0.00000000e+000;
 		SIMValue_2 : REAL (RADIX := Float) := 0.00000000e+000;
 		simvalue_32 : REAL (RADIX := Float) := 0.00000000e+000;
@@ -521,15 +525,15 @@ CONTROLLER Simulation_PLC (ProcessorType := "1756-L72",
 		END_TAG
 
 		ST_ROUTINE INIT 
-			'SIMValue := 200;
-			'SIMValue_2 := 100;
-			'Local:7:O.Ch0Data := (SIMValue / 1200.0) * 20.0;
-			'Local:7:O.Ch2Data := (SIMValue_2 / 1200.0) * 20.0;
+			'SimTankLevel := 200;
+			'SimP3TankLevel := 100;
+			'Local:7:O.Ch0Data := (SimTankLevel / 1200.0) * 20.0;
+			'Local:7:O.Ch2Data := (SimP3TankLevel / 1000.0) * 20.0;
 		END_ST_ROUTINE
 
 		ROUTINE Main 
-				N: XIC(Rst_Sim)OTE(RST_ACTIVE);
-				N: XIC(Start_Sim)OTE(Start_ACTIVE);
+				N: XIC(Rst_Sim)OTL(RST_ACTIVE);
+				N: XIC(Start_Sim)OTL(Start_ACTIVE);
 				N: XIC(S:FS)JSR(INIT,0);
 				N: JSR(Timer,0);
 				N: JSR(WaterTankValues,0);
@@ -547,53 +551,75 @@ CONTROLLER Simulation_PLC (ProcessorType := "1756-L72",
 		ST_ROUTINE Timer 
 			'//start the timers
 			'
-			'if(Start_ACTIVE)then
+			'if(Start_Sim and Not Rst_Sim)then
+			'	Start_Sim := False;
+			'	RST_ACTIVE := False;
+			'end_if;
+			'
+			'if(Rst_Sim and NOT Start_Sim)then
 			'	Rst_Sim := False;
-			'
-			'	TONR(Cycle_Time_fill);
-			'	Cycle_Time_fill.PRE := 1000;
-			'	Cycle_Time_fill.TimerEnable:= NOT Cycle_Time_fill.DN;
+			'	Start_ACTIVE := False;
 			'	
-			'	TONR(Cycle_Time_drain);
-			'	Cycle_Time_drain.PRE := 1000;
-			'	Cycle_Time_drain.TimerEnable:= NOT Cycle_Time_drain.DN;
-			'	
+			'	SimTankLevel := 200;
+			'	SimP3TankLevel := 100;
+			'	Local:7:O.Ch0Data := (SimTankLevel / 1200.0) * 20.0;
+			'	Local:7:O.Ch2Data := (SimP3TankLevel / 1200.0) * 20.0;
 			'end_if;
 			'
-			'if(RST_ACTIVE)then
-			'	Rst_Sim := True;
+			'if(Start_ACTIVE)then
+			'		TONR(Cycle_Time_fill);
+			'		Cycle_Time_fill.PRE := 1000;
+			'		Cycle_Time_fill.TimerEnable:= NOT Cycle_Time_fill.DN;
 			'	
-			'	SIMValue := 200;
-			'	SIMValue_2 := 100;
-			'	Local:7:O.Ch0Data := (SIMValue / 1200.0) * 20.0;
-			'	Local:7:O.Ch2Data := (SIMValue_2 / 1200.0) * 20.0;
+			'		TONR(Cycle_Time_drain);
+			'		Cycle_Time_drain.PRE := 1000;
+			'		Cycle_Time_drain.TimerEnable:= NOT Cycle_Time_drain.DN;
 			'end_if;
-			'
 		END_ST_ROUTINE
 
 		ST_ROUTINE WaterTankValues 
 			'P1.RW_Tank_PR_Valve_sts := Local:5:I.Data.0;
 			'P1.RW_Pump_start := Local:5:I.Data.1;
 			'P3.Ultrafiltration_UFFT_Tank_Valve := Local:5:I.Data.2;
+			'P1_SYS.SHUTDOWN := Local:5:I.Data.3;
 			'
-			'if(Cycle_Time_fill.DN and P1.RW_Tank_PR_Valve_sts)then
-			'		SIMValue := SIMValue + 50;
-			'		Local:7:O.Ch0Data := (SIMValue / 1200.0) * 20.0;
+			'InFlow   := 0.0;
+			'In_Flow_P3 := 0.0;
+			'Out_flow := 0.0;
+			'Out_Flow_P3 := 0.0;
+			'
+			'GSV(TASK, MainTask, LastScanTime, CurrentScanTime_ms);
+			'dt := CurrentScanTime_ms / 1000.0;
+			'
+			'if(Cycle_Time_fill.DN and P1.RW_Tank_PR_Valve_sts and NOT P1_SYS.SHUTDOWN)then
+			'		InFlow := 30;
+			'		SimTankLevel := SimTankLevel + (InFlow - Out_flow) * dt;
+			'		Local:7:O.Ch0Data := (SimTankLevel / 1200.0) * 20.0;
+			'		
 			'end_if;
 			'
-			'if(Cycle_Time_drain.DN and NOT P1.RW_Tank_PR_Valve_sts and P1.RW_Pump_start)then
-			'
-			'		SIMValue := SIMValue - 10;
-			'		SIMValue_2 := SIMValue_2 + 50;
-			'		Local:7:O.Ch0Data := (SIMValue / 1200.0) * 20.0;
-			'		Local:7:O.Ch2Data := (SIMValue_2 / 1200.0) * 20.0;
+			'if(Cycle_Time_drain.DN and NOT P1.RW_Tank_PR_Valve_sts and P1.RW_Pump_start and NOT P1_SYS.SHUTDOWN)then
+			'		In_Flow_P3 := 40.0;
+			'		
+			'		Out_flow := 10.0 * SQRT(SimTankLevel / 1200.0);
+			'		Out_Flow_P3 := 10 * SQRT(SimTankLevel / 1000.0);
+			'		
+			'		//P1 tank level
+			'		SimTankLevel := SimTankLevel + (InFlow - Out_flow) * dt;
+			'		Local:7:O.Ch0Data := (SimTankLevel / 1200.0) * 20.0;
+			'		//P3 tank level
+			'		SimP3TankLevel := SimP3TankLevel + (In_Flow_P3 - Out_Flow_P3) * dt;
+			'		Local:7:O.Ch2Data := (SimP3TankLevel / 1000.0) * 20.0;
 			'
 			'end_if;
 			'
-			'if(Cycle_Time_drain.DN and P3.Ultrafiltration_UFFT_Tank_Valve)then
-			'	SIMValue_2 := SIMValue_2 - 100;
-			'	Local:7:O.Ch2Data := (SIMValue_2 / 1200.0) * 20.0;
+			'//simple linear draining over a set amount of time if the tank is full
+			'if(Cycle_Time_drain.DN and P3.Ultrafiltration_UFFT_Tank_Valve and NOT P1_SYS.SHUTDOWN)then
+			'	SimP3TankLevel := SimP3TankLevel - 50;
+			'	Local:7:O.Ch2Data := (SimP3TankLevel / 1000.0) * 20.0;
 			'end_if;
+			'
+			'
 		END_ST_ROUTINE
 
 		CHILD_PROGRAMS
