@@ -13,11 +13,13 @@ This demo provides a minimal, working example for:
 
 ```
 p1-onboarding/
+├── docs/
+│   └── hmi-setup.md             # Studio 5000 + FactoryTalk setup walkthrough
 ├── implementations/
 │   ├── rockwell/
 │   │   ├── controller/          # Controller PLC (L5X/L5K)
 │   │   ├── simulator/           # Simulator PLC (L5X/L5K)
-│   │   ├── hmi/                 # HMI project files
+│   │   ├── hmi/                 # HMI display exports + batch manifest
 │   │   ├── tests/               # Hardware signal tests
 │   │   ├── rockwell_map.yaml    # CIP path mappings
 │   │   └── hw_test_config.yaml  # Test configuration
@@ -38,13 +40,15 @@ p1-onboarding/
 1. Open Studio 5000 Logix Designer
 2. Import `implementations/rockwell/controller/Controller_PLC.L5X`
 3. Import `implementations/rockwell/simulator/Simulator_PLC.L5X`
-4. Download both projects to the PLCs
-5. In FactoryTalk View SE Studio, import the HMI displays
-   `implementations/rockwell/hmi/Graph.xml` and
-   `implementations/rockwell/hmi/HMI_Start_Stop.xml`
-   (`BatchImport_PLC_V2.xml` is the batch-import manifest for both), then
-   connect the display tags to the controller project — see **HMI Operation** below
-6. Run the displays and start the demo
+4. Download both projects to the PLCs and put them in Run mode
+5. In FactoryTalk View SE, create the device shortcuts `HMI_Sphere` (→ controller)
+   and `HMI_Simulator` (→ simulator), then import the displays from
+   `implementations/rockwell/hmi/`
+6. Run the Main Display, press `Start_Sim`, then `Start_Cont`
+
+**Starting from scratch?** [`docs/hmi-setup.md`](docs/hmi-setup.md) is the full
+step-by-step: Studio 5000 import, shortcut configuration, display import, the
+complete tag reference, and troubleshooting.
 
 ### OpenPLC (Virtual)
 
@@ -98,8 +102,10 @@ Repeat
 ## HMI Operation
 
 The HMI is provided as two FactoryTalk View SE display exports (`Graph.xml`,
-`HMI_Start_Stop.xml`) under `implementations/rockwell/hmi/`. After importing and
-connecting the display tags to the controller project:
+`HMI_Start_Stop.xml`) under `implementations/rockwell/hmi/`. The displays bind
+through two device shortcuts — `HMI_Sphere` (controller) and `HMI_Simulator`
+(simulator) — which must be named exactly that; see
+[`docs/hmi-setup.md`](docs/hmi-setup.md). Once imported and connected:
 
 | Button | Action |
 |--------|--------|
